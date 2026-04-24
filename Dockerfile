@@ -40,8 +40,8 @@ EXPOSE 3000
 # Set up data directory for SQLite persistence
 RUN mkdir -p /app/data
 
-# Install prisma and dotenv for runtime db push
-RUN npm install prisma@7.8.0 dotenv
+# Install prisma, dotenv, tsx, and bcrypt for runtime db push and seed
+RUN npm install prisma@7.8.0 dotenv tsx bcrypt @prisma/adapter-better-sqlite3 better-sqlite3
 
 # Start command
-CMD npx prisma db push && node server.js
+CMD npx prisma db push && npx tsx prisma/seed.ts && node server.js
