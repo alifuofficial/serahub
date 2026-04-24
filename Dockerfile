@@ -38,5 +38,8 @@ EXPOSE 3000
 # Set up data directory for SQLite persistence
 RUN mkdir -p /app/data
 
+# Install prisma globally to run db push at runtime
+RUN npm install -g prisma@7.8.0
+
 # Start command
-CMD npx prisma db push && node server.js
+CMD prisma db push && node server.js
