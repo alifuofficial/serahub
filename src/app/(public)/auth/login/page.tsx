@@ -89,11 +89,6 @@ export default function LoginPage() {
             <p className="text-slate-500 mt-2">Welcome back! Enter your credentials to continue.</p>
           </div>
 
-          <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-            <p className="font-semibold mb-0.5">Demo Admin Account</p>
-            <p>Email: <code className="bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">admin@serahub.com</code></p>
-            <p>Password: <code className="bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">admin123</code></p>
-          </div>
 
           {error && (
             <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
