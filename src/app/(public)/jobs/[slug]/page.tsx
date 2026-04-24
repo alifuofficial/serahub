@@ -20,16 +20,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   
   if (!job) return { title: "Not Found" };
   
-  const desc = getPlainText(job.description).substring(0, 160);
+  const desc = job.metaDescription || getPlainText(job.description).substring(0, 160);
+  const keywords = job.keywords ? job.keywords.split(", ") : [job.title, job.category?.name, "jobs", "careers", "Ethiopia", "opportunities"].filter(Boolean) as string[];
   
   return {
     title: job.title,
-    description: desc || `Apply for ${job.title} on SeraHub. ${job.source ? `Source: ${job.source}.` : ""}`,
-    keywords: [job.title, job.category?.name, "jobs", "careers", "Ethiopia", "opportunities"].filter(Boolean) as string[],
+    description: desc,
+    keywords: keywords,
     alternates: { canonical: `/jobs/${job.slug}` },
     openGraph: {
       title: job.title,
-      description: desc || `Apply for ${job.title} on SeraHub.`,
+      description: desc,
       url: `/jobs/${job.slug}`,
       type: "article",
       publishedTime: job.createdAt.toISOString(),
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: job.title,
-      description: desc || `Apply for ${job.title} on SeraHub.`,
+      description: desc,
     },
   };
 }

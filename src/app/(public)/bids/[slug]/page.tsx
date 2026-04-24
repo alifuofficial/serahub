@@ -20,16 +20,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   
   if (!bid) return { title: "Not Found" };
   
-  const desc = getPlainText(bid.description).substring(0, 160);
+  const desc = bid.metaDescription || getPlainText(bid.description).substring(0, 160);
+  const keywords = bid.keywords ? bid.keywords.split(", ") : [bid.title, bid.category?.name, "bids", "tenders", "procurement", "Ethiopia"].filter(Boolean) as string[];
   
   return {
     title: bid.title,
-    description: desc || `Find details for ${bid.title} on SeraHub. ${bid.source ? `Source: ${bid.source}.` : ""}`,
-    keywords: [bid.title, bid.category?.name, "bids", "tenders", "procurement", "Ethiopia"].filter(Boolean) as string[],
+    description: desc,
+    keywords: keywords,
     alternates: { canonical: `/bids/${bid.slug}` },
     openGraph: {
       title: bid.title,
-      description: desc || `Find details for ${bid.title} on SeraHub.`,
+      description: desc,
       url: `/bids/${bid.slug}`,
       type: "article",
       publishedTime: bid.createdAt.toISOString(),
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: bid.title,
-      description: desc || `Find details for ${bid.title} on SeraHub.`,
+      description: desc,
     },
   };
 }

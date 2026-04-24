@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { getAISuggestions } from "@/lib/ai";
 
 function slugify(text: string): string {
   return text
@@ -17,10 +18,34 @@ export async function createJobAction(formData: FormData) {
   const applyLink = (formData.get("applyLink") as string || "").trim() || null;
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const status = (formData.get("status") as string || "PUBLISHED");
-  const categoryId = (formData.get("categoryId") as string || "").trim() || null;
+  let categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
     return { error: "Title is required." };
+  }
+
+  // AI Suggestions
+  const suggestions = await getAISuggestions(title, description);
+  let keywords: string | null = null;
+  let metaDescription: string | null = null;
+
+  if (suggestions) {
+    keywords = suggestions.keywords.join(", ");
+    metaDescription = suggestions.metaDescription;
+
+    // Auto-create category if missing and AI suggested one
+    if (!categoryId && suggestions.categoryName) {
+      const catSlug = suggestions.categoryName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const category = await prisma.category.upsert({
+        where: { slug: catSlug },
+        update: {},
+        create: {
+          name: suggestions.categoryName,
+          slug: catSlug
+        }
+      });
+      categoryId = category.id;
+    }
   }
 
   let slug = slugify(title);
@@ -39,6 +64,8 @@ export async function createJobAction(formData: FormData) {
       deadline: deadline ? new Date(deadline) : null,
       status,
       categoryId,
+      keywords,
+      metaDescription,
     },
   });
 
@@ -107,10 +134,34 @@ export async function createBidAction(formData: FormData) {
   const applyLink = (formData.get("applyLink") as string || "").trim() || null;
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const status = (formData.get("status") as string || "PUBLISHED");
-  const categoryId = (formData.get("categoryId") as string || "").trim() || null;
+  let categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
     return { error: "Title is required." };
+  }
+
+  // AI Suggestions
+  const suggestions = await getAISuggestions(title, description);
+  let keywords: string | null = null;
+  let metaDescription: string | null = null;
+
+  if (suggestions) {
+    keywords = suggestions.keywords.join(", ");
+    metaDescription = suggestions.metaDescription;
+
+    // Auto-create category if missing and AI suggested one
+    if (!categoryId && suggestions.categoryName) {
+      const catSlug = suggestions.categoryName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const category = await prisma.category.upsert({
+        where: { slug: catSlug },
+        update: {},
+        create: {
+          name: suggestions.categoryName,
+          slug: catSlug
+        }
+      });
+      categoryId = category.id;
+    }
   }
 
   let slug = slugify(title);
@@ -129,6 +180,8 @@ export async function createBidAction(formData: FormData) {
       deadline: deadline ? new Date(deadline) : null,
       status,
       categoryId,
+      keywords,
+      metaDescription,
     },
   });
 
