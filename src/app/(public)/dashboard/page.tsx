@@ -46,10 +46,22 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  // Convert dates to strings for client component
+  // Convert dates and handle nulls for client component
   const formattedBookmarks = bookmarks.map((b) => ({
-    ...b,
+    id: b.id,
     createdAt: b.createdAt.toISOString(),
+    job: b.job ? {
+      title: b.job.title,
+      slug: b.job.slug,
+      source: b.job.source || "Direct",
+      category: b.job.category ? { name: b.job.category.name } : undefined
+    } : null,
+    bid: b.bid ? {
+      title: b.bid.title,
+      slug: b.bid.slug,
+      source: b.bid.source || "Direct",
+      category: b.bid.category ? { name: b.bid.category.name } : undefined
+    } : null,
   }));
 
   return <DashboardClient user={user} bookmarks={formattedBookmarks} />;
