@@ -31,6 +31,8 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /app/package.json ./package.json
 
 # Expose port
 EXPOSE 3000
@@ -38,8 +40,8 @@ EXPOSE 3000
 # Set up data directory for SQLite persistence
 RUN mkdir -p /app/data
 
-# Install prisma globally to run db push at runtime
-RUN npm install -g prisma@7.8.0
+# Install prisma and dotenv for runtime db push
+RUN npm install prisma@7.8.0 dotenv
 
 # Start command
 CMD prisma db push && node server.js
