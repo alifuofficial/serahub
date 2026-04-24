@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --primary: #00c087;
+  --primary-hover: #00a071;
+  --primary-light: #e6fbf4;
+  --secondary: #f8fafc;
+  --secondary-foreground: #475569;
+  --card: #ffffff;
+  --card-border: #f1f5f9;
+  --card-foreground: #0f172a;
+  --font-sans: var(--font-jakarta);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+  --color-card-foreground: var(--card-foreground);
+  --font-sans: var(--font-jakarta);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  @apply antialiased selection:bg-primary/20 selection:text-primary min-h-screen relative;
+  background-image: radial-gradient(circle at 50% 0%, rgba(0, 192, 135, 0.04), transparent 50%);
+}
+
+.card {
+  @apply bg-card border border-[#e2e8f0] rounded-2xl shadow-sm transition-all duration-300;
+}
+
+.card:hover {
+  @apply shadow-lg border-[#cbd5e1] -translate-y-1;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center px-6 py-2.5 font-semibold text-white bg-primary hover:bg-primary-hover transition-all duration-200 rounded-full cursor-pointer shadow-sm shadow-primary/25 hover:shadow-md hover:shadow-primary/30;
+}
+
+.btn-secondary {
+  @apply bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-6 py-2.5 rounded-full font-semibold transition-all duration-200 inline-flex items-center justify-center cursor-pointer hover:border-slate-300 hover:shadow-sm;
+}
+
+.input-field {
+  @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-full text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all;
+}
+
+.pill-tag {
+  @apply bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5;
+}
+
+.pill-tag-primary {
+  @apply bg-[#e6fbf4] text-primary px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5;
+}
+
+.pill-tag-yellow {
+  @apply bg-yellow-50 text-yellow-600 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 6s ease-in-out 2s infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out both;
+}
+
+.glass {
+  @apply bg-white/80 backdrop-blur-xl border border-white/50;
+}
+
+.glass-dark {
+  @apply bg-slate-900/80 backdrop-blur-xl border border-slate-700/50;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, var(--primary) 0%, #00e5a0 50%, var(--primary) 100%);
+  background-size: 200% auto;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.hover-lift {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+}
+
+.hero-mesh {
+  background-image:
+    radial-gradient(at 20% 80%, rgba(0, 192, 135, 0.08) 0%, transparent 50%),
+    radial-gradient(at 80% 20%, rgba(0, 192, 135, 0.06) 0%, transparent 50%),
+    radial-gradient(at 40% 40%, rgba(0, 229, 160, 0.04) 0%, transparent 60%);
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(0, 192, 135, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 192, 135, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.codex-editor__redactor {
+  padding-bottom: 40px !important;
+}
+
+.ce-block__content,
+.ce-toolbar__content {
+  max-width: none !important;
+}
+
+.ce-toolbar--opened {
+  z-index: 99 !important;
+}
+
+.ce-popups {
+  z-index: 100 !important;
+}
+
+.ce-block {
+  margin-bottom: 0;
+}
+
+.ce-block:last-child {
+  margin-bottom: 0;
+}
+
+.editorjs-wrapper .ce-toolbar__plus,
+.editorjs-wrapper .ce-toolbar__settings-btn {
+  color: #94a3b8;
+}
+
+.editorjs-wrapper .ce-toolbar__plus:hover,
+.editorjs-wrapper .ce-toolbar__settings-btn:hover {
+  color: #00c087;
+}
+
+.editorjs-wrapper .cdx-block {
+  padding: 4px 0;
+}
+
+.editorjs-wrapper .ce-header {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.editorjs-wrapper .ce-header[data-level="1"] {
+  font-size: 1.75rem;
+}
+
+.editorjs-wrapper .ce-header[data-level="2"] {
+  font-size: 1.35rem;
+}
+
+.editorjs-wrapper .ce-header[data-level="3"] {
+  font-size: 1.125rem;
+}
+
+.editorjs-wrapper .cdx-list__item {
+  padding: 4px 0;
+}
+
+.editorjs-wrapper .cdx-quote {
+  border-left: 4px solid #00c087;
+  padding-left: 16px;
+  background: rgba(0, 192, 135, 0.05);
+  border-radius: 0 8px 8px 0;
+}
+
+.editorjs-wrapper .tc-wrap {
+  margin: 0;
+}
