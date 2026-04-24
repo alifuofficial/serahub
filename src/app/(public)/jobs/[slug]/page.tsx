@@ -190,8 +190,13 @@ export default async function JobDetailPage({ params }: Params) {
                 <BookmarkButton id={job.id} type="JOB" initialIsBookmarked={isBookmarked} showText={true} />
                 {session ? (
                   job.applyLink ? (
-                    <a href={job.applyLink} target="_blank" rel="noopener noreferrer" className="w-full btn-primary font-bold text-sm py-3.5 justify-center text-center">
-                      Apply for Job
+                    <a 
+                      href={job.applyLink.includes("@") && !job.applyLink.startsWith("mailto:") ? `mailto:${job.applyLink}` : job.applyLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="w-full btn-primary font-bold text-sm py-3.5 justify-center text-center"
+                    >
+                      {job.applyLink.includes("@") ? "Apply via Email" : "Apply for Job"}
                     </a>
                   ) : (
                     <span className="w-full inline-flex items-center justify-center gap-2 text-slate-400 font-bold text-sm py-3.5 rounded-full border border-slate-200">

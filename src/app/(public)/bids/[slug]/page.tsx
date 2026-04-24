@@ -206,8 +206,13 @@ export default async function BidDetailPage({ params }: Params) {
                 <BookmarkButton id={bid.id} type="BID" initialIsBookmarked={isBookmarked} showText={true} />
                 {session ? (
                   bid.applyLink ? (
-                    <a href={bid.applyLink} target="_blank" rel="noopener noreferrer" className="w-full btn-primary font-bold text-sm py-3.5 justify-center text-center">
-                      Apply Now
+                    <a 
+                      href={bid.applyLink.includes("@") && !bid.applyLink.startsWith("mailto:") ? `mailto:${bid.applyLink}` : bid.applyLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="w-full btn-primary font-bold text-sm py-3.5 justify-center text-center"
+                    >
+                      {bid.applyLink.includes("@") ? "Apply via Email" : "Apply Now"}
                     </a>
                   ) : (
                     <span className="w-full inline-flex items-center justify-center gap-2 text-slate-400 font-bold text-sm py-3.5 rounded-full border border-slate-200">
