@@ -11,16 +11,21 @@ function slugify(text: string): string {
 }
 
 export async function createCategoryAction(formData: FormData) {
-  const name = (formData.get("name") as string || "").trim();
-  if (!name) return { error: "Name is required." };
+  try {
+    const name = (formData.get("name") as string || "").trim();
+    if (!name) return { error: "Name is required." };
 
-  const slug = slugify(name);
-  const existing = await prisma.category.findUnique({ where: { slug } });
-  if (existing) return { error: "Category already exists." };
+    const slug = slugify(name);
+    const existing = await prisma.category.findUnique({ where: { slug } });
+    if (existing) return { error: "Category already exists." };
 
-  await prisma.category.create({ data: { name, slug } });
-  revalidatePath("/admin/categories");
-  return { success: true };
+    await prisma.category.create({ data: { name, slug } });
+    revalidatePath("/admin/categories");
+    return { success: true };
+  } catch (error) {
+    console.error("Create category error:", error);
+    return { error: "Failed to create category. Please try again." };
+  }
 }
 
 export async function deleteCategoryAction(formData: FormData) {

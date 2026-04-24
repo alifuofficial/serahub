@@ -42,15 +42,22 @@ export default function CategoriesClient({ user, categories }: Props) {
     e.preventDefault();
     if (!newName.trim()) return;
     setError(null);
-    const fd = new FormData();
-    fd.set("name", newName);
-    const result = await createCategoryAction(fd);
-    if (result?.error) {
-      setError(result.error);
-    } else {
-      setNewName("");
-      router.refresh();
-    }
+    
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("name", newName);
+      try {
+        const result = await createCategoryAction(fd);
+        if (result?.error) {
+          setError(result.error);
+        } else {
+          setNewName("");
+          router.refresh();
+        }
+      } catch (err) {
+        setError("An unexpected error occurred.");
+      }
+    });
   };
 
   const handleDelete = (id: string) => {
