@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Job } from "@prisma/client";
 import BookmarkButton from "@/components/common/BookmarkButton";
+import { getPlainText } from "@/components/editor/Renderer";
 
 interface JobCardProps {
   job: Pick<Job, "id" | "title" | "slug" | "description" | "source" | "deadline" | "createdAt">;
@@ -28,7 +29,7 @@ export default function JobCard({ job, isBookmarked = false }: JobCardProps) {
       </h3>
       
       <p className="text-slate-500 text-sm line-clamp-2 mb-5 flex-grow font-normal leading-relaxed">
-        {job.description}
+        {getPlainText(job.description)}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-6">

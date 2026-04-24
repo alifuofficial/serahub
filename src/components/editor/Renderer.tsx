@@ -15,6 +15,8 @@ function extractText(data: unknown): string {
   if (Array.isArray(data)) return data.map(extractText).join(" ");
   if (typeof data === "object" && data !== null) {
     const obj = data as Record<string, unknown>;
+    // Handle Editor.js list item object format { content: "...", items: [] }
+    if (obj.content && typeof obj.content === "string") return obj.content;
     if (obj.text && typeof obj.text === "string") return obj.text;
     return Object.values(obj).map(extractText).join(" ");
   }
@@ -91,12 +93,17 @@ export default function EditorJSRenderer({ content }: { content: string }) {
           case "paragraph":
             return <p key={i} dangerouslySetInnerHTML={{ __html: (d.text as string) || "" }} />;
           case "list": {
-            const items = (d.items as string[]) || [];
+            const items = (d.items as (string | { content: string })[]) || [];
             const style = (d.style as string) || "unordered";
+            const renderItem = (item: string | { content: string }) => {
+              const html = typeof item === "string" ? item : item.content;
+              return html;
+            };
+
             if (style === "ordered") {
-              return <ol key={i}>{items.map((item, j) => <li key={j} dangerouslySetInnerHTML={{ __html: item }} />)}</ol>;
+              return <ol key={i}>{items.map((item, j) => <li key={j} dangerouslySetInnerHTML={{ __html: renderItem(item) }} />)}</ol>;
             }
-            return <ul key={i}>{items.map((item, j) => <li key={j} dangerouslySetInnerHTML={{ __html: item }} />)}</ul>;
+            return <ul key={i}>{items.map((item, j) => <li key={j} dangerouslySetInnerHTML={{ __html: renderItem(item) }} />)}</ul>;
           }
           case "quote": {
             const text = (d.text as string) || "";

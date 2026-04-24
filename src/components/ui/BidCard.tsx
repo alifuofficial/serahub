@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Bid } from "@prisma/client";
 import BookmarkButton from "@/components/common/BookmarkButton";
+import { getPlainText } from "@/components/editor/Renderer";
 
 interface BidCardProps {
   bid: Pick<Bid, "id" | "title" | "slug" | "description" | "source" | "deadline" | "createdAt">;
@@ -28,7 +29,7 @@ export default function BidCard({ bid, isBookmarked = false }: BidCardProps) {
       </h3>
       
       <p className="text-slate-500 text-sm line-clamp-2 mb-5 flex-grow font-normal leading-relaxed">
-        {bid.description}
+        {getPlainText(bid.description)}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-6">
