@@ -44,4 +44,4 @@ RUN mkdir -p /app/data
 RUN npm install prisma@7.8.0 dotenv
 
 # Start command
-CMD prisma db push && node server.js
+CMD npx prisma db push && node server.js
