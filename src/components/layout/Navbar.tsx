@@ -27,11 +27,7 @@ export default function Navbar({ user, siteName, logoUrl }: NavbarProps) {
     <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          {logoUrl ? (
-            <Image src={logoUrl} alt={name} width={32} height={32} className="w-8 h-8 rounded-md object-contain" />
-          ) : (
-            <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white font-bold text-xl">{name.charAt(0)}</div>
-          )}
+          <Image src={logoUrl || "/logo.png"} alt={name} width={32} height={32} className="w-8 h-8 rounded-lg object-contain" />
           <span className="font-bold text-xl tracking-tight text-slate-800">{name}</span>
         </Link>
 

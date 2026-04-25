@@ -15,11 +15,7 @@ export default function Footer({ siteName, logoUrl }: FooterProps) {
         <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-8">
           <div className="max-w-xs">
             <div className="flex items-center gap-2 mb-3">
-              {logoUrl ? (
-                <Image src={logoUrl} alt={name} width={28} height={28} className="w-7 h-7 rounded-md object-contain" />
-              ) : (
-                <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white text-xs font-bold">{name.charAt(0)}</div>
-              )}
+              <Image src={logoUrl || "/logo.png"} alt={name} width={28} height={28} className="w-7 h-7 rounded-lg object-contain" />
               <span className="font-bold text-slate-800 text-lg">{name}</span>
             </div>
             <p className="text-sm text-slate-500 leading-relaxed">Discover the latest jobs, bids, and tender opportunities. Connecting professionals with career-defining roles.</p>
