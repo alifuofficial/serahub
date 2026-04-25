@@ -19,20 +19,10 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-const CATEGORIES = [
-  "All",
-  "Blockchain",
-  "Cloud Computing",
-  "Content Writing",
-  "Cybersecurity",
-  "Data Science",
-  "DevOps",
-  "Machine Learning"
-];
 export default async function Home() {
   const session = await getSession();
 
-  const [latestJobs, latestBids, userBookmarks, latest2Jobs, latest1Bid, partners] = await Promise.all([
+  const [latestJobs, latestBids, userBookmarks, latest2Jobs, latest1Bid, partners, dbCategories] = await Promise.all([
     prisma.job.findMany({
       where: { status: "PUBLISHED" },
       orderBy: { createdAt: "desc" },
@@ -57,12 +47,17 @@ export default async function Home() {
       orderBy: { createdAt: "desc" },
       take: 1,
     }),
-    // @ts-ignore
-    prisma.partner?.findMany?.({
+    prisma.partner.findMany({
       where: { active: true },
       orderBy: { order: "asc" },
-    }) || Promise.resolve([]),
+    }),
+    prisma.category.findMany({
+      orderBy: { name: "asc" },
+      take: 7
+    })
   ]);
+
+  const CATEGORIES = ["All", ...dbCategories.map(c => c.name)];
 
   const heroItems = [
     ...latest2Jobs.map(j => ({ ...j, type: "JOB" })),

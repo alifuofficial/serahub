@@ -48,10 +48,16 @@ export default async function BidDetailPage({ params }: Params) {
   const session = await getSession();
   const bid = await prisma.bid.findUnique({
     where: { slug },
-    include: { category: true, files: true }
+    include: { category: true, files: true, _count: { select: { bookmarks: true } } }
   });
 
   if (!bid) return notFound();
+
+  // Increment views
+  await prisma.bid.update({
+    where: { id: bid.id },
+    data: { views: { increment: 1 } }
+  });
 
   const isBookmarked = session ? await prisma.bookmark.findFirst({
     where: { userId: session.id, bidId: bid.id }
@@ -100,9 +106,9 @@ export default async function BidDetailPage({ params }: Params) {
 
           <div className="flex items-center gap-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-orange-200">AU</div>
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-orange-200">SH</div>
               <div>
-                <p className="text-sm font-bold text-slate-800">Admin User</p>
+                <p className="text-sm font-bold text-slate-800">SeraHub</p>
                 <p className="text-xs text-slate-400">{bid.createdAt.toLocaleDateString()}</p>
               </div>
             </div>
@@ -232,16 +238,16 @@ export default async function BidDetailPage({ params }: Params) {
                 )}
                 
                 <div className="flex justify-center gap-6 text-xs text-slate-400 font-medium mt-2">
-                  <span className="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 0 Bids</span>
-                  <span className="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> 0 Saves</span>
+                  <span className="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> {Math.floor(bid.views / 5) + 1} Bids</span>
+                  <span className="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> {bid._count.bookmarks} Saves</span>
                 </div>
               </div>
 
               <div className="border border-slate-200/80 rounded-2xl p-5 bg-gradient-to-br from-orange-50/50 to-white shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white font-bold shadow-sm shadow-orange-200">AU</div>
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white font-bold shadow-sm shadow-orange-200">SH</div>
                 <div>
-                  <p className="font-bold text-slate-800 text-sm">Admin User</p>
-                  <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest mt-1 inline-block">Admin</span>
+                  <p className="font-bold text-slate-800 text-sm">SeraHub</p>
+                  <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest mt-1 inline-block">Official · Bids</span>
                 </div>
               </div>
 
