@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getPlainText } from "@/components/editor/Renderer";
 
 export async function getAIConfig() {
   const configs = await prisma.siteConfig.findMany({
@@ -23,45 +24,72 @@ export interface AISuggestions {
   keywords: string[];
   metaDescription: string;
   suggestedTitle: string;
+  grammarNotes?: string;
+  warnings?: string[];
 }
 
-export async function getAISuggestions(title: string, description: string): Promise<AISuggestions | null> {
+export async function getAISuggestions(title: string, rawDescription: string): Promise<AISuggestions | null> {
   const config = await getAIConfig();
-  if (!config.enabled || !config.geminiKey) return null;
+  if (!config.enabled || !config.geminiKey) {
+    console.log("[AI] Skipped — AI not enabled or API key missing.");
+    return null;
+  }
+
+  // Extract readable text from Editor.js JSON blob
+  let description = rawDescription;
+  try {
+    description = getPlainText(rawDescription);
+  } catch {
+    // If it's already plain text, use as-is
+  }
+
+  if (!description || description.trim().length < 10) {
+    console.log("[AI] Skipped — description too short for AI processing.");
+    return null;
+  }
 
   try {
     const genAI = new GoogleGenerativeAI(config.geminiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
-      You are an expert SEO and content categorizer for a job and bid aggregation platform called SeraHub.
-      Analyze the following job/bid posting:
-      
-      TITLE: ${title}
-      DESCRIPTION: ${description.substring(0, 2000)}
-      
-      Provide your response in strictly valid JSON format with the following keys:
-      - categoryName: A single professional category name (e.g., "Software Development", "Accounting", "Construction", "Health Care"). Be concise but specific.
-      - keywords: An array of 5-8 relevant SEO keywords.
-      - metaDescription: A compelling SEO meta description (max 160 chars).
-      - suggestedTitle: A clean, optimized title for the posting.
-      
-      Response:
-    `;
+You are an expert SEO content optimizer and categorizer for "SeraHub", an Ethiopian job and bid aggregation platform.
+
+Analyze the following job/bid posting and return a JSON response only (no markdown, no code blocks):
+
+TITLE: ${title}
+DESCRIPTION: ${description.substring(0, 3000)}
+
+Return ONLY a valid JSON object with these exact keys:
+{
+  "categoryName": "A professional category name (e.g. Software Development, Accounting, Construction, Healthcare, Education, Finance, Marketing, Engineering, Legal, NGO & Development, Government, Procurement, IT & Technology). Pick the most relevant one or create a concise new one.",
+  "keywords": ["5 to 8 relevant SEO keywords as strings"],
+  "metaDescription": "A compelling meta description under 160 characters",
+  "suggestedTitle": "A clean, professional, SEO-optimized version of the title (keep it close to the original)",
+  "grammarNotes": "One brief note about grammar/professionalism improvements, or empty string if none needed",
+  "warnings": ["Any important warnings like missing contact info, past deadline, etc. Array of strings, can be empty."]
+}
+`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
-    
-    // Clean JSON from potential markdown blocks
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]) as AISuggestions;
+    const text = response.text().trim();
+
+    // Robustly extract JSON — strip markdown code blocks if present
+    let jsonText = text;
+    const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (fenceMatch) {
+      jsonText = fenceMatch[1].trim();
+    } else {
+      const objMatch = text.match(/\{[\s\S]*\}/);
+      if (objMatch) jsonText = objMatch[0];
     }
-    
-    return null;
+
+    const parsed = JSON.parse(jsonText) as AISuggestions;
+    console.log("[AI] Suggestions generated:", JSON.stringify(parsed, null, 2));
+    return parsed;
   } catch (error) {
-    console.error("Gemini AI Error:", error);
+    console.error("[AI] Gemini Error:", error);
     return null;
   }
 }

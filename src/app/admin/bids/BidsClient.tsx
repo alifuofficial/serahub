@@ -69,6 +69,15 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
   const [formKey, setFormKey] = useState(0);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [aiResult, setAiResult] = useState<null | {
+    categoryName?: string;
+    keywords?: string[];
+    metaDescription?: string;
+    suggestedTitle?: string;
+    grammarNotes?: string;
+    warnings?: string[];
+  }>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const getFormData = useCallback(() => {
@@ -147,13 +156,19 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
 
   const handleSubmit = async (formData: FormData) => {
     setError(null);
+    setAiResult(null);
+    setIsSubmitting(true);
     const action = editingBid ? updateBidAction : createBidAction;
     if (editingBid) formData.set("id", editingBid.id);
     formData.set("description", descriptionData);
     const result = await action(formData);
+    setIsSubmitting(false);
     if (result?.error) {
       setError(result.error);
     } else {
+      if (!editingBid && result?.ai) {
+        setAiResult(result.ai);
+      }
       setShowForm(false);
       setEditingBid(null);
       setDescriptionData("");
@@ -288,9 +303,9 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                         <input name="deadline" type="date" defaultValue={editingBid?.deadline?.split("T")[0] ?? ""} key={`deadline-${editingBid?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Category</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Category <span className="text-[10px] font-normal text-primary">AI will auto-assign</span></label>
                         <select name="categoryId" defaultValue={editingBid?.categoryId ?? ""} key={`cat-${editingBid?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                          <option value="">None</option>
+                          <option value="">None (AI will suggest)</option>
                           {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                       </div>
@@ -335,12 +350,69 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                         <p className="text-sm text-slate-500">File attachments can be added after creating the bid.</p>
                       </div>
                     )}
+                    {isSubmitting && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50 border border-violet-200">
+                        <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                        <span className="text-xs font-semibold text-violet-700">✨ AI is analyzing your post for SEO, categorization, and grammar...</span>
+                      </div>
+                    )}
                     <div className="flex justify-end gap-3 pt-2">
-                      <button type="button" onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); }} className="btn-secondary text-sm">Cancel</button>
+                      <button type="button" onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); setAiResult(null); }} className="btn-secondary text-sm">Cancel</button>
                       <button type="button" onClick={() => saveDraft()} disabled={isAutoSaving} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50">{isAutoSaving ? "Saving..." : "Save Draft"}</button>
-                      <button type="submit" disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Publishing..." : editingBid ? "Update Bid" : "Publish Bid"}</button>
+                      <button type="submit" disabled={isPending || isSubmitting} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingBid ? "Update Bid" : "Publish Bid"}</button>
                     </div>
                   </form>
+                </div>
+              </div>
+            )}
+
+            {aiResult && (
+              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setAiResult(null)}>
+                <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+                  <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                      </div>
+                      <h2 className="text-lg font-bold text-slate-900">AI Enhancements Applied</h2>
+                    </div>
+                    <button onClick={() => setAiResult(null)} className="p-1 text-slate-400 hover:text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                    </button>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    {aiResult.categoryName && (
+                      <div className="flex items-start gap-3">
+                        <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Auto-Categorized</p><p className="text-sm font-bold text-slate-800">{aiResult.categoryName}</p></div>
+                      </div>
+                    )}
+                    {aiResult.metaDescription && (
+                      <div className="flex items-start gap-3">
+                        <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-blue-600"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">SEO Meta Description</p><p className="text-sm text-slate-700">{aiResult.metaDescription}</p></div>
+                      </div>
+                    )}
+                    {aiResult.keywords && aiResult.keywords.length > 0 && (
+                      <div className="flex items-start gap-3">
+                        <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-amber-600"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">SEO Keywords</p><div className="flex flex-wrap gap-1.5 mt-1">{aiResult.keywords.map(k => <span key={k} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-xs font-medium">{k}</span>)}</div></div>
+                      </div>
+                    )}
+                    {aiResult.grammarNotes && (
+                      <div className="flex items-start gap-3">
+                        <span className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-violet-600"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg></span>
+                        <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Grammar Note</p><p className="text-sm text-slate-700">{aiResult.grammarNotes}</p></div>
+                      </div>
+                    )}
+                    {aiResult.warnings && aiResult.warnings.length > 0 && (
+                      <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Warnings</p>
+                        {aiResult.warnings.map((w, i) => <p key={i} className="text-xs text-amber-700 flex items-start gap-1.5"><span className="mt-0.5">⚠️</span>{w}</p>)}
+                      </div>
+                    )}
+                    <button onClick={() => setAiResult(null)} className="w-full btn-primary text-sm mt-2">Got it!</button>
+                  </div>
                 </div>
               </div>
             )}

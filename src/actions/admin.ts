@@ -25,27 +25,34 @@ export async function createJobAction(formData: FormData) {
   }
 
   // AI Suggestions
-  const suggestions = await getAISuggestions(title, description);
+  let suggestions = null;
   let keywords: string | null = null;
   let metaDescription: string | null = null;
 
-  if (suggestions) {
-    keywords = suggestions.keywords.join(", ");
-    metaDescription = suggestions.metaDescription;
+  try {
+    suggestions = await getAISuggestions(title, description);
 
-    // Auto-create category if missing and AI suggested one
-    if (!categoryId && suggestions.categoryName) {
-      const catSlug = suggestions.categoryName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      const category = await prisma.category.upsert({
-        where: { slug: catSlug },
-        update: {},
-        create: {
-          name: suggestions.categoryName,
-          slug: catSlug
-        }
-      });
-      categoryId = category.id;
+    if (suggestions) {
+      keywords = suggestions.keywords.join(", ");
+      metaDescription = suggestions.metaDescription;
+
+      // Auto-categorize: upsert AI-suggested category if no category was manually selected
+      if (!categoryId && suggestions.categoryName) {
+        const catSlug = slugify(suggestions.categoryName);
+        const category = await prisma.category.upsert({
+          where: { slug: catSlug },
+          update: {},
+          create: {
+            name: suggestions.categoryName,
+            slug: catSlug,
+          }
+        });
+        categoryId = category.id;
+      }
     }
+  } catch (aiError) {
+    console.error("[AI] Non-fatal error during job creation:", aiError);
+    // AI failure does NOT block job creation
   }
 
   let slug = slugify(title);
@@ -71,7 +78,18 @@ export async function createJobAction(formData: FormData) {
 
   revalidatePath("/admin/jobs");
   revalidatePath("/jobs/[slug]");
-  return { success: true };
+  revalidatePath("/");
+  return {
+    success: true,
+    ai: suggestions ? {
+      categoryName: suggestions.categoryName,
+      keywords: suggestions.keywords,
+      metaDescription: suggestions.metaDescription,
+      suggestedTitle: suggestions.suggestedTitle,
+      grammarNotes: suggestions.grammarNotes,
+      warnings: suggestions.warnings,
+    } : null
+  };
 }
 
 export async function updateJobAction(formData: FormData) {
@@ -141,27 +159,34 @@ export async function createBidAction(formData: FormData) {
   }
 
   // AI Suggestions
-  const suggestions = await getAISuggestions(title, description);
+  let suggestions = null;
   let keywords: string | null = null;
   let metaDescription: string | null = null;
 
-  if (suggestions) {
-    keywords = suggestions.keywords.join(", ");
-    metaDescription = suggestions.metaDescription;
+  try {
+    suggestions = await getAISuggestions(title, description);
 
-    // Auto-create category if missing and AI suggested one
-    if (!categoryId && suggestions.categoryName) {
-      const catSlug = suggestions.categoryName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      const category = await prisma.category.upsert({
-        where: { slug: catSlug },
-        update: {},
-        create: {
-          name: suggestions.categoryName,
-          slug: catSlug
-        }
-      });
-      categoryId = category.id;
+    if (suggestions) {
+      keywords = suggestions.keywords.join(", ");
+      metaDescription = suggestions.metaDescription;
+
+      // Auto-categorize: upsert AI-suggested category if no category was manually selected
+      if (!categoryId && suggestions.categoryName) {
+        const catSlug = slugify(suggestions.categoryName);
+        const category = await prisma.category.upsert({
+          where: { slug: catSlug },
+          update: {},
+          create: {
+            name: suggestions.categoryName,
+            slug: catSlug,
+          }
+        });
+        categoryId = category.id;
+      }
     }
+  } catch (aiError) {
+    console.error("[AI] Non-fatal error during bid creation:", aiError);
+    // AI failure does NOT block bid creation
   }
 
   let slug = slugify(title);
@@ -187,7 +212,18 @@ export async function createBidAction(formData: FormData) {
 
   revalidatePath("/admin/bids");
   revalidatePath("/bids/[slug]");
-  return { success: true };
+  revalidatePath("/");
+  return {
+    success: true,
+    ai: suggestions ? {
+      categoryName: suggestions.categoryName,
+      keywords: suggestions.keywords,
+      metaDescription: suggestions.metaDescription,
+      suggestedTitle: suggestions.suggestedTitle,
+      grammarNotes: suggestions.grammarNotes,
+      warnings: suggestions.warnings,
+    } : null
+  };
 }
 
 export async function updateBidAction(formData: FormData) {
