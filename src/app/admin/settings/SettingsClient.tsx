@@ -187,7 +187,40 @@ export default function SettingsClient({ user, users, config }: Props) {
                         <FormRow label="Meta Keywords" hint="Comma-separated keywords for search engines"><input type="text" value={form.site_keywords} onChange={(e) => update("site_keywords", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="jobs, bids, tenders, Ethiopia, opportunities" /></FormRow>
                         <FormRow label="OG Title" hint="Title shown when sharing on social media"><input type="text" value={form.seo_og_title} onChange={(e) => update("seo_og_title", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="SeraHub | Job & Bid Aggregator" /></FormRow>
                         <FormRow label="OG Description" hint="Description shown when sharing on social media"><textarea value={form.seo_og_description} onChange={(e) => update("seo_og_description", e.target.value)} rows={2} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" placeholder="Discover the latest jobs, bids, and tender opportunities." /></FormRow>
-                        <FormRow label="OG Image URL" hint="Image shown when sharing on social media (1200x630 recommended)"><input type="url" value={form.seo_og_image} onChange={(e) => update("seo_og_image", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://serahub.com/og-image.png" /></FormRow>
+                        <FormRow label="OG Image" hint="Image shown when sharing on social media (1200×630px recommended). Upload or paste a URL.">
+                          <div className="space-y-3">
+                            {form.seo_og_image && (
+                              <div className="relative w-full aspect-[1200/630] max-h-40 rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+                                <img src={form.seo_og_image} alt="OG Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                              </div>
+                            )}
+                            <div className="flex gap-2">
+                              <input type="url" value={form.seo_og_image} onChange={(e) => update("seo_og_image", e.target.value)} className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://serahub.com/og-image.png" />
+                              <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-slate-300 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors text-sm font-medium text-slate-500 hover:text-primary whitespace-nowrap" id="og-image-upload-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                                Upload
+                                <input type="file" className="hidden" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  const label = document.getElementById("og-image-upload-label");
+                                  if (label) label.textContent = "Uploading...";
+                                  try {
+                                    const fd = new FormData();
+                                    fd.append("file", file);
+                                    const res = await fetch("/api/upload", { method: "POST", body: fd });
+                                    const data = await res.json();
+                                    if (res.ok && data.url) {
+                                      update("seo_og_image", data.url);
+                                    }
+                                  } finally {
+                                    e.target.value = "";
+                                    if (label) { label.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Upload`; }
+                                  }
+                                }} />
+                              </label>
+                            </div>
+                          </div>
+                        </FormRow>
                         <FormRow label="Google Site Verification" hint="Meta tag content for Google Search Console verification"><input type="text" value={form.seo_google_verification} onChange={(e) => update("seo_google_verification", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="e.g. abc123def456" /></FormRow>
                         <FormRow label="Google Analytics Tracking ID" hint="Your Google Analytics measurement ID (e.g. G-XXXXXXXXXX). Leave empty to disable analytics tracking."><input type="text" value={form.seo_google_analytics} onChange={(e) => update("seo_google_analytics", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="G-XXXXXXXXXX" /></FormRow>
                       </div>

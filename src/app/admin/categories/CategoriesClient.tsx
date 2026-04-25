@@ -35,29 +35,31 @@ export default function CategoriesClient({ user, categories }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim()) return;
+    const trimmed = newName.trim();
+    if (!trimmed) return;
     setError(null);
-    
-    startTransition(async () => {
+    setIsCreating(true);
+    try {
       const fd = new FormData();
-      fd.set("name", newName);
-      try {
-        const result = await createCategoryAction(fd);
-        if (result?.error) {
-          setError(result.error);
-        } else {
-          setNewName("");
-          router.refresh();
-        }
-      } catch (err) {
-        setError("An unexpected error occurred.");
+      fd.set("name", trimmed);
+      const result = await createCategoryAction(fd);
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        setNewName("");
+        router.refresh();
       }
-    });
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -136,8 +138,12 @@ export default function CategoriesClient({ user, categories }: Props) {
             <div className="bg-white rounded-2xl border border-slate-200/60 p-6 mb-6">
               <h2 className="text-base font-bold text-slate-900 mb-4">Add Category</h2>
               <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-3">
-                <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Category name" className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                <button type="submit" disabled={isPending} className="btn-primary text-sm disabled:opacity-50">Add Category</button>
+                <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Category name (e.g. Healthcare, Engineering)" className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                <button type="submit" disabled={isCreating || !newName.trim()} className="btn-primary text-sm disabled:opacity-50 min-w-[130px]">
+                  {isCreating ? (
+                    <span className="flex items-center gap-2"><svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Adding...</span>
+                  ) : "Add Category"}
+                </button>
               </form>
               {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             </div>
