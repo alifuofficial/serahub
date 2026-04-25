@@ -45,19 +45,25 @@ export default function CategoriesClient({ user, categories }: Props) {
     if (!trimmed) return;
     setError(null);
     setIsCreating(true);
+
     try {
       const fd = new FormData();
       fd.set("name", trimmed);
       const result = await createCategoryAction(fd);
+      
       if (result?.error) {
         setError(result.error);
+        setIsCreating(false);
       } else {
         setNewName("");
-        router.refresh();
+        startTransition(() => {
+          router.refresh();
+          setIsCreating(false);
+        });
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("An unexpected error occurred. Please try again.");
-    } finally {
       setIsCreating(false);
     }
   };

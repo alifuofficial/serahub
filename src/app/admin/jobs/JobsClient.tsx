@@ -236,9 +236,15 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Company / Hiring Organization</label>
+                        <input name="company" defaultValue={(editingJob as any)?.company ?? ""} key={`company-${editingJob?.id ?? "new"}`} placeholder="e.g. Google, Safaricom" className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                      </div>
+                      <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">Source</label>
                         <input name="source" defaultValue={editingJob?.source ?? ""} key={`source-${editingJob?.id ?? "new"}`} placeholder="e.g. Remote, Global" className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                       </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">Apply Link</label>
                         <input name="applyLink" defaultValue={editingJob?.applyLink ?? ""} key={`apply-${editingJob?.id ?? "new"}`} placeholder="https://..." className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />

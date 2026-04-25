@@ -4,10 +4,12 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 function slugify(text: string): string {
-  return text
+  const slug = text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+  
+  return slug || `cat-${Date.now().toString(36)}`;
 }
 
 export async function createCategoryAction(formData: FormData) {
@@ -21,6 +23,9 @@ export async function createCategoryAction(formData: FormData) {
 
     await prisma.category.create({ data: { name, slug } });
     revalidatePath("/admin/categories");
+    revalidatePath("/jobs");
+    revalidatePath("/bids");
+    revalidatePath("/");
     return { success: true };
   } catch (error) {
     console.error("Create category error:", error);

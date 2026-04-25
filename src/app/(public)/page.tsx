@@ -132,7 +132,7 @@ export default async function Home() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-slate-800 text-sm truncate group-hover/hero:text-primary transition-colors">{item.title}</p>
-                          <p className="text-xs text-slate-400 mt-0.5">{item.source || "Direct"} · {item.type === "JOB" ? "Job" : "Bid"}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{(item as any).company || item.source || "SeraHub"} · {item.type === "JOB" ? "Job" : "Bid"}</p>
                         </div>
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
                           idx === 0 ? "pill-tag-primary" :

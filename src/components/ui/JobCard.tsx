@@ -4,7 +4,7 @@ import BookmarkButton from "@/components/common/BookmarkButton";
 import { getPlainText } from "@/components/editor/Renderer";
 
 interface JobCardProps {
-  job: Pick<Job, "id" | "title" | "slug" | "description" | "source" | "deadline" | "createdAt">;
+  job: Pick<Job, "id" | "title" | "slug" | "description" | "source" | "deadline" | "createdAt" | "company">;
   isBookmarked?: boolean;
 }
 
@@ -41,7 +41,7 @@ export default function JobCard({ job, isBookmarked = false }: JobCardProps) {
       <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
         <div className="flex items-center gap-2.5 text-xs font-semibold text-slate-700">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-white font-bold text-[10px] shadow-sm shadow-primary/20">SH</div>
-          SeraHub
+          {job.company || "SeraHub"}
         </div>
         
         <div className="flex items-center gap-3">

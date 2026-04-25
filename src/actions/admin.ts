@@ -5,10 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { getAISuggestions } from "@/lib/ai";
 
 function slugify(text: string): string {
-  return text
+  const slug = text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+  
+  return slug || `item-${Date.now().toString(36)}`;
 }
 
 export async function createJobAction(formData: FormData) {
@@ -18,6 +20,7 @@ export async function createJobAction(formData: FormData) {
   const applyLink = (formData.get("applyLink") as string || "").trim() || null;
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const status = (formData.get("status") as string || "PUBLISHED");
+  const company = (formData.get("company") as string || "").trim() || null;
   let categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
@@ -71,6 +74,7 @@ export async function createJobAction(formData: FormData) {
       deadline: deadline ? new Date(deadline) : null,
       status,
       categoryId,
+      company,
       keywords,
       metaDescription,
     },
@@ -100,6 +104,7 @@ export async function updateJobAction(formData: FormData) {
   const applyLink = (formData.get("applyLink") as string || "").trim() || null;
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const status = (formData.get("status") as string || "PUBLISHED");
+  const company = (formData.get("company") as string || "").trim() || null;
   const categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
@@ -129,6 +134,7 @@ export async function updateJobAction(formData: FormData) {
       deadline: deadline ? new Date(deadline) : null,
       status,
       categoryId,
+      company,
     },
   });
 
@@ -286,6 +292,7 @@ export async function saveJobDraftAction(formData: FormData) {
   const source = (formData.get("source") as string || "").trim() || null;
   const applyLink = (formData.get("applyLink") as string || "").trim() || null;
   const deadline = (formData.get("deadline") as string || "").trim() || null;
+  const company = (formData.get("company") as string || "").trim() || null;
   const categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
@@ -305,6 +312,7 @@ export async function saveJobDraftAction(formData: FormData) {
         deadline: deadline ? new Date(deadline) : null,
         status: "DRAFT",
         categoryId,
+        company,
       },
     });
     revalidatePath("/admin/jobs");
@@ -327,6 +335,7 @@ export async function saveJobDraftAction(formData: FormData) {
       deadline: deadline ? new Date(deadline) : null,
       status: "DRAFT",
       categoryId,
+      company,
     },
   });
 

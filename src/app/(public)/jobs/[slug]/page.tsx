@@ -71,7 +71,7 @@ export default async function JobDetailPage({ params }: Params) {
         description={getPlainText(job.description)}
         datePosted={job.createdAt.toISOString()}
         validThrough={job.deadline?.toISOString()}
-        hiringOrganization={job.source || undefined}
+        hiringOrganization={job.company || job.source || "SeraHub"}
       />
       <BreadcrumbJsonLd items={[
         { name: "Home", url: "https://serahub.com" },
@@ -116,7 +116,7 @@ export default async function JobDetailPage({ params }: Params) {
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-primary/20">SH</div>
               <div>
-                <p className="text-sm font-bold text-slate-800">SeraHub</p>
+                <p className="text-sm font-bold text-slate-800">{job.company || "SeraHub"}</p>
                 <p className="text-xs text-slate-400">{job.createdAt.toLocaleDateString()}</p>
               </div>
             </div>
@@ -230,7 +230,7 @@ export default async function JobDetailPage({ params }: Params) {
               <div className="border border-slate-200/80 rounded-2xl p-5 bg-gradient-to-br from-[#e6fbf4]/50 to-white shadow-sm flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-white font-bold shadow-sm shadow-primary/20">SH</div>
                 <div>
-                  <p className="font-bold text-slate-800 text-sm">SeraHub</p>
+                  <p className="font-bold text-slate-800 text-sm">{job.company || "SeraHub"}</p>
                   <span className="bg-[#e6fbf4] text-primary px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest mt-1 inline-block">Official · Jobs</span>
                 </div>
               </div>
