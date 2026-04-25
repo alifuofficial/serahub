@@ -110,8 +110,9 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
     if (result?.error) {
       setError(result.error);
     } else {
-      if (!editingJob && result?.ai) {
-        setAiResult(result.ai);
+      const res = result as any;
+      if (!editingJob && res?.ai) {
+        setAiResult(res.ai);
       }
       setShowForm(false);
       setEditingJob(null);

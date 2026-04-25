@@ -166,8 +166,9 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
     if (result?.error) {
       setError(result.error);
     } else {
-      if (!editingBid && result?.ai) {
-        setAiResult(result.ai);
+      const res = result as any;
+      if (!editingBid && res?.ai) {
+        setAiResult(res.ai);
       }
       setShowForm(false);
       setEditingBid(null);
