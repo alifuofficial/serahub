@@ -41,7 +41,7 @@ EXPOSE 3000
 RUN mkdir -p /app/data
 
 # Install prisma, dotenv, tsx, and bcrypt for runtime db push and seed
-RUN npm install prisma@7.8.0 dotenv tsx bcrypt @prisma/adapter-better-sqlite3 better-sqlite3
+RUN npm install prisma@7.8.0 dotenv tsx bcrypt @prisma/adapter-better-sqlite3 better-sqlite3 && npm cache clean --force
 
 # Start command
 CMD npx prisma db push && npx tsx prisma/seed.ts && node server.js
