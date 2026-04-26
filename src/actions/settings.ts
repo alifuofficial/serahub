@@ -53,3 +53,27 @@ export async function deleteDraftsAction() {
   revalidatePath("/admin/settings");
   return { success: true, deletedJobs: deletedJobs.count, deletedBids: deletedBids.count };
 }
+
+export async function testSmtpAction(email: string) {
+  if (!email) return { error: "Email is required for testing." };
+  try {
+    const { sendMail } = await import("@/lib/mail");
+    await sendMail({
+      to: email,
+      subject: "SeraHub - SMTP Test Connection",
+      text: "This is a test email to verify your SMTP configuration is working correctly.",
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #00c087;">SMTP Test Successful!</h2>
+          <p>Your SMTP configuration is working perfectly. You can now use this service for sending OTPs, newsletters, and system notifications.</p>
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #64748b;">This is an automated test message from your SeraHub Admin Panel.</p>
+        </div>
+      `
+    });
+    return { success: true };
+  } catch (error: any) {
+    console.error("SMTP Test Error:", error);
+    return { error: error.message || "Failed to connect to SMTP server. Check your host, port, and credentials." };
+  }
+}

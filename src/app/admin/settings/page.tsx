@@ -27,6 +27,8 @@ const SETTING_KEYS = [
   "smtp_secure",
   "ads_enabled",
   "ads_client_id",
+  "auth_email_verification",
+  "auth_forgot_password",
   "appearance_primary_color",
   "appearance_site_url",
   "appearance_logo_url",

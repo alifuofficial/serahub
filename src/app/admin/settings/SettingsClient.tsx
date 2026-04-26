@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { logoutAction } from "@/actions/auth";
-import { updateSettingsAction, resetViewsAction, deleteDraftsAction } from "@/actions/settings";
+import { updateSettingsAction, resetViewsAction, deleteDraftsAction, testSmtpAction } from "@/actions/settings";
 import ImageUpload from "@/components/common/ImageUpload";
 
 interface User {
@@ -71,6 +71,9 @@ export default function SettingsClient({ user, users, config }: Props) {
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmDrafts, setConfirmDrafts] = useState(false);
   const [dangerMsg, setDangerMsg] = useState("");
+  const [testEmail, setTestEmail] = useState(user.email);
+  const [testStatus, setTestStatus] = useState<{ type: "success" | "error" | "none", msg: string }>({ type: "none", msg: "" });
+  const [isTesting, setIsTesting] = useState(false);
 
   const [form, setForm] = useState(config);
 
@@ -170,6 +173,20 @@ export default function SettingsClient({ user, users, config }: Props) {
                           </div>
                           <Toggle checked={form.registration_enabled !== "false"} onChange={(v) => update("registration_enabled", v ? "true" : "false")} />
                         </div>
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-800">Email Verification (OTP)</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Require users to verify their email before logging in</p>
+                          </div>
+                          <Toggle checked={form.auth_email_verification === "true"} onChange={(v) => update("auth_email_verification", v ? "true" : "false")} />
+                        </div>
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-800">Forgot Password</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Allow users to reset their password via email</p>
+                          </div>
+                          <Toggle checked={form.auth_forgot_password === "true"} onChange={(v) => update("auth_forgot_password", v ? "true" : "false")} />
+                        </div>
                         <FormRow label="Site Name" hint="Displayed in the browser tab and header"><input type="text" value={form.site_name} onChange={(e) => update("site_name", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="SeraHub" /></FormRow>
                         <FormRow label="Site Description" hint="A short description used in search results and social sharing"><textarea value={form.site_description} onChange={(e) => update("site_description", e.target.value)} rows={3} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" placeholder="Discover the latest jobs, bids, and tender opportunities..." /></FormRow>
                       </div>
@@ -239,10 +256,10 @@ export default function SettingsClient({ user, users, config }: Props) {
                         <div><h2 className="text-lg font-bold text-slate-900">SMTP Configuration</h2><p className="text-sm text-slate-500">Configure email delivery for notifications and newsletters.</p></div>
                       </div>
                       <div className="space-y-5">
-                        <div className="flex items-center justify-between p-4 rounded-xl bg-amber-50 border border-amber-200/50">
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-[#e6fbf4] border border-primary/20">
                           <div>
-                            <p className="text-sm font-semibold text-amber-900">SMTP is for future use</p>
-                            <p className="text-xs text-amber-700 mt-0.5">Email sending will be available in a future update. Configure now to be ready.</p>
+                            <p className="text-sm font-semibold text-primary">SMTP is now active</p>
+                            <p className="text-xs text-secondary-foreground mt-0.5">Configured settings will be used for OTPs and notifications.</p>
                           </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -262,6 +279,46 @@ export default function SettingsClient({ user, users, config }: Props) {
                               <span className="text-sm text-slate-600">{form.smtp_secure === "true" ? "TLS enabled" : "No encryption"}</span>
                             </div>
                           </div>
+                        </div>
+
+                        <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 mt-4">
+                          <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                            Test Connection
+                          </h3>
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <input 
+                              type="email" 
+                              value={testEmail} 
+                              onChange={(e) => setTestEmail(e.target.value)} 
+                              className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" 
+                              placeholder="test@example.com" 
+                            />
+                            <button 
+                              onClick={() => {
+                                setIsTesting(true);
+                                setTestStatus({ type: "none", msg: "" });
+                                startTransition(async () => {
+                                  const res = await testSmtpAction(testEmail);
+                                  if (res.error) {
+                                    setTestStatus({ type: "error", msg: res.error });
+                                  } else {
+                                    setTestStatus({ type: "success", msg: "Test email sent successfully! Check your inbox." });
+                                  }
+                                  setIsTesting(false);
+                                });
+                              }} 
+                              disabled={isTesting || !testEmail}
+                              className="px-6 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-50 whitespace-nowrap"
+                            >
+                              {isTesting ? "Testing..." : "Send Test Email"}
+                            </button>
+                          </div>
+                          {testStatus.type !== "none" && (
+                            <p className={`mt-3 text-xs font-medium ${testStatus.type === "success" ? "text-primary" : "text-red-500"}`}>
+                              {testStatus.msg}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
