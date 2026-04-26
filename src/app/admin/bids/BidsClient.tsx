@@ -490,7 +490,9 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                         <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                         <span className="text-xs font-semibold text-violet-700">✨ AI is analyzing your post for SEO, categorization, and grammar...</span>
                       </div>
-                                 <div className="flex justify-end gap-3 pt-2">
+                    )}
+                    
+                    <div className="flex justify-end gap-3 pt-2">
                       <button type="button" onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); setHasAppliedReview(false); }} className="btn-secondary text-sm">Cancel</button>
                       <button type="button" onClick={() => saveDraft()} disabled={isAutoSaving} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50">{isAutoSaving ? "Saving..." : "Save Draft"}</button>
                       {!editingBid && !reviewResult && !hasAppliedReview && (
@@ -500,7 +502,7 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                       )}
                       <button type="submit" disabled={isPending || isSubmitting || (!editingBid && !reviewResult && !hasAppliedReview)} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingBid ? "Update Bid" : (reviewResult || hasAppliedReview) ? "Publish" : "Review required"}</button>
                     </div>
-       </div>
+                    </div>
                   </form>
                 </div>
               </div>
