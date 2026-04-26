@@ -21,6 +21,10 @@ export async function createJobAction(formData: FormData) {
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const status = (formData.get("status") as string || "PUBLISHED");
   const company = (formData.get("company") as string || "").trim() || null;
+  const locationType = (formData.get("locationType") as string || "").trim() || null;
+  const careerLevel = (formData.get("careerLevel") as string || "").trim() || null;
+  const employmentType = (formData.get("employmentType") as string || "").trim() || null;
+  const vacancyCount = (formData.get("vacancyCount") as string || "").trim() || null;
   let categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
@@ -75,6 +79,10 @@ export async function createJobAction(formData: FormData) {
       status,
       categoryId,
       company,
+      locationType,
+      careerLevel,
+      employmentType,
+      vacancyCount,
       keywords,
       metaDescription,
     },
@@ -105,6 +113,10 @@ export async function updateJobAction(formData: FormData) {
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const status = (formData.get("status") as string || "PUBLISHED");
   const company = (formData.get("company") as string || "").trim() || null;
+  const locationType = (formData.get("locationType") as string || "").trim() || null;
+  const careerLevel = (formData.get("careerLevel") as string || "").trim() || null;
+  const employmentType = (formData.get("employmentType") as string || "").trim() || null;
+  const vacancyCount = (formData.get("vacancyCount") as string || "").trim() || null;
   let categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
@@ -164,6 +176,10 @@ export async function updateJobAction(formData: FormData) {
       status,
       categoryId,
       company,
+      locationType,
+      careerLevel,
+      employmentType,
+      vacancyCount,
       keywords,
       metaDescription,
     },
@@ -395,6 +411,10 @@ export async function saveJobDraftAction(formData: FormData) {
   const applyLink = (formData.get("applyLink") as string || "").trim() || null;
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const company = (formData.get("company") as string || "").trim() || null;
+  const locationType = (formData.get("locationType") as string || "").trim() || null;
+  const careerLevel = (formData.get("careerLevel") as string || "").trim() || null;
+  const employmentType = (formData.get("employmentType") as string || "").trim() || null;
+  const vacancyCount = (formData.get("vacancyCount") as string || "").trim() || null;
   const categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
@@ -415,6 +435,10 @@ export async function saveJobDraftAction(formData: FormData) {
         status: "DRAFT",
         categoryId,
         company,
+        locationType,
+        careerLevel,
+        employmentType,
+        vacancyCount,
       },
     });
     revalidatePath("/admin/jobs");
@@ -438,6 +462,10 @@ export async function saveJobDraftAction(formData: FormData) {
       status: "DRAFT",
       categoryId,
       company,
+      locationType,
+      careerLevel,
+      employmentType,
+      vacancyCount,
     },
   });
 

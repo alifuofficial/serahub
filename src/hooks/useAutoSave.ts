@@ -7,9 +7,10 @@ interface AutoSaveOptions {
   interval?: number;
   getFormData: () => FormData;
   enabled?: boolean;
+  onSaveSuccess?: (id: string) => void;
 }
 
-export function useAutoSave({ onSave, interval = 15000, getFormData, enabled = true }: AutoSaveOptions) {
+export function useAutoSave({ onSave, interval = 15000, getFormData, enabled = true, onSaveSuccess }: AutoSaveOptions) {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [draftId, setDraftId] = useState<string | null>(null);
@@ -33,6 +34,7 @@ export function useAutoSave({ onSave, interval = 15000, getFormData, enabled = t
       if (result?.success && result.id) {
         setDraftId(result.id);
         draftIdRef.current = result.id;
+        if (onSaveSuccess) onSaveSuccess(result.id);
       }
       setLastSaved(new Date());
     } catch {

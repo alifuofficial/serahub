@@ -24,6 +24,12 @@ export interface AISuggestions {
 export interface AIReviewResult extends AISuggestions {
   fixedTitle: string;
   fixedDescriptionText: string;
+  company?: string;
+  locationType?: string;
+  careerLevel?: string;
+  employmentType?: string;
+  vacancyCount?: string;
+  deadline?: string;
 }
 
 export async function getAIConfig(): Promise<AIConfig> {
@@ -85,6 +91,12 @@ Return ONLY a valid JSON object with these exact keys:
 {
   "fixedTitle": "The title with grammar/spelling/capitalization fixed and made more professional. Keep it close to the original.",
   "fixedDescriptionText": "The description text with grammar, spelling, punctuation, and professionalism fixes applied. Keep the same meaning and structure.",
+  "company": "The hiring company name if found, otherwise empty string",
+  "locationType": "One of: Office, Remote, Hybrid. Based on description.",
+  "careerLevel": "A concise level (e.g. Junior, Senior, Manager, Internship, Entry level)",
+  "employmentType": "One of: Full time, Part time, Contract, Freelance, Internship",
+  "vacancyCount": "The number of positions available as a string (e.g. '1', '5+', 'Many'), or empty string if not mentioned",
+  "deadline": "The application deadline in YYYY-MM-DD format if found, otherwise empty string",
   "categoryName": "A professional category name (e.g. Software Development, Accounting, Construction, Healthcare, Education, Finance, Marketing, Engineering, Legal, NGO & Development, Government, Procurement, IT & Technology). Pick the most relevant one or create a concise new one.",
   "keywords": ["5 to 8 relevant SEO keywords as strings"],
   "metaDescription": "A compelling meta description under 160 characters",

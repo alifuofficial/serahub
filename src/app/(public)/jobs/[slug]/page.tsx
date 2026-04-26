@@ -139,18 +139,18 @@ export default async function JobDetailPage({ params }: Params) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
           <div className="lg:col-span-8">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
               <div className="group border border-slate-200/80 rounded-2xl p-5 bg-white hover:border-primary/20 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-[#e6fbf4] flex items-center justify-center text-primary flex-shrink-0 group-hover:bg-primary/10 transition-colors">
+                <div className="w-11 h-11 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 flex-shrink-0 group-hover:bg-teal-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Salary / Pay</p>
-                  <p className="font-bold text-slate-800 text-lg">Competitive</p>
+                  <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Salary</p>
+                  <p className="font-bold text-slate-800">Competitive</p>
                 </div>
               </div>
               <div className="group border border-slate-200/80 rounded-2xl p-5 bg-white hover:border-primary/20 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-[#e6fbf4] flex items-center justify-center text-primary flex-shrink-0 group-hover:bg-primary/10 transition-colors">
+                <div className="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0 group-hover:bg-amber-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
                 <div>
@@ -161,12 +161,39 @@ export default async function JobDetailPage({ params }: Params) {
                 </div>
               </div>
               <div className="group border border-slate-200/80 rounded-2xl p-5 bg-white hover:border-primary/20 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 flex items-start gap-4">
-                <div className="w-11 h-11 rounded-xl bg-[#e6fbf4] flex items-center justify-center text-primary flex-shrink-0 group-hover:bg-primary/10 transition-colors">
+                <div className="w-11 h-11 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 flex-shrink-0 group-hover:bg-sky-100 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Source</p>
-                  <p className="font-bold text-slate-800">{job.source || 'Varied Location'}</p>
+                  <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Location</p>
+                  <p className="font-bold text-slate-800">{job.locationType || job.source || 'Office'}</p>
+                </div>
+              </div>
+              <div className="group border border-slate-200/80 rounded-2xl p-5 bg-white hover:border-primary/20 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0 group-hover:bg-emerald-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Job Type</p>
+                  <p className="font-bold text-slate-800">{job.employmentType || 'Full-time'}</p>
+                </div>
+              </div>
+              <div className="group border border-slate-200/80 rounded-2xl p-5 bg-white hover:border-primary/20 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 flex-shrink-0 group-hover:bg-violet-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Level</p>
+                  <p className="font-bold text-slate-800">{job.careerLevel || 'Not Specified'}</p>
+                </div>
+              </div>
+              <div className="group border border-slate-200/80 rounded-2xl p-5 bg-white hover:border-primary/20 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 flex-shrink-0 group-hover:bg-rose-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Vacancies</p>
+                  <p className="font-bold text-slate-800">{job.vacancyCount || '1 Position'}</p>
                 </div>
               </div>
             </div>

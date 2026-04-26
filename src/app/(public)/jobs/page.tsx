@@ -32,6 +32,10 @@ export default async function JobsPage({ searchParams }: PageProps) {
               OR: [
                 { title: { contains: search } },
                 { source: { contains: search } },
+                { company: { contains: search } },
+                { locationType: { contains: search } },
+                { employmentType: { contains: search } },
+                { careerLevel: { contains: search } },
                 { description: { contains: search } },
               ],
             }

@@ -50,6 +50,10 @@ model Job {
   category    Category?  @relation(fields: [categoryId], references: [id])
   bookmarks   Bookmark[]
   company     String?
+  locationType String?    // Office, Remote, Hybrid
+  careerLevel  String?    // Junior, Senior, etc.
+  employmentType String?  // Full time, Part time, etc.
+  vacancyCount String?    // Number of people required
   keywords    String?
   metaDescription String?
   createdAt   DateTime   @default(now())

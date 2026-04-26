@@ -3,12 +3,23 @@
 import { useState } from "react";
 import Link from "next/link";
 import { registerAction } from "@/actions/auth";
+import SocialLogins from "@/components/auth/SocialLogins";
 
 interface RegisterClientProps {
   registrationDisabled?: boolean;
+  googleEnabled?: boolean;
+  facebookEnabled?: boolean;
+  googleClientId?: string;
+  facebookAppId?: string;
 }
 
-export default function RegisterClient({ registrationDisabled }: RegisterClientProps) {
+export default function RegisterClient({ 
+  registrationDisabled, 
+  googleEnabled, 
+  facebookEnabled,
+  googleClientId,
+  facebookAppId
+}: RegisterClientProps) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -160,6 +171,13 @@ export default function RegisterClient({ registrationDisabled }: RegisterClientP
                 <button type="submit" disabled={loading} className="btn-primary w-full py-3.5 text-base disabled:opacity-50 disabled:cursor-not-allowed">
                   {loading ? "Creating account..." : "Create Account"}
                 </button>
+
+                <SocialLogins 
+                  googleEnabled={googleEnabled} 
+                  facebookEnabled={facebookEnabled} 
+                  googleClientId={googleClientId}
+                  facebookAppId={facebookAppId}
+                />
               </form>
 
               <p className="mt-8 text-center text-sm text-slate-500">

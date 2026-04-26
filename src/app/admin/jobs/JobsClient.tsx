@@ -22,6 +22,11 @@ interface Job {
   views: number;
   categoryId: string | null;
   category: { name: string } | null;
+  company: string | null;
+  locationType: string | null;
+  careerLevel: string | null;
+  employmentType: string | null;
+  vacancyCount: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,6 +63,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [descriptionData, setDescriptionData] = useState("");
   const [formKey, setFormKey] = useState(0);
+  const [draftIdState, setDraftIdState] = useState<string | null>(null);
   const [aiResult, setAiResult] = useState<null | {
     categoryName?: string;
     keywords?: string[];
@@ -76,12 +82,19 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
     metaDescription?: string;
     grammarNotes?: string;
     warnings?: string[];
+    company?: string;
+    locationType?: string;
+    careerLevel?: string;
+    employmentType?: string;
+    vacancyCount?: string;
+    deadline?: string;
   }>(null);
   const router = useRouter();
 
   const getFormData = useCallback(() => {
     const fd = new FormData();
-    if (editingJob) fd.set("id", editingJob.id);
+    const id = editingJob?.id || draftIdState;
+    if (id) fd.set("id", id);
     const formEl = document.querySelector<HTMLFormElement>('#job-form');
     if (formEl) {
       const inputs = formEl.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input[name], select[name], textarea[name]');
@@ -90,12 +103,13 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
     fd.set("description", descriptionData);
     fd.set("status", editingJob?.status ?? "DRAFT");
     return fd;
-  }, [editingJob, descriptionData]);
+  }, [editingJob, descriptionData, draftIdState]);
 
-  const { lastSaved, isSaving: isAutoSaving, draftId, save: saveDraft } = useAutoSave({
+  const { lastSaved, isSaving: isAutoSaving, save: saveDraft } = useAutoSave({
     onSave: saveJobDraftAction,
     getFormData,
     enabled: showForm,
+    onSaveSuccess: (id) => setDraftIdState(id),
   });
 
   const handleDelete = (id: string) => {
@@ -155,6 +169,59 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
     } else if (result?.review) {
       setReviewResult(result.review);
     }
+  };
+
+  const applyAiReview = () => {
+    if (!reviewResult) return;
+    const formEl = document.querySelector<HTMLFormElement>('#job-form');
+    if (!formEl) return;
+
+    if (reviewResult.fixedTitle) {
+      const titleInput = formEl.querySelector<HTMLInputElement>('input[name="title"]');
+      if (titleInput) titleInput.value = reviewResult.fixedTitle;
+    }
+
+    if (reviewResult.company) {
+      const companyInput = formEl.querySelector<HTMLInputElement>('input[name="company"]');
+      if (companyInput) companyInput.value = reviewResult.company;
+    }
+
+    if (reviewResult.locationType) {
+      const locationInput = formEl.querySelector<HTMLSelectElement>('select[name="locationType"]');
+      if (locationInput) locationInput.value = reviewResult.locationType;
+    }
+
+    if (reviewResult.employmentType) {
+      const employmentInput = formEl.querySelector<HTMLSelectElement>('select[name="employmentType"]');
+      if (employmentInput) employmentInput.value = reviewResult.employmentType;
+    }
+
+    if (reviewResult.careerLevel) {
+      const careerInput = formEl.querySelector<HTMLInputElement>('input[name="careerLevel"]');
+      if (careerInput) careerInput.value = reviewResult.careerLevel;
+    }
+
+    if (reviewResult.vacancyCount) {
+      const vacancyInput = formEl.querySelector<HTMLInputElement>('input[name="vacancyCount"]');
+      if (vacancyInput) vacancyInput.value = reviewResult.vacancyCount;
+    }
+
+    if (reviewResult.deadline) {
+      const deadlineInput = formEl.querySelector<HTMLInputElement>('input[name="deadline"]');
+      if (deadlineInput) deadlineInput.value = reviewResult.deadline;
+    }
+
+    if (reviewResult.categoryName) {
+      // Find category by name
+      const cat = categories.find(c => c.name.toLowerCase() === reviewResult.categoryName?.toLowerCase());
+      if (cat) {
+        const catSelect = formEl.querySelector<HTMLSelectElement>('select[name="categoryId"]');
+        if (catSelect) catSelect.value = cat.id;
+      }
+    }
+
+    // Grammar note and warnings are handled in UI
+    setReviewResult(null); // Clear review after applying
   };
 
   return (
@@ -222,7 +289,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                 <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">Jobs</h1>
                 <p className="text-slate-500 mt-1">{jobs.length} total jobs</p>
               </div>
-              <button onClick={() => { setEditingJob(null); setDescriptionData(""); setFormKey((k) => k + 1); setShowForm(true); }} className="btn-primary text-sm">
+              <button onClick={() => { setEditingJob(null); setDraftIdState(null); setDescriptionData(""); setFormKey((k) => k + 1); setShowForm(true); }} className="btn-primary text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                 Add Job
               </button>
@@ -243,7 +310,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
             </form>
 
             {showForm && (
-              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setShowForm(false); setEditingJob(null); setDescriptionData(""); setAiResult(null); }}>
+              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setShowForm(false); setEditingJob(null); setDraftIdState(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); }}>
                 <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                   <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
@@ -251,7 +318,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                       {isAutoSaving && <p className="text-xs text-slate-400 mt-0.5">Saving draft...</p>}
                       {!isAutoSaving && lastSaved && <p className="text-xs text-emerald-500 mt-0.5">Draft saved {lastSaved.toLocaleTimeString()}</p>}
                     </div>
-                    <button onClick={() => { setShowForm(false); setEditingJob(null); setDescriptionData(""); setAiResult(null); }} className="p-1 text-slate-400 hover:text-slate-600">
+                    <button onClick={() => { setShowForm(false); setEditingJob(null); setDraftIdState(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); }} className="p-1 text-slate-400 hover:text-slate-600">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                     </button>
                   </div>
@@ -285,12 +352,42 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">Apply Link</label>
                         <input name="applyLink" defaultValue={editingJob?.applyLink ?? ""} key={`apply-${editingJob?.id ?? "new"}`} placeholder="https://..." className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                       </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Number of People Required</label>
+                        <input name="vacancyCount" defaultValue={editingJob?.vacancyCount ?? ""} key={`vacancy-${editingJob?.id ?? "new"}`} placeholder="e.g. 1, 5, Many" className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Location Type</label>
+                        <select name="locationType" defaultValue={editingJob?.locationType ?? "Office"} key={`loc-${editingJob?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                          <option value="Office">Office</option>
+                          <option value="Remote">Remote</option>
+                          <option value="Hybrid">Hybrid</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Employment Type</label>
+                        <select name="employmentType" defaultValue={editingJob?.employmentType ?? "Full time"} key={`emp-${editingJob?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                          <option value="Full time">Full time</option>
+                          <option value="Part time">Part time</option>
+                          <option value="Contract">Contract</option>
+                          <option value="Freelance">Freelance</option>
+                          <option value="Internship">Internship</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Career Level</label>
+                        <input name="careerLevel" defaultValue={editingJob?.careerLevel ?? ""} key={`career-${editingJob?.id ?? "new"}`} placeholder="e.g. Senior, Junior" className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                      </div>
                       <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">Deadline</label>
                         <input name="deadline" type="date" defaultValue={editingJob?.deadline?.split("T")[0] ?? ""} key={`deadline-${editingJob?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                       </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">Category <span className="text-[10px] font-normal text-primary">AI will auto-assign</span></label>
                         <select name="categoryId" defaultValue={editingJob?.categoryId ?? ""} key={`cat-${editingJob?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
@@ -298,13 +395,13 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                           {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Status</label>
-                      <select name="status" defaultValue={editingJob?.status ?? "PUBLISHED"} key={`status-${editingJob?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                        <option value="PUBLISHED">Published</option>
-                        <option value="DRAFT">Draft</option>
-                      </select>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Status</label>
+                        <select name="status" defaultValue={editingJob?.status ?? "PUBLISHED"} key={`status-${editingJob?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                          <option value="PUBLISHED">Published</option>
+                          <option value="DRAFT">Draft</option>
+                        </select>
+                      </div>
                     </div>
                     {isReviewing && (
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-teal-50 border border-teal-200">
@@ -334,12 +431,50 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                             <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{reviewResult.fixedDescriptionText}</p>
                           </div>
                         )}
+                        {reviewResult.company && (
+                          <div className="flex items-start gap-2">
+                            <span className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">🏢</span>
+                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Company</p><p className="text-sm font-semibold text-slate-800">{reviewResult.company}</p></div>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-2 gap-4">
+                          {reviewResult.deadline && (
+                            <div className="flex items-start gap-2">
+                              <span className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">📅</span>
+                              <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Deadline</p><p className="text-sm font-semibold text-slate-800">{reviewResult.deadline}</p></div>
+                            </div>
+                          )}
+                          {reviewResult.locationType && (
+                            <div className="flex items-start gap-2">
+                              <span className="w-6 h-6 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0 mt-0.5">📍</span>
+                              <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Location</p><p className="text-sm font-semibold text-slate-800">{reviewResult.locationType}</p></div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          {reviewResult.employmentType && (
+                            <div className="flex items-start gap-2">
+                              <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">💼</span>
+                              <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Type</p><p className="text-sm font-semibold text-slate-800">{reviewResult.employmentType}</p></div>
+                            </div>
+                          )}
+                          {reviewResult.careerLevel && (
+                            <div className="flex items-start gap-2">
+                              <span className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5">📈</span>
+                              <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Level</p><p className="text-sm font-semibold text-slate-800">{reviewResult.careerLevel}</p></div>
+                            </div>
+                          )}
+                        </div>
                         {reviewResult.categoryName && (
                           <div className="flex items-start gap-2">
                             <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg></span>
                             <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Category</p><p className="text-sm font-semibold text-slate-800">{reviewResult.categoryName}</p></div>
                           </div>
                         )}
+                        <button type="button" onClick={applyAiReview} className="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          Apply AI Suggestions
+                        </button>
                         {reviewResult.metaDescription && (
                           <div className="flex items-start gap-2">
                             <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-blue-600"><polyline points="20 6 9 17 4 12"/></svg></span>
@@ -376,7 +511,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                       </div>
                     )}
                     <div className="flex justify-end gap-3 pt-2">
-                      <button type="button" onClick={() => { setShowForm(false); setEditingJob(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); }} className="btn-secondary text-sm">Cancel</button>
+                      <button type="button" onClick={() => { setShowForm(false); setEditingJob(null); setDraftIdState(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); }} className="btn-secondary text-sm">Cancel</button>
                       <button type="button" onClick={() => saveDraft()} disabled={isAutoSaving} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50">{isAutoSaving ? "Saving..." : "Save Draft"}</button>
                       {!editingJob && !reviewResult && (
                         <button type="button" onClick={handleReview} disabled={isReviewing || isSubmitting} className="px-4 py-2 text-sm font-semibold text-teal-600 bg-teal-50 border border-teal-200 rounded-xl hover:bg-teal-100 transition-colors disabled:opacity-50">
@@ -476,7 +611,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                         <td className="px-6 py-4 hidden lg:table-cell text-sm text-slate-400">{new Date(job.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => { setEditingJob(job); setDescriptionData(job.description); setFormKey((k) => k + 1); setShowForm(true); }} className="p-2 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/5 transition-colors" title="Edit">
+                            <button onClick={() => { setEditingJob(job); setDraftIdState(null); setDescriptionData(job.description); setFormKey((k) => k + 1); setShowForm(true); }} className="p-2 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/5 transition-colors" title="Edit">
                               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                             </button>
                             <button onClick={() => handleDelete(job.id)} className="p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Delete">
