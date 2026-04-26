@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://serahub.com";
+  const siteUrlConfig = await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } });
+  const baseUrl = (siteUrlConfig?.value || process.env.NEXT_PUBLIC_SITE_URL || "https://serahub.com").replace(/\/$/, "");
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 },

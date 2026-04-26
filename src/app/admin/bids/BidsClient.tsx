@@ -340,7 +340,7 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                     </button>
                   </div>
-                   <form id="bid-form" action={handleSubmit} className="p-6 space-y-4">
+                   <form key={formKey} id="bid-form" action={handleSubmit} className="p-6 space-y-4">
                     {error && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium">{error}</div>}
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1.5">Title *</label>
@@ -491,6 +491,14 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                         <span className="text-xs font-semibold text-violet-700">✨ AI is analyzing your post for SEO, categorization, and grammar...</span>
                       </div>
                     )}
+                    {hasAppliedReview && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <span className="text-xs font-semibold text-emerald-700">AI suggestions applied! Your post is now optimized and ready to publish.</span>
+                      </div>
+                    )}
                     
                     <div className="flex justify-end gap-3 pt-2">
                       <button type="button" onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); setHasAppliedReview(false); }} className="btn-secondary text-sm">Cancel</button>
@@ -611,5 +619,6 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
         </main>
       </div>
     </div>
-  );
+  </div>
+);
 }

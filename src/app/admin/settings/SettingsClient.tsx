@@ -457,6 +457,16 @@ export default function SettingsClient({ user, config }: Props) {
                             <li><strong>Grammar Fix:</strong> Ensures job postings look professional and clean.</li>
                           </ul>
                         </div>
+                        <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                          <div><p className="text-sm font-semibold text-slate-800">Automatic Weekly Newsletter</p><p className="text-xs text-slate-500 mt-0.5">Automatically send a summary of new jobs to all subscribers every week</p></div>
+                          <Toggle checked={form.newsletter_auto_enabled === "true"} onChange={(v) => update("newsletter_auto_enabled", v ? "true" : "false")} />
+                        </div>
+                        
+                        {form.newsletter_auto_enabled === "true" && (
+                          <FormRow label="Newsletter Secret Token" hint="Used to secure the automated trigger. Keep this secret.">
+                            <input type="password" value={form.newsletter_cron_token} onChange={(e) => update("newsletter_cron_token", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" />
+                          </FormRow>
+                        )}
                       </div>
                     </div>
                     <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>
@@ -597,6 +607,7 @@ export default function SettingsClient({ user, config }: Props) {
                       </div>
                     </div>
                     <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>
+                    </div>
                   </div>
                 )}
 
@@ -625,7 +636,12 @@ export default function SettingsClient({ user, config }: Props) {
                         <div><p className="text-sm font-semibold text-slate-800">Delete All Draft Content</p><p className="text-xs text-slate-500 mt-0.5">Remove all jobs and bids with DRAFT status</p></div>
                         {confirmDrafts ? (
                           <div className="flex items-center gap-2">
-                            <button onClick={() => startTransition(async () => { const res = await deleteDraftsAction(); setConfirmDrafts(false); setDangerMsg(`Deleted ${(res as { deletedJobs: number; deletedBids: number }).deletedJobs} draft jobs and ${(res as { deletedJobs: number; deletedBids: number }).deletedBids} draft bids.`); setTimeout(() => setDangerMsg(""), 5000); })} disabled={isPending} className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50">{isPending ? "Deleting..." : "Confirm"}</button>
+                            <button onClick={() => startTransition(async () => { 
+                              const res = await deleteDraftsAction() as { deletedJobs: number; deletedBids: number };
+                              setConfirmDrafts(false); 
+                              setDangerMsg(`Deleted ${res.deletedJobs} draft jobs and ${res.deletedBids} draft bids.`); 
+                              setTimeout(() => setDangerMsg(""), 5000); 
+                            })} disabled={isPending} className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50">{isPending ? "Deleting..." : "Confirm"}</button>
                             <button onClick={() => setConfirmDrafts(false)} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">Cancel</button>
                           </div>
                         ) : (
@@ -641,5 +657,6 @@ export default function SettingsClient({ user, config }: Props) {
         </main>
       </div>
     </div>
-  );
+  </div>
+);
 }
