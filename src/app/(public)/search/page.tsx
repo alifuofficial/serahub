@@ -37,13 +37,38 @@ export default async function SearchPage({ searchParams }: PageProps) {
   const bidWhere: any = { status: "PUBLISHED" };
 
   if (q) {
-    const searchConditions = [
-      { title: { contains: q } },
-      { description: { contains: q } },
-      { source: { contains: q } },
-    ];
-    jobWhere.OR = [...searchConditions, { company: { contains: q } }];
-    bidWhere.OR = searchConditions;
+    const keywords = q.split(/\s+/).filter(k => k.length > 2);
+    
+    if (keywords.length > 0) {
+      const searchConditions = keywords.map(k => ({
+        OR: [
+          { title: { contains: k } },
+          { description: { contains: k } },
+          { source: { contains: k } },
+          { company: { contains: k } },
+        ]
+      }));
+      
+      // Using AND between keywords (e.g. "accountant" AND "remote")
+      // but OR within each keyword check
+      jobWhere.AND = searchConditions;
+      bidWhere.AND = keywords.map(k => ({
+        OR: [
+          { title: { contains: k } },
+          { description: { contains: k } },
+          { source: { contains: k } },
+        ]
+      }));
+    } else {
+      // Fallback to exact match if keywords are too short
+      const exactConditions = [
+        { title: { contains: q } },
+        { description: { contains: q } },
+        { source: { contains: q } },
+      ];
+      jobWhere.OR = [...exactConditions, { company: { contains: q } }];
+      bidWhere.OR = exactConditions;
+    }
   }
 
   if (cat) {
