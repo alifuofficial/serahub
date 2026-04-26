@@ -34,14 +34,14 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/package.json ./package.json
 
+# Copy pre-built node_modules from builder (includes prisma CLI, tsx, bcrypt, better-sqlite3 already compiled)
+COPY --from=builder /app/node_modules ./node_modules
+
 # Expose port
 EXPOSE 3000
 
 # Set up data directory for SQLite persistence
 RUN mkdir -p /app/data
-
-# Install prisma, dotenv, tsx, and bcrypt for runtime db push and seed
-RUN npm install prisma@7.8.0 dotenv tsx bcrypt @prisma/adapter-better-sqlite3 better-sqlite3 && npm cache clean --force
 
 # Start command
 CMD npx prisma db push && npx tsx prisma/seed.ts && node server.js
