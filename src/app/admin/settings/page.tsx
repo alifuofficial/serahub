@@ -47,6 +47,15 @@ const SETTING_KEYS = [
   "gemini_api_key",
   "deepseek_api_key",
   "qwen_api_key",
+  "maintenance_enabled",
+  "maintenance_title",
+  "maintenance_message",
+  "social_google_enabled",
+  "social_google_client_id",
+  "social_google_client_secret",
+  "social_facebook_enabled",
+  "social_facebook_app_id",
+  "social_facebook_app_secret",
 ];
 
 export default async function SettingsPage() {
@@ -56,13 +65,7 @@ export default async function SettingsPage() {
     redirect("/auth/login");
   }
 
-  const [users, configRows] = await Promise.all([
-    prisma.user.findMany({
-      orderBy: { createdAt: "desc" },
-      select: { id: true, email: true, name: true, role: true, createdAt: true },
-    }),
-    prisma.siteConfig.findMany({ where: { key: { in: SETTING_KEYS } } }),
-  ]);
+  const configRows = await prisma.siteConfig.findMany({ where: { key: { in: SETTING_KEYS } } });
 
   const config: Record<string, string> = {};
   for (const key of SETTING_KEYS) {
@@ -72,10 +75,5 @@ export default async function SettingsPage() {
     config[row.key] = row.value;
   }
 
-  const serializedUsers = users.map((u) => ({
-    ...u,
-    createdAt: u.createdAt.toISOString(),
-  }));
-
-  return <SettingsClient user={session} users={serializedUsers} config={config} />;
+  return <SettingsClient user={session} config={config} />;
 }

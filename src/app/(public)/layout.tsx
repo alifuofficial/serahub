@@ -3,6 +3,7 @@ import Footer from "@/components/layout/Footer";
 import VisitTracker from "@/components/seo/VisitTracker";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import MaintenancePage from "./maintenance/page";
 
 export default async function PublicLayout({
   children,
@@ -12,13 +13,20 @@ export default async function PublicLayout({
   const [session, configRows] = await Promise.all([
     getSession(),
     prisma.siteConfig.findMany({
-      where: { key: { in: ["site_name", "appearance_logo_url", "appearance_dark_logo_url"] } },
+      where: { key: { in: ["site_name", "appearance_logo_url", "appearance_dark_logo_url", "maintenance_enabled", "maintenance_title", "maintenance_message"] } },
     }),
   ]);
 
   const config: Record<string, string> = {};
   for (const row of configRows) {
     config[row.key] = row.value;
+  }
+
+  const maintenanceEnabled = config["maintenance_enabled"] === "true";
+  const isAdmin = session?.role === "ADMIN";
+
+  if (maintenanceEnabled && !isAdmin) {
+    return <MaintenancePage />;
   }
 
   return (
