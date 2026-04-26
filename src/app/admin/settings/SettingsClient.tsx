@@ -657,6 +657,5 @@ export default function SettingsClient({ user, config }: Props) {
         </main>
       </div>
     </div>
-  </div>
 );
 }

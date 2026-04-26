@@ -619,6 +619,5 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
         </main>
       </div>
     </div>
-  </div>
 );
 }
