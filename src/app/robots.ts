@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
+import { prisma } from "@/lib/prisma";
 
-export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://serahub.com";
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const siteUrlConfig = await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } });
+  const baseUrl = (siteUrlConfig?.value || process.env.NEXT_PUBLIC_SITE_URL || "https://www.serahub.click").replace(/\/$/, "");
 
   return {
     rules: [

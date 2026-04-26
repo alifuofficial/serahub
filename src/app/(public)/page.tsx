@@ -57,7 +57,10 @@ export default async function Home() {
     })
   ]);
 
-  const CATEGORIES = ["All", ...dbCategories.map(c => c.name)];
+  const CATEGORIES = [
+    { name: "All", slug: "all" },
+    ...dbCategories.map(c => ({ name: c.name, slug: c.slug }))
+  ];
 
   const heroItems = [
     ...latest2Jobs.map(j => ({ ...j, type: "JOB" })),
@@ -178,10 +181,14 @@ export default async function Home() {
           <div className="glass rounded-2xl px-6 py-5 mb-0">
             <div className="flex flex-wrap justify-center gap-2.5">
               {CATEGORIES.map((cat, i) => (
-                <button key={cat} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 cursor-pointer ${i === 0 ? 'bg-primary text-white border-primary shadow-sm shadow-primary/25' : 'bg-white text-slate-600 border-slate-200 hover:border-primary/30 hover:bg-primary/5 hover:text-primary'}`}>
-                  {i > 0 && <span className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs ${i === 0 ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400'}`}>{(cat.charCodeAt(0) % 5) + 1}</span>}
-                  {cat}
-                </button>
+                <Link 
+                  key={cat.slug} 
+                  href={cat.slug === "all" ? "/jobs" : `/categories/${cat.slug}`}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 cursor-pointer ${i === 0 ? 'bg-primary text-white border-primary shadow-sm shadow-primary/25' : 'bg-white text-slate-600 border-slate-200 hover:border-primary/30 hover:bg-primary/5 hover:text-primary'}`}
+                >
+                  {i > 0 && <span className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs ${i === 0 ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400'}`}>{(cat.name.charCodeAt(0) % 5) + 1}</span>}
+                  {cat.name}
+                </Link>
               ))}
             </div>
           </div>
