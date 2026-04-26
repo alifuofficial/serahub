@@ -32,7 +32,7 @@ const sections: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: "appearance", label: "Appearance", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> },
   { id: "storage", label: "Storage", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9"/><path d="M3 13h18"/><path d="M12 17V9"/><path d="m9 12 3 3 3-3"/></svg> },
   { id: "ai", label: "AI Configuration", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4"/><path d="m16.2 3.8 2.8 2.8"/><path d="M22 12h-4"/><path d="m18.2 16.2-2.8 2.8"/><path d="M12 22v-4"/><path d="m7.8 20.2-2.8-2.8"/><path d="M2 12h4"/><path d="m5.8 7.8 2.8-2.8"/><circle cx="12" cy="12" r="4"/><path d="M16 12h.01"/><path d="M12 16h.01"/><path d="M8 12h.01"/><path d="M12 8h.01"/></svg> },
-  { id: "maintenance", label: "Maintenance", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> },
+  { id: "maintenance", label: "Availability", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> },
   { id: "social", label: "Social Login", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> },
   { id: "danger", label: "Danger Zone", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> },
 ];
@@ -468,19 +468,52 @@ export default function SettingsClient({ user, config }: Props) {
                     <div className="bg-white rounded-2xl border border-slate-200/60 p-6">
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></div>
-                        <div><h2 className="text-lg font-bold text-slate-900">Maintenance Mode</h2><p className="text-sm text-slate-500">Control site availability during maintenance.</p></div>
+                        <div><h2 className="text-lg font-bold text-slate-900">Site Availability</h2><p className="text-sm text-slate-500">Control site access during maintenance or pre-launch.</p></div>
                       </div>
-                      <div className="space-y-5">
-                        <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
-                          <div><p className="text-sm font-semibold text-slate-800">Enable Maintenance Mode</p><p className="text-xs text-slate-500 mt-0.5">Show a maintenance page to visitors. Admins can still access the site.</p></div>
-                          <Toggle checked={form.maintenance_enabled === "true"} onChange={(v) => update("maintenance_enabled", v ? "true" : "false")} />
+                      <div className="space-y-8">
+                        {/* Maintenance Mode */}
+                        <div className="space-y-4">
+                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <span className="w-1.5 h-4 bg-amber-500 rounded-full"></span>
+                            Maintenance Mode
+                          </h3>
+                          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                            <div><p className="text-sm font-semibold text-slate-800">Enable Maintenance Mode</p><p className="text-xs text-slate-500 mt-0.5">Show a maintenance page to visitors. Admins can still access the site.</p></div>
+                            <Toggle checked={form.maintenance_enabled === "true"} onChange={(v) => {
+                              update("maintenance_enabled", v ? "true" : "false");
+                              if (v) update("coming_soon_enabled", "false"); // Disable coming soon if maintenance is enabled
+                            }} />
+                          </div>
+                          <FormRow label="Maintenance Title">
+                            <input type="text" value={form.maintenance_title ?? ""} onChange={(e) => update("maintenance_title", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="We'll be back soon!" />
+                          </FormRow>
+                          <FormRow label="Maintenance Message">
+                            <textarea value={form.maintenance_message ?? ""} onChange={(e) => update("maintenance_message", e.target.value)} rows={3} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" placeholder="Our site is currently undergoing scheduled maintenance..." />
+                          </FormRow>
                         </div>
-                        <FormRow label="Maintenance Title" hint="Shown as the heading on the maintenance page">
-                          <input type="text" value={form.maintenance_title ?? ""} onChange={(e) => update("maintenance_title", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="We'll be back soon!" />
-                        </FormRow>
-                        <FormRow label="Maintenance Message" hint="Shown below the title on the maintenance page">
-                          <textarea value={form.maintenance_message ?? ""} onChange={(e) => update("maintenance_message", e.target.value)} rows={3} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" placeholder="Our site is currently undergoing scheduled maintenance..." />
-                        </FormRow>
+
+                        <hr className="border-slate-100" />
+
+                        {/* Coming Soon Mode */}
+                        <div className="space-y-4">
+                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>
+                            Coming Soon Mode
+                          </h3>
+                          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                            <div><p className="text-sm font-semibold text-slate-800">Enable Coming Soon Mode</p><p className="text-xs text-slate-500 mt-0.5">Display a pre-launch landing page. Useful for new site launches.</p></div>
+                            <Toggle checked={form.coming_soon_enabled === "true"} onChange={(v) => {
+                              update("coming_soon_enabled", v ? "true" : "false");
+                              if (v) update("maintenance_enabled", "false"); // Disable maintenance if coming soon is enabled
+                            }} />
+                          </div>
+                          <FormRow label="Coming Soon Title">
+                            <input type="text" value={form.coming_soon_title ?? ""} onChange={(e) => update("coming_soon_title", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Something big is coming!" />
+                          </FormRow>
+                          <FormRow label="Coming Soon Message">
+                            <textarea value={form.coming_soon_message ?? ""} onChange={(e) => update("coming_soon_message", e.target.value)} rows={3} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" placeholder="We are working hard to bring you the best experience..." />
+                          </FormRow>
+                        </div>
                       </div>
                     </div>
                     <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>
@@ -491,10 +524,41 @@ export default function SettingsClient({ user, config }: Props) {
                   <div className="space-y-6">
                     <div className="bg-white rounded-2xl border border-slate-200/60 p-6">
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-                        <div><h2 className="text-lg font-bold text-slate-900">Social Media Login</h2><p className="text-sm text-slate-500">Configure social login providers for user authentication.</p></div>
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+                        <div><h2 className="text-lg font-bold text-slate-900">Social Media & Links</h2><p className="text-sm text-slate-500">Manage social profiles and login providers.</p></div>
                       </div>
-                      <div className="space-y-5">
+                      <div className="space-y-8">
+                        {/* Social Profiles */}
+                        <div className="space-y-4">
+                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <span className="w-1.5 h-4 bg-primary rounded-full"></span>
+                            Official Profiles
+                          </h3>
+                          <p className="text-xs text-slate-500 mb-4">These links will be displayed in the site footer.</p>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormRow label="Facebook URL">
+                              <input type="url" value={form.social_link_facebook ?? ""} onChange={(e) => update("social_link_facebook", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://facebook.com/serahub" />
+                            </FormRow>
+                            <FormRow label="Instagram URL">
+                              <input type="url" value={form.social_link_instagram ?? ""} onChange={(e) => update("social_link_instagram", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://instagram.com/serahub" />
+                            </FormRow>
+                            <FormRow label="TikTok URL">
+                              <input type="url" value={form.social_link_tiktok ?? ""} onChange={(e) => update("social_link_tiktok", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://tiktok.com/@serahub" />
+                            </FormRow>
+                            <FormRow label="LinkedIn URL">
+                              <input type="url" value={form.social_link_linkedin ?? ""} onChange={(e) => update("social_link_linkedin", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://linkedin.com/company/serahub" />
+                            </FormRow>
+                          </div>
+                        </div>
+
+                        <hr className="border-slate-100" />
+
+                        <div className="space-y-5">
+                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 pt-2">
+                            <span className="w-1.5 h-4 bg-violet-500 rounded-full"></span>
+                            Social Login (OAuth)
+                          </h3>
                         <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">

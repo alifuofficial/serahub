@@ -502,7 +502,6 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                       )}
                       <button type="submit" disabled={isPending || isSubmitting || (!editingBid && !reviewResult && !hasAppliedReview)} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingBid ? "Update Bid" : (reviewResult || hasAppliedReview) ? "Publish" : "Review required"}</button>
                     </div>
-                    </div>
                   </form>
                 </div>
               </div>

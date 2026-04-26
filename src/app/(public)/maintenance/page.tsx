@@ -36,13 +36,23 @@ export default async function MaintenancePage() {
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-3">{title}</h1>
         <p className="text-slate-500 text-lg leading-relaxed mb-8">{message}</p>
 
-        <div className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-xl border border-slate-200 shadow-sm">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-xl border border-slate-200 shadow-sm mb-8">
           <div className="flex gap-1.5">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
           <span className="text-sm font-semibold text-slate-600">Maintenance in progress</span>
+        </div>
+
+        <div className="max-w-md mx-auto p-1 rounded-2xl bg-white border border-slate-200 shadow-sm">
+           <div className="p-5">
+             <p className="text-sm font-bold text-slate-800 mb-3 text-left">Get notified when we&apos;re back</p>
+             <form action="/api/subscribe" method="POST" className="flex gap-2">
+               <input type="email" name="email" placeholder="your@email.com" required className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
+               <button type="submit" className="px-5 py-2.5 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600 transition-colors">Notify Me</button>
+             </form>
+           </div>
         </div>
 
         <p className="text-xs text-slate-400 mt-8">{siteName} &copy; {new Date().getFullYear()}</p>
