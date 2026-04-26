@@ -45,6 +45,7 @@ const SETTING_KEYS = [
   "ai_enabled",
   "ai_provider",
   "gemini_api_key",
+  "deepseek_api_key",
   "qwen_api_key",
 ];
 

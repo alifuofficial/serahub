@@ -420,18 +420,22 @@ export default function SettingsClient({ user, users, config }: Props) {
                             onChange={(e) => update("ai_provider", e.target.value)}
                             className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
                           >
-                            <option value="gemini">Google Gemini (Recommended)</option>
-                            <option value="qwen">Qwen AI (Alibaba)</option>
+                           <option value="gemini">Google Gemini (Recommended)</option>
+                             <option value="deepseek">DeepSeek AI</option>
+                             <option value="qwen">Qwen AI (Alibaba)</option>
                           </select>
                         </FormRow>
 
                         <div className="grid grid-cols-1 gap-5">
-                          <FormRow label="Gemini API Key" hint="Required if Gemini is selected. Get it from Google AI Studio.">
-                            <input type="password" value={form.gemini_api_key} onChange={(e) => update("gemini_api_key", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" />
-                          </FormRow>
-                          <FormRow label="Qwen API Key" hint="Required if Qwen is selected. Get it from Alibaba Cloud DashScope.">
-                            <input type="password" value={form.qwen_api_key} onChange={(e) => update("qwen_api_key", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" />
-                          </FormRow>
+                           <FormRow label="Gemini API Key" hint="Required if Gemini is selected. Get it from Google AI Studio.">
+                             <input type="password" value={form.gemini_api_key} onChange={(e) => update("gemini_api_key", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" />
+                           </FormRow>
+                           <FormRow label="DeepSeek API Key" hint="Required if DeepSeek is selected. Get it from platform.deepseek.com.">
+                             <input type="password" value={form.deepseek_api_key} onChange={(e) => update("deepseek_api_key", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" />
+                           </FormRow>
+                           <FormRow label="Qwen API Key" hint="Required if Qwen is selected. Get it from Alibaba Cloud DashScope.">
+                             <input type="password" value={form.qwen_api_key} onChange={(e) => update("qwen_api_key", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" />
+                           </FormRow>
                         </div>
 
                         <div className="p-4 rounded-xl bg-blue-50 border border-blue-200/50">

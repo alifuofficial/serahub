@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getAISuggestions } from "@/lib/ai";
+import { getAISuggestions, reviewContent } from "@/lib/ai";
 
 function slugify(text: string): string {
   const slug = text
@@ -105,10 +105,39 @@ export async function updateJobAction(formData: FormData) {
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const status = (formData.get("status") as string || "PUBLISHED");
   const company = (formData.get("company") as string || "").trim() || null;
-  const categoryId = (formData.get("categoryId") as string || "").trim() || null;
+  let categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
     return { error: "Title is required." };
+  }
+
+  // Re-run AI on update to refresh SEO and categorization
+  let suggestions = null;
+  let keywords: string | null = null;
+  let metaDescription: string | null = null;
+
+  try {
+    suggestions = await getAISuggestions(title, description);
+
+    if (suggestions) {
+      keywords = suggestions.keywords.join(", ");
+      metaDescription = suggestions.metaDescription;
+
+      if (!categoryId && suggestions.categoryName) {
+        const catSlug = slugify(suggestions.categoryName);
+        const category = await prisma.category.upsert({
+          where: { slug: catSlug },
+          update: {},
+          create: {
+            name: suggestions.categoryName,
+            slug: catSlug,
+          }
+        });
+        categoryId = category.id;
+      }
+    }
+  } catch (aiError) {
+    console.error("[AI] Non-fatal error during job update:", aiError);
   }
 
   let slug = slugify(title);
@@ -135,6 +164,8 @@ export async function updateJobAction(formData: FormData) {
       status,
       categoryId,
       company,
+      keywords,
+      metaDescription,
     },
   });
 
@@ -240,10 +271,39 @@ export async function updateBidAction(formData: FormData) {
   const applyLink = (formData.get("applyLink") as string || "").trim() || null;
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const status = (formData.get("status") as string || "PUBLISHED");
-  const categoryId = (formData.get("categoryId") as string || "").trim() || null;
+  let categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
   if (!title) {
     return { error: "Title is required." };
+  }
+
+  // Re-run AI on update to refresh SEO and categorization
+  let suggestions = null;
+  let keywords: string | null = null;
+  let metaDescription: string | null = null;
+
+  try {
+    suggestions = await getAISuggestions(title, description);
+
+    if (suggestions) {
+      keywords = suggestions.keywords.join(", ");
+      metaDescription = suggestions.metaDescription;
+
+      if (!categoryId && suggestions.categoryName) {
+        const catSlug = slugify(suggestions.categoryName);
+        const category = await prisma.category.upsert({
+          where: { slug: catSlug },
+          update: {},
+          create: {
+            name: suggestions.categoryName,
+            slug: catSlug,
+          }
+        });
+        categoryId = category.id;
+      }
+    }
+  } catch (aiError) {
+    console.error("[AI] Non-fatal error during bid update:", aiError);
   }
 
   let slug = slugify(title);
@@ -269,6 +329,8 @@ export async function updateBidAction(formData: FormData) {
       deadline: deadline ? new Date(deadline) : null,
       status,
       categoryId,
+      keywords,
+      metaDescription,
     },
   });
 
@@ -283,6 +345,46 @@ export async function deleteBidAction(formData: FormData) {
   revalidatePath("/admin/bids");
   revalidatePath("/bids");
   return { success: true };
+}
+
+export async function reviewJobAction(formData: FormData) {
+  const title = (formData.get("title") as string || "").trim();
+  const description = (formData.get("description") as string || "");
+
+  if (!title) {
+    return { error: "Title is required for review." };
+  }
+
+  try {
+    const review = await reviewContent(title, description);
+    if (!review) {
+      return { error: "AI review failed. Check your AI configuration and try again." };
+    }
+    return { success: true, review };
+  } catch (error) {
+    console.error("[AI Review] Job review error:", error);
+    return { error: "AI review encountered an error. Please try again." };
+  }
+}
+
+export async function reviewBidAction(formData: FormData) {
+  const title = (formData.get("title") as string || "").trim();
+  const description = (formData.get("description") as string || "");
+
+  if (!title) {
+    return { error: "Title is required for review." };
+  }
+
+  try {
+    const review = await reviewContent(title, description);
+    if (!review) {
+      return { error: "AI review failed. Check your AI configuration and try again." };
+    }
+    return { success: true, review };
+  } catch (error) {
+    console.error("[AI Review] Bid review error:", error);
+    return { error: "AI review encountered an error. Please try again." };
+  }
 }
 
 export async function saveJobDraftAction(formData: FormData) {

@@ -2,21 +2,14 @@ import { prisma } from "./prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getPlainText } from "@/components/editor/Renderer";
 
-export async function getAIConfig() {
-  const configs = await prisma.siteConfig.findMany({
-    where: {
-      key: { in: ["ai_enabled", "ai_provider", "gemini_api_key"] }
-    }
-  });
+export type AIProvider = "gemini" | "deepseek" | "qwen";
 
-  const configMap: Record<string, string> = {};
-  configs.forEach(c => configMap[c.key] = c.value);
-
-  return {
-    enabled: configMap["ai_enabled"] === "true",
-    provider: configMap["ai_provider"] || "gemini",
-    geminiKey: configMap["gemini_api_key"] || ""
-  };
+export interface AIConfig {
+  enabled: boolean;
+  provider: AIProvider;
+  geminiKey: string;
+  deepseekKey: string;
+  qwenKey: string;
 }
 
 export interface AISuggestions {
@@ -28,31 +21,40 @@ export interface AISuggestions {
   warnings?: string[];
 }
 
-export async function getAISuggestions(title: string, rawDescription: string): Promise<AISuggestions | null> {
-  const config = await getAIConfig();
-  if (!config.enabled || !config.geminiKey) {
-    console.log("[AI] Skipped — AI not enabled or API key missing.");
-    return null;
+export interface AIReviewResult extends AISuggestions {
+  fixedTitle: string;
+  fixedDescriptionText: string;
+}
+
+export async function getAIConfig(): Promise<AIConfig> {
+  const configs = await prisma.siteConfig.findMany({
+    where: {
+      key: { in: ["ai_enabled", "ai_provider", "gemini_api_key", "deepseek_api_key", "qwen_api_key"] }
+    }
+  });
+
+  const configMap: Record<string, string> = {};
+  configs.forEach(c => configMap[c.key] = c.value);
+
+  return {
+    enabled: configMap["ai_enabled"] === "true",
+    provider: (configMap["ai_provider"] as AIProvider) || "gemini",
+    geminiKey: configMap["gemini_api_key"] || "",
+    deepseekKey: configMap["deepseek_api_key"] || "",
+    qwenKey: configMap["qwen_api_key"] || ""
+  };
+}
+
+function getProviderKey(config: AIConfig): string | null {
+  switch (config.provider) {
+    case "gemini": return config.geminiKey || null;
+    case "deepseek": return config.deepseekKey || null;
+    case "qwen": return config.qwenKey || null;
+    default: return null;
   }
+}
 
-  // Extract readable text from Editor.js JSON blob
-  let description = rawDescription;
-  try {
-    description = getPlainText(rawDescription);
-  } catch {
-    // If it's already plain text, use as-is
-  }
-
-  if (!description || description.trim().length < 10) {
-    console.log("[AI] Skipped — description too short for AI processing.");
-    return null;
-  }
-
-  try {
-    const genAI = new GoogleGenerativeAI(config.geminiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const prompt = `
+const SEO_PROMPT = (title: string, description: string) => `
 You are an expert SEO content optimizer and categorizer for "SeraHub", an Ethiopian job and bid aggregation platform.
 
 Analyze the following job/bid posting and return a JSON response only (no markdown, no code blocks):
@@ -71,25 +73,155 @@ Return ONLY a valid JSON object with these exact keys:
 }
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text().trim();
+const REVIEW_PROMPT = (title: string, description: string) => `
+You are an expert content editor for "SeraHub", an Ethiopian job and bid aggregation platform. Your job is to review a job/bid posting, fix grammar and professionalism issues, and provide SEO suggestions.
 
-    // Robustly extract JSON — strip markdown code blocks if present
-    let jsonText = text;
-    const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (fenceMatch) {
-      jsonText = fenceMatch[1].trim();
-    } else {
-      const objMatch = text.match(/\{[\s\S]*\}/);
-      if (objMatch) jsonText = objMatch[0];
+Review the following posting and return a JSON response only (no markdown, no code blocks):
+
+TITLE: ${title}
+DESCRIPTION: ${description.substring(0, 3000)}
+
+Return ONLY a valid JSON object with these exact keys:
+{
+  "fixedTitle": "The title with grammar/spelling/capitalization fixed and made more professional. Keep it close to the original.",
+  "fixedDescriptionText": "The description text with grammar, spelling, punctuation, and professionalism fixes applied. Keep the same meaning and structure.",
+  "categoryName": "A professional category name (e.g. Software Development, Accounting, Construction, Healthcare, Education, Finance, Marketing, Engineering, Legal, NGO & Development, Government, Procurement, IT & Technology). Pick the most relevant one or create a concise new one.",
+  "keywords": ["5 to 8 relevant SEO keywords as strings"],
+  "metaDescription": "A compelling meta description under 160 characters",
+  "grammarNotes": "Specific notes about what grammar/professionalism fixes were made, or empty string if none needed",
+  "warnings": ["Any important warnings like missing contact info, past deadline, inconsistent information, etc. Array of strings, can be empty."]
+}
+`;
+
+async function callGemini(prompt: string, apiKey: string): Promise<string> {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return response.text().trim();
+}
+
+async function callDeepSeek(prompt: string, apiKey: string): Promise<string> {
+  const res = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.3,
+      max_tokens: 2048,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`DeepSeek API error ${res.status}: ${text}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content?.trim() || "";
+}
+
+async function callAI(prompt: string, config: AIConfig): Promise<string> {
+  switch (config.provider) {
+    case "gemini": {
+      if (!config.geminiKey) throw new Error("Gemini API key not configured");
+      return callGemini(prompt, config.geminiKey);
     }
+    case "deepseek": {
+      if (!config.deepseekKey) throw new Error("DeepSeek API key not configured");
+      return callDeepSeek(prompt, config.deepseekKey);
+    }
+    default:
+      throw new Error(`AI provider "${config.provider}" is not implemented`);
+  }
+}
 
-    const parsed = JSON.parse(jsonText) as AISuggestions;
+function parseAIResponse(text: string): unknown {
+  let jsonText = text;
+
+  const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenceMatch) {
+    jsonText = fenceMatch[1].trim();
+  } else {
+    const objMatch = text.match(/\{[\s\S]*\}/);
+    if (objMatch) jsonText = objMatch[0];
+  }
+
+  return JSON.parse(jsonText);
+}
+
+export async function getAISuggestions(title: string, rawDescription: string): Promise<AISuggestions | null> {
+  const config = await getAIConfig();
+  if (!config.enabled) {
+    console.log("[AI] Skipped — AI not enabled.");
+    return null;
+  }
+
+  const apiKey = getProviderKey(config);
+  if (!apiKey) {
+    console.log(`[AI] Skipped — no API key for provider "${config.provider}".`);
+    return null;
+  }
+
+  let description = rawDescription;
+  try {
+    description = getPlainText(rawDescription);
+  } catch {
+    // If it's already plain text, use as-is
+  }
+
+  if (!description || description.trim().length < 10) {
+    console.log("[AI] Skipped — description too short for AI processing.");
+    return null;
+  }
+
+  try {
+    const text = await callAI(SEO_PROMPT(title, description), config);
+    const parsed = parseAIResponse(text) as unknown as AISuggestions;
     console.log("[AI] Suggestions generated:", JSON.stringify(parsed, null, 2));
     return parsed;
   } catch (error) {
-    console.error("[AI] Gemini Error:", error);
+    console.error(`[AI] ${config.provider} Error:`, error);
+    return null;
+  }
+}
+
+export async function reviewContent(title: string, rawDescription: string): Promise<AIReviewResult | null> {
+  const config = await getAIConfig();
+  if (!config.enabled) {
+    console.log("[AI Review] Skipped — AI not enabled.");
+    return null;
+  }
+
+  const apiKey = getProviderKey(config);
+  if (!apiKey) {
+    console.log(`[AI Review] Skipped — no API key for provider "${config.provider}".`);
+    return null;
+  }
+
+  let description = rawDescription;
+  try {
+    description = getPlainText(rawDescription);
+  } catch {
+    // If it's already plain text, use as-is
+  }
+
+  if (!description || description.trim().length < 10) {
+    console.log("[AI Review] Skipped — description too short for AI processing.");
+    return null;
+  }
+
+  try {
+    const text = await callAI(REVIEW_PROMPT(title, description), config);
+    const parsed = parseAIResponse(text) as unknown as AIReviewResult;
+    console.log("[AI Review] Content reviewed:", JSON.stringify(parsed, null, 2));
+    return parsed;
+  } catch (error) {
+    console.error(`[AI Review] ${config.provider} Error:`, error);
     return null;
   }
 }

@@ -4,7 +4,7 @@ import { useState, useTransition, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { createJobAction, updateJobAction, deleteJobAction, saveJobDraftAction } from "@/actions/admin";
+import { createJobAction, updateJobAction, deleteJobAction, saveJobDraftAction, reviewJobAction } from "@/actions/admin";
 import { logoutAction } from "@/actions/auth";
 import { useAutoSave } from "@/hooks/useAutoSave";
 
@@ -67,6 +67,16 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
     warnings?: string[];
   }>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewResult, setReviewResult] = useState<null | {
+    fixedTitle: string;
+    fixedDescriptionText: string;
+    categoryName?: string;
+    keywords?: string[];
+    metaDescription?: string;
+    grammarNotes?: string;
+    warnings?: string[];
+  }>(null);
   const router = useRouter();
 
   const getFormData = useCallback(() => {
@@ -105,6 +115,11 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
     const action = editingJob ? updateJobAction : createJobAction;
     if (editingJob) formData.set("id", editingJob.id);
     formData.set("description", descriptionData);
+    // If we have review data, apply the AI-fixed title and keep description as-is
+    // (description is Editor.js JSON and can't be easily replaced with plain text)
+    if (!editingJob && reviewResult) {
+      formData.set("title", reviewResult.fixedTitle);
+    }
     const result = await action(formData);
     setIsSubmitting(false);
     if (result?.error) {
@@ -117,7 +132,28 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
       setShowForm(false);
       setEditingJob(null);
       setDescriptionData("");
+      setReviewResult(null);
       router.refresh();
+    }
+  };
+
+  const handleReview = async () => {
+    setError(null);
+    setReviewResult(null);
+    setIsReviewing(true);
+    const fd = new FormData();
+    const formEl = document.querySelector<HTMLFormElement>('form[action]');
+    if (formEl) {
+      const inputs = formEl.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input[name], select[name], textarea[name]');
+      inputs.forEach((el) => { fd.set(el.name, el.value); });
+    }
+    fd.set("description", descriptionData);
+    const result = await reviewJobAction(fd);
+    setIsReviewing(false);
+    if (result?.error) {
+      setError(result.error);
+    } else if (result?.review) {
+      setReviewResult(result.review);
     }
   };
 
@@ -270,6 +306,69 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                         <option value="DRAFT">Draft</option>
                       </select>
                     </div>
+                    {isReviewing && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-teal-50 border border-teal-200">
+                        <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                        <span className="text-xs font-semibold text-teal-700">🔍 AI is reviewing your post for grammar, SEO, and fixes...</span>
+                      </div>
+                    )}
+                    {reviewResult && !editingJob && (
+                      <div className="p-5 rounded-2xl bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200 space-y-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                          </div>
+                          <h3 className="text-sm font-bold text-teal-900">AI Review Complete — Review changes before publishing</h3>
+                        </div>
+                        {reviewResult.fixedTitle && (
+                          <div className="p-3 rounded-xl bg-white/70 border border-teal-100">
+                            <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider mb-1">Fixed Title</p>
+                            <div className="text-sm">
+                              <p className="text-slate-800 font-semibold">{reviewResult.fixedTitle}</p>
+                            </div>
+                          </div>
+                        )}
+                        {reviewResult.fixedDescriptionText && (
+                          <div className="p-3 rounded-xl bg-white/70 border border-teal-100">
+                            <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider mb-1">Fixed Description Text</p>
+                            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{reviewResult.fixedDescriptionText}</p>
+                          </div>
+                        )}
+                        {reviewResult.categoryName && (
+                          <div className="flex items-start gap-2">
+                            <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Category</p><p className="text-sm font-semibold text-slate-800">{reviewResult.categoryName}</p></div>
+                          </div>
+                        )}
+                        {reviewResult.metaDescription && (
+                          <div className="flex items-start gap-2">
+                            <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-blue-600"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">SEO Meta Description</p><p className="text-sm text-slate-700">{reviewResult.metaDescription}</p></div>
+                          </div>
+                        )}
+                        {reviewResult.keywords && reviewResult.keywords.length > 0 && (
+                          <div className="flex items-start gap-2">
+                            <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-amber-600"><polyline points="20 6 9 17 4 12"/></svg></span>
+                            <div>
+                              <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">SEO Keywords</p>
+                              <div className="flex flex-wrap gap-1.5 mt-1">{reviewResult.keywords.map((k: string) => <span key={k} className="bg-white text-slate-600 px-2 py-0.5 rounded-md text-xs font-medium border border-slate-200">{k}</span>)}</div>
+                            </div>
+                          </div>
+                        )}
+                        {reviewResult.grammarNotes && (
+                          <div className="flex items-start gap-2">
+                            <span className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-violet-600"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg></span>
+                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Grammar Notes</p><p className="text-sm text-slate-700">{reviewResult.grammarNotes}</p></div>
+                          </div>
+                        )}
+                        {reviewResult.warnings && reviewResult.warnings.length > 0 && (
+                          <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                            <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Warnings</p>
+                            {reviewResult.warnings.map((w: string, i: number) => <p key={i} className="text-xs text-amber-700 flex items-start gap-1.5"><span className="mt-0.5">⚠️</span>{w}</p>)}
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {isSubmitting && (
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50 border border-violet-200">
                         <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -277,9 +376,14 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                       </div>
                     )}
                     <div className="flex justify-end gap-3 pt-2">
-                      <button type="button" onClick={() => { setShowForm(false); setEditingJob(null); setDescriptionData(""); setAiResult(null); }} className="btn-secondary text-sm">Cancel</button>
+                      <button type="button" onClick={() => { setShowForm(false); setEditingJob(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); }} className="btn-secondary text-sm">Cancel</button>
                       <button type="button" onClick={() => saveDraft()} disabled={isAutoSaving} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50">{isAutoSaving ? "Saving..." : "Save Draft"}</button>
-                      <button type="submit" disabled={isPending || isSubmitting} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingJob ? "Update Job" : "Publish Job"}</button>
+                      {!editingJob && !reviewResult && (
+                        <button type="button" onClick={handleReview} disabled={isReviewing || isSubmitting} className="px-4 py-2 text-sm font-semibold text-teal-600 bg-teal-50 border border-teal-200 rounded-xl hover:bg-teal-100 transition-colors disabled:opacity-50">
+                          {isReviewing ? "Reviewing..." : "🔍 Review with AI"}
+                        </button>
+                      )}
+                      <button type="submit" disabled={isPending || isSubmitting || (!editingJob && !reviewResult)} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingJob ? "Update Job" : reviewResult ? "Publish" : "Review required"}</button>
                     </div>
                   </form>
                 </div>
