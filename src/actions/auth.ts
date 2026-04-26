@@ -20,6 +20,8 @@ export async function loginAction(formData: FormData) {
     return { error: "Invalid email or password." };
   }
 
+  const valid = await verifyPassword(password, user.password);
+
   if (!valid) {
     return { error: "Invalid email or password." };
   }
