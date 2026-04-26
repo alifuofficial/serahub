@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { deleteSubscriberAction } from "@/actions/subscribers";
+import { deleteSubscriberAction, triggerNewsletterAction } from "@/actions/subscribers";
 import { logoutAction } from "@/actions/auth";
 
 interface SubscriberItem {
@@ -31,7 +31,27 @@ const navItems = [
 export default function SubscribersClient({ user, subscribers }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isSending, setIsSending] = useState(false);
+  const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const router = useRouter();
+
+  const handleTriggerNewsletter = async () => {
+    if (!confirm("This will generate a newsletter using AI and send it to ALL subscribers. Continue?")) return;
+    setIsSending(true);
+    setMsg(null);
+    try {
+      const result = await triggerNewsletterAction();
+      if (result.error) {
+        setMsg({ type: "error", text: result.error });
+      } else {
+        setMsg({ type: "success", text: result.message || "Newsletter sent successfully!" });
+      }
+    } catch (err: any) {
+      setMsg({ type: "error", text: err.message || "An unexpected error occurred." });
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to remove this subscriber?")) return;
@@ -86,11 +106,44 @@ export default function SubscribersClient({ user, subscribers }: Props) {
           <div className="px-4 lg:px-8 py-6 lg:py-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div><h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">Subscribers</h1><p className="text-slate-500 mt-1">{subscribers.length} subscriber{subscribers.length !== 1 ? "s" : ""}</p></div>
-              <div className="flex items-center gap-2 text-sm text-slate-500 bg-white border border-slate-200 rounded-xl px-4 py-2.5">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                Newsletter subscribers
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={handleTriggerNewsletter} 
+                  disabled={isSending || subscribers.length === 0}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-violet-200 hover:bg-violet-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSending ? (
+                    <>
+                      <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                      Send Weekly Newsletter
+                    </>
+                  )}
+                </button>
+                <div className="flex items-center gap-2 text-sm text-slate-500 bg-white border border-slate-200 rounded-xl px-4 py-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  Newsletter active
+                </div>
               </div>
             </div>
+            
+            {msg && (
+              <div className={`mb-6 p-4 rounded-xl border ${msg.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"} flex items-start gap-3`}>
+                {msg.type === "success" ? (
+                  <svg className="mt-0.5" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                ) : (
+                  <svg className="mt-0.5" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                )}
+                <div className="text-sm font-medium">{msg.text}</div>
+                <button onClick={() => setMsg(null)} className="ml-auto text-slate-400 hover:text-slate-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+              </div>
+            )}
             <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">

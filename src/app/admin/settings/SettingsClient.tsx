@@ -234,6 +234,21 @@ export default function SettingsClient({ user, config }: Props) {
                         </FormRow>
                         <FormRow label="Google Site Verification" hint="Meta tag content for Google Search Console verification"><input type="text" value={form.seo_google_verification} onChange={(e) => update("seo_google_verification", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="e.g. abc123def456" /></FormRow>
                         <FormRow label="Google Analytics Tracking ID" hint="Your Google Analytics measurement ID (e.g. G-XXXXXXXXXX). Leave empty to disable analytics tracking."><input type="text" value={form.seo_google_analytics} onChange={(e) => update("seo_google_analytics", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="G-XXXXXXXXXX" /></FormRow>
+                        
+                        <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 mt-4">
+                          <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg>
+                            Dynamic Sitemap
+                          </h3>
+                          <p className="text-xs text-slate-500 mb-4">Your sitemap is automatically generated and updated whenever you publish new jobs or bids.</p>
+                          <div className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl">
+                            <code className="text-xs font-mono text-slate-600">/sitemap.xml</code>
+                            <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-primary hover:underline flex items-center gap-1.5">
+                              View Sitemap
+                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                            </a>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>

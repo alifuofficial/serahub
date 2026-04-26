@@ -88,6 +88,7 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
     grammarNotes?: string;
     warnings?: string[];
   }>(null);
+  const [hasAppliedReview, setHasAppliedReview] = useState(false);
   const router = useRouter();
 
   const getFormData = useCallback(() => {
@@ -99,7 +100,15 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
       inputs.forEach((el) => { fd.set(el.name, el.value); });
     }
     fd.set("description", descriptionData);
-    fd.set("status", editingBid?.status ?? "DRAFT");
+    
+    // Status should be read from the form if available, otherwise fallback to editingBid status
+    const statusSelect = formEl?.querySelector<HTMLSelectElement>('select[name="status"]');
+    if (statusSelect) {
+      fd.set("status", statusSelect.value);
+    } else {
+      fd.set("status", editingBid?.status ?? "DRAFT");
+    }
+    
     return fd;
   }, [editingBid, descriptionData]);
 
@@ -209,6 +218,28 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
     } else if (result?.review) {
       setReviewResult(result.review);
     }
+  };
+  
+  const applyAiReview = () => {
+    if (!reviewResult) return;
+    const formEl = document.querySelector<HTMLFormElement>('#bid-form');
+    if (!formEl) return;
+
+    if (reviewResult.fixedTitle) {
+      const titleInput = formEl.querySelector<HTMLInputElement>('input[name="title"]');
+      if (titleInput) titleInput.value = reviewResult.fixedTitle;
+    }
+
+    if (reviewResult.categoryName) {
+      const cat = categories.find(c => c.name.toLowerCase() === reviewResult.categoryName?.toLowerCase());
+      if (cat) {
+        const catSelect = formEl.querySelector<HTMLSelectElement>('select[name="categoryId"]');
+        if (catSelect) catSelect.value = cat.id;
+      }
+    }
+
+    setReviewResult(null);
+    setHasAppliedReview(true);
   };
 
   return (
@@ -443,11 +474,15 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                           </div>
                         )}
                         {reviewResult.warnings && reviewResult.warnings.length > 0 && (
-                          <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
-                            <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Warnings</p>
-                            {reviewResult.warnings.map((w: string, i: number) => <p key={i} className="text-xs text-amber-700 flex items-start gap-1.5"><span className="mt-0.5">⚠️</span>{w}</p>)}
+                          <div className="flex items-start gap-2">
+                            <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-600"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg></span>
+                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Warnings</p>{reviewResult.warnings.map((w: string, i: number) => <p key={i} className="text-xs text-amber-700 flex items-start gap-1.5"><span className="mt-0.5">⚠️</span>{w}</p>)}</div>
                           </div>
                         )}
+                        <button type="button" onClick={applyAiReview} className="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          Apply AI Suggestions
+                        </button>
                       </div>
                     )}
                     {isSubmitting && (
@@ -455,17 +490,17 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                         <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                         <span className="text-xs font-semibold text-violet-700">✨ AI is analyzing your post for SEO, categorization, and grammar...</span>
                       </div>
-                    )}
-                    <div className="flex justify-end gap-3 pt-2">
-                      <button type="button" onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); }} className="btn-secondary text-sm">Cancel</button>
+                                 <div className="flex justify-end gap-3 pt-2">
+                      <button type="button" onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); setHasAppliedReview(false); }} className="btn-secondary text-sm">Cancel</button>
                       <button type="button" onClick={() => saveDraft()} disabled={isAutoSaving} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50">{isAutoSaving ? "Saving..." : "Save Draft"}</button>
-                      {!editingBid && !reviewResult && (
+                      {!editingBid && !reviewResult && !hasAppliedReview && (
                         <button type="button" onClick={handleReview} disabled={isReviewing || isSubmitting} className="px-4 py-2 text-sm font-semibold text-teal-600 bg-teal-50 border border-teal-200 rounded-xl hover:bg-teal-100 transition-colors disabled:opacity-50">
                           {isReviewing ? "Reviewing..." : "🔍 Review with AI"}
                         </button>
                       )}
-                      <button type="submit" disabled={isPending || isSubmitting || (!editingBid && !reviewResult)} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingBid ? "Update Bid" : reviewResult ? "Publish" : "Review required"}</button>
+                      <button type="submit" disabled={isPending || isSubmitting || (!editingBid && !reviewResult && !hasAppliedReview)} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingBid ? "Update Bid" : (reviewResult || hasAppliedReview) ? "Publish" : "Review required"}</button>
                     </div>
+       </div>
                   </form>
                 </div>
               </div>

@@ -26,6 +26,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: { slug: true, updatedAt: true },
   });
 
+  const categories = await prisma.category.findMany({
+    select: { slug: true },
+  });
+
   const jobPages: MetadataRoute.Sitemap = jobs.map((job) => ({
     url: `${baseUrl}/jobs/${job.slug}`,
     lastModified: job.updatedAt,
@@ -40,5 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...jobPages, ...bidPages];
+  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
+    url: `${baseUrl}/categories/${cat.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticPages, ...jobPages, ...bidPages, ...categoryPages];
 }

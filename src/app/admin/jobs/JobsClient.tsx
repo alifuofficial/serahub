@@ -89,6 +89,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
     vacancyCount?: string;
     deadline?: string;
   }>(null);
+  const [hasAppliedReview, setHasAppliedReview] = useState(false);
   const router = useRouter();
 
   const getFormData = useCallback(() => {
@@ -101,7 +102,15 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
       inputs.forEach((el) => { fd.set(el.name, el.value); });
     }
     fd.set("description", descriptionData);
-    fd.set("status", editingJob?.status ?? "DRAFT");
+    
+    // Status should be read from the form if available, otherwise fallback to editingJob status
+    const statusSelect = formEl?.querySelector<HTMLSelectElement>('select[name="status"]');
+    if (statusSelect) {
+      fd.set("status", statusSelect.value);
+    } else {
+      fd.set("status", editingJob?.status ?? "DRAFT");
+    }
+    
     return fd;
   }, [editingJob, descriptionData, draftIdState]);
 
@@ -222,6 +231,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
 
     // Grammar note and warnings are handled in UI
     setReviewResult(null); // Clear review after applying
+    setHasAppliedReview(true);
   };
 
   return (
@@ -511,14 +521,14 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                       </div>
                     )}
                     <div className="flex justify-end gap-3 pt-2">
-                      <button type="button" onClick={() => { setShowForm(false); setEditingJob(null); setDraftIdState(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); }} className="btn-secondary text-sm">Cancel</button>
+                      <button type="button" onClick={() => { setShowForm(false); setEditingJob(null); setDraftIdState(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); setHasAppliedReview(false); }} className="btn-secondary text-sm">Cancel</button>
                       <button type="button" onClick={() => saveDraft()} disabled={isAutoSaving} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50">{isAutoSaving ? "Saving..." : "Save Draft"}</button>
-                      {!editingJob && !reviewResult && (
+                      {!editingJob && !reviewResult && !hasAppliedReview && (
                         <button type="button" onClick={handleReview} disabled={isReviewing || isSubmitting} className="px-4 py-2 text-sm font-semibold text-teal-600 bg-teal-50 border border-teal-200 rounded-xl hover:bg-teal-100 transition-colors disabled:opacity-50">
                           {isReviewing ? "Reviewing..." : "🔍 Review with AI"}
                         </button>
                       )}
-                      <button type="submit" disabled={isPending || isSubmitting || (!editingJob && !reviewResult)} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingJob ? "Update Job" : reviewResult ? "Publish" : "Review required"}</button>
+                      <button type="submit" disabled={isPending || isSubmitting || (!editingJob && !reviewResult && !hasAppliedReview)} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingJob ? "Update Job" : (reviewResult || hasAppliedReview) ? "Publish" : "Review required"}</button>
                     </div>
                   </form>
                 </div>

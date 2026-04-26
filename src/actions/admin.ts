@@ -417,6 +417,8 @@ export async function saveJobDraftAction(formData: FormData) {
   const vacancyCount = (formData.get("vacancyCount") as string || "").trim() || null;
   const categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
+  const status = (formData.get("status") as string || "DRAFT");
+
   if (!title) {
     return { error: "Title is required to save draft." };
   }
@@ -432,7 +434,7 @@ export async function saveJobDraftAction(formData: FormData) {
         source,
         applyLink,
         deadline: deadline ? new Date(deadline) : null,
-        status: "DRAFT",
+        status,
         categoryId,
         company,
         locationType,
@@ -459,7 +461,7 @@ export async function saveJobDraftAction(formData: FormData) {
       source,
       applyLink,
       deadline: deadline ? new Date(deadline) : null,
-      status: "DRAFT",
+      status,
       categoryId,
       company,
       locationType,
@@ -512,6 +514,8 @@ export async function saveBidDraftAction(formData: FormData) {
   const deadline = (formData.get("deadline") as string || "").trim() || null;
   const categoryId = (formData.get("categoryId") as string || "").trim() || null;
 
+  const status = (formData.get("status") as string || "DRAFT");
+
   if (!title) {
     return { error: "Title is required to save draft." };
   }
@@ -527,7 +531,7 @@ export async function saveBidDraftAction(formData: FormData) {
         source,
         applyLink,
         deadline: deadline ? new Date(deadline) : null,
-        status: "DRAFT",
+        status,
         categoryId,
       },
     });
@@ -549,7 +553,7 @@ export async function saveBidDraftAction(formData: FormData) {
       source,
       applyLink,
       deadline: deadline ? new Date(deadline) : null,
-      status: "DRAFT",
+      status,
       categoryId,
     },
   });

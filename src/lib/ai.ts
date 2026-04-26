@@ -105,6 +105,29 @@ Return ONLY a valid JSON object with these exact keys:
 }
 `;
 
+const NEWSLETTER_PROMPT = (jobs: { title: string, link: string, metaDescription?: string }[], siteName: string) => `
+You are a career expert at "${siteName}", an Ethiopian job and bid aggregation platform.
+Create a weekly newsletter for our subscribers featuring the following new opportunities.
+
+JOBS:
+${jobs.map((j, i) => `${i + 1}. TITLE: ${j.title}\n   LINK: ${j.link}\n   SUMMARY: ${j.metaDescription || "Click to see details."}`).join("\n\n")}
+
+Guidelines:
+1. Subject line should be catchy, professional, and personalized (e.g. "Your Weekly Career Update from ${siteName}").
+2. The body should be in clean, professional HTML.
+3. Use a friendly but professional tone.
+4. Highlight why these opportunities are exciting.
+5. Include a clear call to action for each job.
+6. The HTML should be self-contained and suitable for email (inline styles).
+7. Return a JSON response only (no markdown, no code blocks).
+
+Return ONLY a valid JSON object with these exact keys:
+{
+  "subject": "The email subject line",
+  "html": "The full HTML body of the email"
+}
+`;
+
 async function callGemini(prompt: string, apiKey: string): Promise<string> {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -234,6 +257,31 @@ export async function reviewContent(title: string, rawDescription: string): Prom
     return parsed;
   } catch (error) {
     console.error(`[AI Review] ${config.provider} Error:`, error);
+    return null;
+  }
+}
+export async function generateNewsletter(jobs: { title: string, link: string, metaDescription?: string }[]): Promise<{ subject: string, html: string } | null> {
+  const config = await getAIConfig();
+  if (!config.enabled) {
+    console.log("[AI Newsletter] Skipped — AI not enabled.");
+    return null;
+  }
+
+  const apiKey = getProviderKey(config);
+  if (!apiKey) {
+    console.log(`[AI Newsletter] Skipped — no API key for provider "${config.provider}".`);
+    return null;
+  }
+
+  const siteName = (await prisma.siteConfig.findUnique({ where: { key: "site_name" } }))?.value || "SeraHub";
+
+  try {
+    const text = await callAI(NEWSLETTER_PROMPT(jobs, siteName), config);
+    const parsed = parseAIResponse(text) as any;
+    console.log("[AI Newsletter] Newsletter generated successfully.");
+    return parsed;
+  } catch (error) {
+    console.error(`[AI Newsletter] ${config.provider} Error:`, error);
     return null;
   }
 }
