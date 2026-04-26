@@ -82,7 +82,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
   const getFormData = useCallback(() => {
     const fd = new FormData();
     if (editingJob) fd.set("id", editingJob.id);
-    const formEl = document.querySelector<HTMLFormElement>('form[action]');
+    const formEl = document.querySelector<HTMLFormElement>('#job-form');
     if (formEl) {
       const inputs = formEl.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input[name], select[name], textarea[name]');
       inputs.forEach((el) => { fd.set(el.name, el.value); });
@@ -142,7 +142,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
     setReviewResult(null);
     setIsReviewing(true);
     const fd = new FormData();
-    const formEl = document.querySelector<HTMLFormElement>('form[action]');
+    const formEl = document.querySelector<HTMLFormElement>('#job-form');
     if (formEl) {
       const inputs = formEl.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input[name], select[name], textarea[name]');
       inputs.forEach((el) => { fd.set(el.name, el.value); });
@@ -255,7 +255,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                     </button>
                   </div>
-                  <form action={handleSubmit} className="p-6 space-y-4">
+                   <form id="job-form" action={handleSubmit} className="p-6 space-y-4">
                     {error && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium">{error}</div>}
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1.5">Title *</label>
