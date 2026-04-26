@@ -285,3 +285,37 @@ export async function generateNewsletter(jobs: { title: string, link: string, me
     return null;
   }
 }
+export async function smartSearch(query: string): Promise<{ q: string, category?: string, locationType?: string, type: "JOB" | "BID" | "BOTH", explanation: string } | null> {
+  const config = await getAIConfig();
+  if (!config.enabled) return null;
+
+  const categories = (await prisma.category.findMany({ select: { name: true } })).map(c => c.name);
+
+  const SEARCH_PROMPT = `
+You are an expert search assistant for "SeraHub", an Ethiopian job and bid aggregation platform.
+The user is searching for: "${query}"
+
+Available Categories: ${categories.join(", ")}
+
+Analyze the query and return a JSON response with parameters to filter the database.
+If the query is a simple keyword, keep it simple. If it's natural language, extract the intent.
+
+Return ONLY a valid JSON object with these exact keys:
+{
+  "q": "The core search keywords (e.g. 'Software Engineer')",
+  "category": "The most relevant category name from the list above, or empty string if none matches well",
+  "locationType": "One of: Office, Remote, Hybrid (if specified), otherwise empty string",
+  "type": "JOB, BID, or BOTH (pick the most likely intent)",
+  "explanation": "A very brief friendly message (max 15 words) explaining what you're searching for"
+}
+`;
+
+  try {
+    const text = await callAI(SEARCH_PROMPT, config);
+    const parsed = parseAIResponse(text) as any;
+    return parsed;
+  } catch (error) {
+    console.error("[AI Search] Error:", error);
+    return null;
+  }
+}
