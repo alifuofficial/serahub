@@ -136,15 +136,27 @@ You are a career expert at "${siteName}", an Ethiopian job and bid aggregation p
 Create a weekly newsletter body for our subscribers featuring the following new opportunities.
 
 JOBS:
-${jobs.map((j, i) => `${i + 1}. TITLE: ${j.title}\n   LINK: ${siteUrl}/api/track?url=${encodeURIComponent(j.link)}&source=newsletter\n   SUMMARY: ${j.metaDescription || "Click to see details."}`).join("\n\n")}
+${jobs.map((j, i) => `${i + 1}. TITLE: ${j.title}
+   LINK: ${j.link}
+   SUMMARY: ${j.metaDescription || "Click to see details."}`).join("\n\n")}
 
 Guidelines:
-1. Subject line should be catchy, professional, and personalized (e.g. "Your Weekly Career Update from ${siteName}").
-2. The body should be in clean, professional HTML (do NOT include <html>, <head>, or <body> tags, just the inner HTML elements like <h1>, <h2>, <p>, <a>, <div>, etc.).
-3. Use a friendly but professional tone.
-4. Highlight why these opportunities are exciting.
-5. Create a visually appealing "card" for each job using <div class="card">, <h3 class="card-title">, <p class="card-company">, and <a class="btn"> classes.
-6. Make sure to use the exact tracking LINKS provided above for the calls to action.
+1. Subject line: Catchy, professional, and personalized (e.g. "Your Weekly Career Update from ${siteName}").
+2. HTML Body: 
+   - Output ONLY the inner HTML elements (no <html>, <head>, <body>).
+   - For each job, create a card using this EXACT structure:
+     <div class="card">
+       <h2 class="card-title">${siteName} | {{Job Title}}</h2>
+       <p class="card-company">{{Company Name if known or 'Various Locations'}}</p>
+       <p class="card-desc">{{A concise, engaging 2-sentence summary of the role and requirements}}</p>
+       <div style="margin-top: 20px;">
+         <a href="{{TRACKING_LINK}}" class="btn">Read more & Apply →</a>
+       </div>
+     </div>
+   - Use the exact tracking links provided in the JOBS list above for the {{TRACKING_LINK}} placeholders.
+   - The tracking links already include the redirect proxy, DO NOT modify them.
+   - Use a friendly but highly professional "AI-curated" tone.
+   - You can add a brief 1-2 sentence intro before the cards and an outro after the cards.
 
 Please output your response exactly in this format:
 SUBJECT: [Your Subject Here]
@@ -330,7 +342,7 @@ export async function generateNewsletter(jobs: { title: string, link: string, me
   }
 
   const siteName = (await prisma.siteConfig.findUnique({ where: { key: "site_name" } }))?.value || "SeraHub";
-  const siteUrl = (await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } }))?.value || "https://serahub.com";
+  const siteUrl = (await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } }))?.value || "https://serahub.click";
 
   try {
     const text = await callAI(NEWSLETTER_PROMPT(jobs, siteName, siteUrl), config, "newsletter");

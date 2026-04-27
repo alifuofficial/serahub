@@ -65,9 +65,9 @@ export default async function CategoryPage({ params }: PageProps) {
   return (
     <div className="container mx-auto px-4 py-12 max-w-6xl">
       <BreadcrumbJsonLd items={[
-        { name: "Home", url: "https://serahub.com" },
-        { name: "Categories", url: "https://serahub.com" },
-        { name: category.name, url: `https://serahub.com/categories/${category.slug}` },
+        { name: "Home", url: "https://serahub.click" },
+        { name: "Categories", url: "https://serahub.click" },
+        { name: category.name, url: `https://serahub.click/categories/${category.slug}` },
       ]} />
       <div className="mb-12">
         <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6">

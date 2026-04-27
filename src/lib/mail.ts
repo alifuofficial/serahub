@@ -40,9 +40,9 @@ export async function sendMail({ to, subject, text, html }: { to: string, subjec
     return acc;
   }, {} as Record<string, string>);
 
-  const fromEmail = config.smtp_from || "noreply@serahub.com";
+  const fromEmail = config.smtp_from || "noreply@serahub.click";
   const siteName = config.site_name || "SeraHub";
-  const siteUrl = config.appearance_site_url || "https://serahub.com";
+  const siteUrl = config.appearance_site_url || "https://serahub.click";
 
   const finalHtml = html ? getEmailTemplateHtml(html, config, subject) : undefined;
 

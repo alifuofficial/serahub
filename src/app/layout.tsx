@@ -12,7 +12,7 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://serahub.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://serahub.click";
 
 export const viewport: Viewport = {
   themeColor: "#00c087",

@@ -74,9 +74,9 @@ export default async function JobDetailPage({ params }: Params) {
         hiringOrganization={job.company || job.source || "SeraHub"}
       />
       <BreadcrumbJsonLd items={[
-        { name: "Home", url: "https://serahub.com" },
-        { name: "Jobs", url: "https://serahub.com/jobs" },
-        { name: job.title, url: `https://serahub.com/jobs/${job.slug}` },
+        { name: "Home", url: "https://serahub.click" },
+        { name: "Jobs", url: "https://serahub.click/jobs" },
+        { name: job.title, url: `https://serahub.click/jobs/${job.slug}` },
       ]} />
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">

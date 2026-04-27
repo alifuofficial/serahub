@@ -55,12 +55,16 @@ export async function triggerNewsletterAction() {
     if (jobs.length === 0) return { error: "No new jobs found in the last 7 days." };
 
     // 3. Generate newsletter content with AI
-    const siteUrl = (await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } }))?.value || "https://serahub.com";
-    const newsletterJobs = jobs.map(j => ({
-      title: j.title,
-      link: `${siteUrl.replace(/\/$/, "")}/jobs/${j.slug}`,
-      metaDescription: j.metaDescription ?? undefined
-    }));
+    const siteUrl = (await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } }))?.value || "https://serahub.click";
+    const newsletterJobs = jobs.map(j => {
+      const jobUrl = `${siteUrl.replace(/\/$/, "")}/jobs/${j.slug}`;
+      const trackingLink = `${siteUrl.replace(/\/$/, "")}/api/track?url=${encodeURIComponent(jobUrl)}&source=newsletter`;
+      return {
+        title: j.title,
+        link: trackingLink,
+        metaDescription: j.metaDescription ?? undefined
+      };
+    });
 
     const content = await generateNewsletter(newsletterJobs);
     if (!content) return { error: "Failed to generate newsletter with AI." };

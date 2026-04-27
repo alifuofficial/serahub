@@ -206,7 +206,7 @@ export default function SettingsClient({ user, config }: Props) {
                               </div>
                             )}
                             <div className="flex gap-2">
-                              <input type="url" value={form.seo_og_image} onChange={(e) => update("seo_og_image", e.target.value)} className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://serahub.com/og-image.png" />
+                              <input type="url" value={form.seo_og_image} onChange={(e) => update("seo_og_image", e.target.value)} className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://serahub.click/og-image.png" />
                               <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-slate-300 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors text-sm font-medium text-slate-500 hover:text-primary whitespace-nowrap" id="og-image-upload-label">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                                 Upload
@@ -274,11 +274,11 @@ export default function SettingsClient({ user, config }: Props) {
                           <FormRow label="SMTP Port"><input type="text" value={form.smtp_port} onChange={(e) => update("smtp_port", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="587" /></FormRow>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                          <FormRow label="SMTP Username"><input type="text" value={form.smtp_user} onChange={(e) => update("smtp_user", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="noreply@serahub.com" /></FormRow>
+                          <FormRow label="SMTP Username"><input type="text" value={form.smtp_user} onChange={(e) => update("smtp_user", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="noreply@serahub.click" /></FormRow>
                           <FormRow label="SMTP Password"><input type="password" value={form.smtp_pass} onChange={(e) => update("smtp_pass", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" /></FormRow>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                          <FormRow label="From Email"><input type="email" value={form.smtp_from} onChange={(e) => update("smtp_from", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="noreply@serahub.com" /></FormRow>
+                          <FormRow label="From Email"><input type="email" value={form.smtp_from} onChange={(e) => update("smtp_from", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="noreply@serahub.click" /></FormRow>
                           <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Secure Connection</label>
                             <div className="flex items-center gap-3 mt-2">
@@ -370,7 +370,7 @@ export default function SettingsClient({ user, config }: Props) {
                           </div>
                         </FormRow>
                         <FormRow label="Site URL" hint="The canonical URL of your website">
-                          <input type="url" value={form.appearance_site_url} onChange={(e) => update("appearance_site_url", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://serahub.com" />
+                          <input type="url" value={form.appearance_site_url} onChange={(e) => update("appearance_site_url", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://serahub.click" />
                         </FormRow>
                       </div>
                     </div>

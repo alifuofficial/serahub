@@ -3,8 +3,8 @@ export function OrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "SeraHub",
-    url: "https://serahub.com",
-    logo: "https://serahub.com/logo.png",
+    url: "https://serahub.click",
+    logo: "https://serahub.click/logo.png",
     description: "Discover the latest jobs, bids, and tender opportunities. SeraHub connects you with top companies and talented professionals.",
     sameAs: [],
   };
@@ -22,10 +22,10 @@ export function WebSiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "SeraHub",
-    url: "https://serahub.com",
+    url: "https://serahub.click",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://serahub.com/jobs?q={search_term_string}",
+      target: "https://serahub.click/jobs?q={search_term_string}",
       "query-input": "required name=search_term_string",
     },
   };

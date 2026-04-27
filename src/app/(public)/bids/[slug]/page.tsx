@@ -73,9 +73,9 @@ export default async function BidDetailPage({ params }: Params) {
         category={bid.category?.name}
       />
       <BreadcrumbJsonLd items={[
-        { name: "Home", url: "https://serahub.com" },
-        { name: "Bids", url: "https://serahub.com/bids" },
-        { name: bid.title, url: `https://serahub.com/bids/${bid.slug}` },
+        { name: "Home", url: "https://serahub.click" },
+        { name: "Bids", url: "https://serahub.click/bids" },
+        { name: bid.title, url: `https://serahub.click/bids/${bid.slug}` },
       ]} />
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">

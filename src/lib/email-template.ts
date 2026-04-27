@@ -5,7 +5,7 @@ export function getEmailTemplateHtml(
 ) {
   const siteName = config.site_name || "SeraHub";
   const primaryColor = config.appearance_primary_color || "#00c087";
-  const siteUrl = config.appearance_site_url || "https://serahub.com";
+  const siteUrl = config.appearance_site_url || "https://serahub.click";
   const logoUrl = config.appearance_logo_url || `${siteUrl}/logo.png`;
 
   const socialLinksHtml = [
@@ -22,207 +22,174 @@ export function getEmailTemplateHtml(
         `<a href="${siteUrl}/api/track?url=${encodeURIComponent(
           s.url!
         )}&source=email_social" style="display:inline-block; margin: 0 8px;">
-          <img src="${s.icon}" alt="${s.name}" width="24" height="24" style="display:block; width:24px; height:24px;" />
+          <img src="${s.icon}" alt="${s.name}" width="20" height="20" style="display:block; width:20px; height:20px; opacity: 0.8;" />
         </a>`
     )
     .join("");
 
-  return `
+  return \`
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>\${title}</title>
   <style>
-    body {
+    * {
       margin: 0;
       padding: 0;
-      background-color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #334155;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #ecfdf5;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
     }
-    .email-wrapper {
-      width: 100%;
-      background-color: #f8fafc;
-      padding: 40px 0;
+    .ai-gradient-bg {
+      background: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
     }
-    .email-content {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    }
-    .email-header {
-      background-color: #ffffff;
-      padding: 32px 40px;
-      text-align: center;
-      border-bottom: 2px solid #f1f5f9;
-    }
-    .email-header img {
-      height: 48px;
-      width: auto;
-    }
-    .email-body {
-      padding: 40px;
-      line-height: 1.6;
-      font-size: 16px;
-      color: #334155;
-    }
-    .email-body h1 {
-      font-size: 24px;
-      font-weight: 800;
-      color: #0f172a;
-      margin-top: 0;
-      margin-bottom: 24px;
-    }
-    .email-body h2 {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-top: 32px;
-      margin-bottom: 16px;
-    }
-    .email-body p {
-      margin-top: 0;
-      margin-bottom: 16px;
-    }
-    .email-body a {
-      color: ${primaryColor};
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .email-body a:hover {
-      text-decoration: underline;
-    }
-    .btn {
-      display: inline-block;
-      background-color: ${primaryColor};
-      color: #ffffff !important;
-      padding: 14px 28px;
-      border-radius: 8px;
-      font-weight: 700;
-      text-decoration: none;
-      text-align: center;
-      margin: 16px 0;
-    }
-    .email-footer {
-      background-color: #f8fafc;
-      padding: 32px 40px;
-      text-align: center;
-      border-top: 1px solid #e2e8f0;
-    }
-    .social-links {
-      margin-bottom: 24px;
-    }
-    .footer-text {
-      font-size: 13px;
-      color: #64748b;
-      line-height: 1.5;
-      margin: 0 0 8px 0;
-    }
-    .footer-links a {
-      color: #64748b;
-      text-decoration: underline;
-      margin: 0 8px;
-    }
-    /* Card Styles for Newsletter Jobs/Bids */
     .card {
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      background-color: #ffffff;
+      margin-bottom: 24px;
+      padding: 24px;
+      border-radius: 24px;
+      border: 1px solid #f1f5f9;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .card-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 0 0 8px 0;
+      font-size: 20px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+      text-decoration: none;
     }
     .card-company {
       font-size: 14px;
       color: #64748b;
-      margin: 0 0 12px 0;
-      font-weight: 600;
+      margin-bottom: 12px;
+      font-weight: 500;
     }
-    .card-details {
-      font-size: 14px;
+    .card-desc {
+      font-size: 15px;
       color: #475569;
-      margin: 0 0 16px 0;
+      line-height: 1.6;
+      margin-bottom: 20px;
     }
-    .badge {
+    .btn {
       display: inline-block;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
-      background-color: #f1f5f9;
-      color: #475569;
-      margin-right: 8px;
-      margin-bottom: 8px;
-    }
-    .badge-primary {
-      background-color: ${primaryColor}15;
-      color: ${primaryColor};
+      background: linear-gradient(105deg, #047857, #059669);
+      color: #ffffff !important;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      text-align: center;
     }
     @media only screen and (max-width: 600px) {
-      .email-content {
-        border-radius: 0;
+      .container {
+        border-radius: 0 !important;
+        margin: 0 !important;
       }
-      .email-header, .email-body, .email-footer {
+      .header, .body, .footer {
         padding: 24px !important;
       }
     }
   </style>
 </head>
-<body>
-  <div class="email-wrapper">
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr>
-        <td align="center">
-          <div class="email-content">
-            
-            <!-- Header -->
-            <div class="email-header">
-              <a href="${siteUrl}/api/track?url=${encodeURIComponent(siteUrl)}&source=email_header" target="_blank">
-                <img src="${logoUrl}" alt="${siteName} Logo" />
-              </a>
-            </div>
+<body style="background-color: #ecfdf5; margin: 0; padding: 0;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ecfdf5;">
+    <tr>
+      <td align="center" style="padding: 32px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 32px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); border: 1px solid #d1fae5;">
+          
+          <!-- HEADER -->
+          <tr>
+            <td class="header" style="background: linear-gradient(135deg, #022c22 0%, #0a5c42 100%); padding: 44px 32px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td>
+                    <div style="background-color: rgba(255,255,255,0.2); display: inline-block; padding: 4px 12px; border-radius: 20px; color: #d1fae5; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 12px;">AI • CURATED</div>
+                    <span style="color: #a7f3d0; font-size: 12px; margin-left: 8px;">weekly digest</span>
+                    <h1 style="color: #ffffff; font-size: 42px; font-weight: 800; margin: 0; letter-spacing: -0.02em;">
+                      \${siteName.toLowerCase()}<span style="color: #a7f3d0; font-weight: 300;">/jobs</span>
+                    </h1>
+                    <p style="color: #d1fae5; font-size: 16px; line-height: 1.5; margin: 12px 0 0 0; max-width: 320px; opacity: 0.9;">
+                      Smart aggregated jobs & bids — fresh opportunities, delivered weekly to your inbox.
+                    </p>
+                    <div style="width: 64px; height: 4px; background-color: #34d399; border-radius: 2px; margin-top: 24px;"></div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-            <!-- Body -->
-            <div class="email-body">
-              ${bodyHtml}
-            </div>
+          <!-- BODY -->
+          <tr>
+            <td class="body" style="padding: 40px 32px; background-color: #ffffff;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 32px;">
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                       <span style="font-size: 20px;">🤖</span>
+                       <span style="color: #374151; font-size: 14px; font-weight: 600; margin-left: 8px;">Curated by <span style="background-color: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 12px; font-size: 12px;">Smart Match 2.0</span></span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
 
-            <!-- Footer -->
-            <div class="email-footer">
-              <div class="social-links">
-                ${socialLinksHtml}
+              <div class="email-body" style="color: #334155;">
+                \${bodyHtml}
               </div>
-              
-              <p class="footer-text">
-                You are receiving this email because you subscribed to updates from ${siteName}.
-              </p>
-              
-              <div class="footer-links">
-                <a href="${siteUrl}/api/track?url=${encodeURIComponent(siteUrl + "/privacy")}&source=email_footer">Privacy Policy</a>
-                <a href="${siteUrl}/api/track?url=${encodeURIComponent(siteUrl + "/unsubscribe")}&source=email_footer">Unsubscribe</a>
+
+              <div style="text-align: center; margin-top: 40px;">
+                <p style="color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Curated by \${siteName} engine • Updated every week</p>
+                <div style="border-top: 1px solid #f1f5f9;"></div>
               </div>
-              
-              <p class="footer-text" style="margin-top: 16px;">
-                &copy; ${new Date().getFullYear()} ${siteName}. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td class="footer" style="background-color: #fafef9; padding: 40px 32px; border-top: 1px solid #d1fae5;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="padding-bottom: 32px;">
+                    <div style="margin-bottom: 12px;">
+                      <span style="font-weight: 800; color: #1e293b; font-size: 20px; letter-spacing: -0.02em;">\${siteName}<span style="color: #047857;">/jobs</span></span>
+                    </div>
+                    <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0; max-width: 240px;">AI-powered weekly insights for job seekers and businesses in Ethiopia.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="border-top: 1px solid #e2e8f0; padding-top: 24px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="color: #94a3b8; font-size: 11px;">
+                          © \${new Date().getFullYear()} \${siteName} • Innovation Hub<br>
+                          Addis Ababa, Ethiopia
+                        </td>
+                        <td align="right">
+                          <a href="\${siteUrl}/unsubscribe" style="color: #059669; text-decoration: none; font-size: 11px; font-weight: 700; margin-left: 16px;">Unsubscribe</a>
+                          <a href="\${siteUrl}/privacy" style="color: #059669; text-decoration: none; font-size: 11px; font-weight: 700; margin-left: 16px;">Privacy</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
-  `;
+\`;
 }
