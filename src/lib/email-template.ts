@@ -27,14 +27,14 @@ export function getEmailTemplateHtml(
     )
     .join("");
 
-  return \`
+  return `
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="x-apple-disable-message-reformatting">
-  <title>\${title}</title>
+  <title>${title}</title>
   <style>
     * {
       margin: 0;
@@ -116,7 +116,7 @@ export function getEmailTemplateHtml(
                     <div style="background-color: rgba(255,255,255,0.2); display: inline-block; padding: 4px 12px; border-radius: 20px; color: #d1fae5; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 12px;">AI • CURATED</div>
                     <span style="color: #a7f3d0; font-size: 12px; margin-left: 8px;">weekly digest</span>
                     <h1 style="color: #ffffff; font-size: 42px; font-weight: 800; margin: 0; letter-spacing: -0.02em;">
-                      \${siteName.toLowerCase()}<span style="color: #a7f3d0; font-weight: 300;">/jobs</span>
+                      ${siteName.toLowerCase()}<span style="color: #a7f3d0; font-weight: 300;">/jobs</span>
                     </h1>
                     <p style="color: #d1fae5; font-size: 16px; line-height: 1.5; margin: 12px 0 0 0; max-width: 320px; opacity: 0.9;">
                       Smart aggregated jobs & bids — fresh opportunities, delivered weekly to your inbox.
@@ -143,11 +143,11 @@ export function getEmailTemplateHtml(
               </table>
 
               <div class="email-body" style="color: #334155;">
-                \${bodyHtml}
+                ${bodyHtml}
               </div>
 
               <div style="text-align: center; margin-top: 40px;">
-                <p style="color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Curated by \${siteName} engine • Updated every week</p>
+                <p style="color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Curated by ${siteName} engine • Updated every week</p>
                 <div style="border-top: 1px solid #f1f5f9;"></div>
               </div>
             </td>
@@ -160,7 +160,7 @@ export function getEmailTemplateHtml(
                 <tr>
                   <td style="padding-bottom: 32px;">
                     <div style="margin-bottom: 12px;">
-                      <span style="font-weight: 800; color: #1e293b; font-size: 20px; letter-spacing: -0.02em;">\${siteName}<span style="color: #047857;">/jobs</span></span>
+                      <span style="font-weight: 800; color: #1e293b; font-size: 20px; letter-spacing: -0.02em;">${siteName}<span style="color: #047857;">/jobs</span></span>
                     </div>
                     <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0; max-width: 240px;">AI-powered weekly insights for job seekers and businesses in Ethiopia.</p>
                   </td>
@@ -170,12 +170,12 @@ export function getEmailTemplateHtml(
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td style="color: #94a3b8; font-size: 11px;">
-                          © \${new Date().getFullYear()} \${siteName} • Innovation Hub<br>
+                          © ${new Date().getFullYear()} ${siteName} • Innovation Hub<br>
                           Addis Ababa, Ethiopia
                         </td>
                         <td align="right">
-                          <a href="\${siteUrl}/unsubscribe" style="color: #059669; text-decoration: none; font-size: 11px; font-weight: 700; margin-left: 16px;">Unsubscribe</a>
-                          <a href="\${siteUrl}/privacy" style="color: #059669; text-decoration: none; font-size: 11px; font-weight: 700; margin-left: 16px;">Privacy</a>
+                          <a href="${siteUrl}/unsubscribe" style="color: #059669; text-decoration: none; font-size: 11px; font-weight: 700; margin-left: 16px;">Unsubscribe</a>
+                          <a href="${siteUrl}/privacy" style="color: #059669; text-decoration: none; font-size: 11px; font-weight: 700; margin-left: 16px;">Privacy</a>
                         </td>
                       </tr>
                     </table>
@@ -191,5 +191,5 @@ export function getEmailTemplateHtml(
   </table>
 </body>
 </html>
-\`;
+`;
 }
