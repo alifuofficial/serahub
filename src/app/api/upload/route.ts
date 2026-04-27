@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
       });
 
       const remoteRoot = config.ftp_root || "/";
+      await client.ensureDir(remoteRoot);
       const remotePath = path.posix.join(remoteRoot, uniqueName);
       
       // Ensure the buffer is sent as a readable stream or directly if supported

@@ -102,8 +102,10 @@ export async function testFtpAction() {
       secure: false
     });
 
-    const uniqueName = `test-connection-${Date.now()}.txt`;
     const remoteRoot = config.ftp_root || "/";
+    await client.ensureDir(remoteRoot);
+    
+    const uniqueName = `test-connection-${Date.now()}.txt`;
     const remotePath = (remoteRoot.endsWith("/") ? remoteRoot : remoteRoot + "/") + uniqueName;
     
     // Create a simple text stream for the test file
