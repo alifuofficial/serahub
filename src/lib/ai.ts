@@ -145,13 +145,11 @@ Guidelines:
 4. Highlight why these opportunities are exciting.
 5. Include a clear call to action for each job.
 6. The HTML should be self-contained and suitable for email (inline styles).
-7. Return a JSON response only (no markdown, no code blocks).
 
-Return ONLY a valid JSON object with these exact keys:
-{
-  "subject": "The email subject line",
-  "html": "The full HTML body of the email"
-}
+Please output your response exactly in this format:
+SUBJECT: [Your Subject Here]
+HTML:
+[Your HTML code here]
 `;
 
 async function callGemini(prompt: string, apiKey: string): Promise<string> {
@@ -335,9 +333,19 @@ export async function generateNewsletter(jobs: { title: string, link: string, me
 
   try {
     const text = await callAI(NEWSLETTER_PROMPT(jobs, siteName), config, "newsletter");
-    const parsed = parseAIResponse(text) as any;
+    
+    // Parse the custom format
+    const subjectMatch = text.match(/SUBJECT:\s*(.+)/i);
+    let htmlPart = text.split(/HTML:/i)[1] || text;
+    
+    // Remove markdown code fences if AI still wrapped it in ```html ... ```
+    htmlPart = htmlPart.replace(/```(?:html)?\s*([\s\S]*?)```/i, "$1");
+    
+    const subject = subjectMatch ? subjectMatch[1].trim() : `Your Weekly Career Update from ${siteName}`;
+    const html = htmlPart.trim();
+    
     console.log("[AI Newsletter] Newsletter generated successfully.");
-    return parsed;
+    return { subject, html };
   } catch (error) {
     console.error(`[AI Newsletter] ${config.provider} Error:`, error);
     return null;
