@@ -77,3 +77,51 @@ export async function testSmtpAction(email: string) {
     return { error: error.message || "Failed to connect to SMTP server. Check your host, port, and credentials." };
   }
 }
+
+export async function testFtpAction() {
+  const configRows = await prisma.siteConfig.findMany({
+    where: { key: { in: ["ftp_host", "ftp_port", "ftp_user", "ftp_pass", "ftp_root", "ftp_public_url"] } }
+  });
+  const config: Record<string, string> = {};
+  configRows.forEach(row => config[row.key] = row.value);
+
+  if (!config.ftp_host || !config.ftp_user || !config.ftp_pass) {
+    return { error: "FTP Host, User, and Password are required for testing." };
+  }
+
+  const ftp = await import("basic-ftp");
+  const client = new ftp.Client();
+  client.ftp.verbose = true;
+  
+  try {
+    await client.access({
+      host: config.ftp_host,
+      port: parseInt(config.ftp_port || "21"),
+      user: config.ftp_user,
+      password: config.ftp_pass,
+      secure: false
+    });
+
+    const uniqueName = `test-connection-${Date.now()}.txt`;
+    const remoteRoot = config.ftp_root || "/";
+    const remotePath = (remoteRoot.endsWith("/") ? remoteRoot : remoteRoot + "/") + uniqueName;
+    
+    // Create a simple text stream for the test file
+    const stream = new (require("stream").Readable)();
+    stream.push("SeraHub FTP Connection Test\nStatus: Successful\nTime: " + new Date().toISOString() + "\nThis file can be safely deleted.");
+    stream.push(null);
+
+    await client.uploadFrom(stream, remotePath);
+    await client.close();
+
+    const publicUrl = config.ftp_public_url?.replace(/\/$/, "") || "";
+    return { 
+      success: true, 
+      url: `${publicUrl}/${uniqueName}` 
+    };
+  } catch (err: any) {
+    console.error("FTP Test Error:", err);
+    client.close();
+    return { error: `FTP Test failed: ${err.message}` };
+  }
+}

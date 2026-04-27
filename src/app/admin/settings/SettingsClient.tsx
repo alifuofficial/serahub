@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { logoutAction } from "@/actions/auth";
-import { updateSettingsAction, resetViewsAction, deleteDraftsAction, testSmtpAction } from "@/actions/settings";
+import { updateSettingsAction, resetViewsAction, deleteDraftsAction, testSmtpAction, testFtpAction } from "@/actions/settings";
 import ImageUpload from "@/components/common/ImageUpload";
 
 interface Props {
@@ -66,6 +66,8 @@ export default function SettingsClient({ user, config }: Props) {
   const [testEmail, setTestEmail] = useState(user.email);
   const [testStatus, setTestStatus] = useState<{ type: "success" | "error" | "none", msg: string }>({ type: "none", msg: "" });
   const [isTesting, setIsTesting] = useState(false);
+  const [ftpTestStatus, setFtpTestStatus] = useState<{ type: "success" | "error" | "none", msg: string, url?: string }>({ type: "none", msg: "" });
+  const [isFtpTesting, setIsFtpTesting] = useState(false);
 
   const [form, setForm] = useState(config);
 
@@ -402,6 +404,61 @@ export default function SettingsClient({ user, config }: Props) {
                         </div>
                         <FormRow label="Root Directory" hint="The path on the FTP server where files will be saved (e.g., /public_html/uploads)"><input type="text" value={form.ftp_root} onChange={(e) => update("ftp_root", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="/" /></FormRow>
                         <FormRow label="Public URL" hint="The public URL where these files are accessible (e.g., https://cdn.example.com/uploads)"><input type="url" value={form.ftp_public_url} onChange={(e) => update("ftp_public_url", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://cdn.example.com" /></FormRow>
+                        
+                        <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 mt-4">
+                          <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            Test FTP Connection
+                          </h3>
+                          <p className="text-xs text-slate-500 mb-4">Clicking the button below will attempt to upload a small <code>test-connection.txt</code> file to your server to verify the configuration.</p>
+                          
+                          <button 
+                            onClick={() => {
+                              setIsFtpTesting(true);
+                              setFtpTestStatus({ type: "none", msg: "" });
+                              startTransition(async () => {
+                                const res = await testFtpAction();
+                                if (res.error) {
+                                  setFtpTestStatus({ type: "error", msg: res.error });
+                                } else {
+                                  setFtpTestStatus({ type: "success", msg: "FTP Connection Successful! Test file uploaded.", url: res.url });
+                                }
+                                setIsFtpTesting(false);
+                              });
+                            }} 
+                            disabled={isFtpTesting || !form.ftp_host || !form.ftp_user || !form.ftp_pass}
+                            className="px-6 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {isFtpTesting ? (
+                              <>
+                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Testing...
+                              </>
+                            ) : "Test FTP Upload"}
+                          </button>
+
+                          {ftpTestStatus.type !== "none" && (
+                            <div className={`mt-4 p-4 rounded-xl border ${ftpTestStatus.type === "success" ? "bg-emerald-50 border-emerald-100 text-emerald-800" : "bg-red-50 border-red-100 text-red-800"}`}>
+                              <p className="text-sm font-bold flex items-center gap-2">
+                                {ftpTestStatus.type === "success" ? (
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                ) : (
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                )}
+                                {ftpTestStatus.type === "success" ? "Success" : "Error"}
+                              </p>
+                              <p className="text-xs mt-1 leading-relaxed">{ftpTestStatus.msg}</p>
+                              {ftpTestStatus.url && (
+                                <div className="mt-3 pt-3 border-t border-emerald-200/50">
+                                  <p className="text-[10px] uppercase font-bold text-emerald-600/70 tracking-wider">Test File URL</p>
+                                  <a href={ftpTestStatus.url} target="_blank" rel="noopener noreferrer" className="text-xs font-mono break-all text-primary hover:underline mt-1 block">
+                                    {ftpTestStatus.url}
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>
