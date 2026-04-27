@@ -4,6 +4,7 @@ import BidCard from "@/components/ui/BidCard";
 import SearchForm from "@/components/common/SearchForm";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
+import type { Job, Bid } from "@prisma/client";
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const { q } = await searchParams;
@@ -95,12 +96,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
 
   // 2. Fetch Data
   const [jobs, bids, userBookmarks] = await Promise.all([
-    type === "BID" ? Promise.resolve([]) : prisma.job.findMany({
+    type === "BID" ? Promise.resolve([] as Job[]) : prisma.job.findMany({
       where: jobWhere,
       orderBy: { createdAt: "desc" },
       take: 20
     }),
-    type === "JOB" ? Promise.resolve([]) : prisma.bid.findMany({
+    type === "JOB" ? Promise.resolve([] as Bid[]) : prisma.bid.findMany({
       where: bidWhere,
       orderBy: { createdAt: "desc" },
       take: 20
@@ -108,7 +109,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
     session ? prisma.bookmark.findMany({
       where: { userId: session.id },
       select: { jobId: true, bidId: true }
-    }) : Promise.resolve([])
+    }) : Promise.resolve([] as { jobId: string | null; bidId: string | null }[])
   ]);
 
   const bookmarkedJobIds = new Set(userBookmarks.map(b => b.jobId).filter(Boolean));

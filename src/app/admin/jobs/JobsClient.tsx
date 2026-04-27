@@ -290,7 +290,7 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
                     </button>
                   </div>
                   <div className="border border-slate-100 rounded-[24px] overflow-hidden">
-                    <Editor value={editingJob?.description || ""} onChange={setDescriptionData} />
+                    <Editor initialData={editingJob?.description || ""} onChange={setDescriptionData} />
                   </div>
                 </div>
 

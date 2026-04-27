@@ -287,7 +287,7 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
                     </button>
                   </div>
                   <div className="border border-slate-100 rounded-[24px] overflow-hidden">
-                    <Editor value={editingBid?.description || ""} onChange={setDescriptionData} />
+                    <Editor initialData={editingBid?.description || ""} onChange={setDescriptionData} />
                   </div>
                 </div>
 
