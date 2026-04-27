@@ -93,19 +93,17 @@ export default function JobsClient({ user, jobs, categories, filters }: Props) {
   }, [editingJob, draftIdState, descriptionData]);
 
   const { isSaving, lastSaved } = useAutoSave({
-    onSave: async () => {
-      if (!showForm || editingJob) return;
-      const fd = getFormData();
+    onSave: async (fd) => {
       const title = fd.get("title") as string;
-      if (!title || title.trim().length < 3) return;
-      
-      const result = await saveJobDraftAction(fd);
-      if (result.success && result.id) {
-        setDraftIdState(result.id);
-      }
+      if (!title || title.trim().length < 3) return null;
+      return await saveJobDraftAction(fd);
+    },
+    getFormData,
+    onSaveSuccess: (id) => {
+      if (!editingJob) setDraftIdState(id);
     },
     enabled: showForm && !editingJob,
-    debounceMs: 5000
+    interval: 10000
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

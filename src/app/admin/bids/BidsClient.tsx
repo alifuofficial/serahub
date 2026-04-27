@@ -91,19 +91,17 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
   }, [editingBid, descriptionData]);
 
   const { isSaving, lastSaved } = useAutoSave({
-    onSave: async () => {
-      if (!showForm || editingBid) return;
-      const fd = getFormData();
+    onSave: async (fd) => {
       const title = fd.get("title") as string;
-      if (!title || title.trim().length < 3) return;
-      
-      const result = await saveBidDraftAction(fd);
-      if (result.success && result.id) {
-        setEditingBid({ id: result.id } as any);
-      }
+      if (!title || title.trim().length < 3) return null;
+      return await saveBidDraftAction(fd);
+    },
+    getFormData,
+    onSaveSuccess: (id) => {
+      if (!editingBid) setEditingBid({ id } as any);
     },
     enabled: showForm && !editingBid,
-    debounceMs: 5000
+    interval: 10000
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
