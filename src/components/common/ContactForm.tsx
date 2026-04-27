@@ -59,6 +59,12 @@ export default function ContactForm() {
           <option value="feedback">Feedback</option>
         </select>
       </div>
+
+      {/* Honeypot field - hidden from users */}
+      <div style={{ display: 'none' }} aria-hidden="true">
+        <input type="text" name="hp_phone" tabIndex={-1} autoComplete="off" />
+      </div>
+
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="contact-message">Message</label>
         <textarea id="contact-message" name="message" rows={5} placeholder="Tell us how we can help..." required className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm resize-none" />

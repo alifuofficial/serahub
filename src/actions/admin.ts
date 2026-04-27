@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getAISuggestions, reviewContent } from "@/lib/ai";
+import { requireAdmin } from "@/lib/session";
 
 function slugify(text: string): string {
   const slug = text
@@ -14,6 +15,7 @@ function slugify(text: string): string {
 }
 
 export async function createJobAction(formData: FormData) {
+  await requireAdmin();
   const title = (formData.get("title") as string || "").trim();
   const description = (formData.get("description") as string || "");
   const source = (formData.get("source") as string || "").trim() || null;
@@ -105,6 +107,7 @@ export async function createJobAction(formData: FormData) {
 }
 
 export async function updateJobAction(formData: FormData) {
+  await requireAdmin();
   const id = formData.get("id") as string;
   const title = (formData.get("title") as string || "").trim();
   const description = (formData.get("description") as string || "");
@@ -191,6 +194,7 @@ export async function updateJobAction(formData: FormData) {
 }
 
 export async function deleteJobAction(formData: FormData) {
+  await requireAdmin();
   const id = formData.get("id") as string;
   await prisma.job.delete({ where: { id } });
   revalidatePath("/admin/jobs");
@@ -199,6 +203,7 @@ export async function deleteJobAction(formData: FormData) {
 }
 
 export async function createBidAction(formData: FormData) {
+  await requireAdmin();
   const title = (formData.get("title") as string || "").trim();
   const description = (formData.get("description") as string || "");
   const source = (formData.get("source") as string || "").trim() || null;
@@ -280,6 +285,7 @@ export async function createBidAction(formData: FormData) {
 }
 
 export async function updateBidAction(formData: FormData) {
+  await requireAdmin();
   const id = formData.get("id") as string;
   const title = (formData.get("title") as string || "").trim();
   const description = (formData.get("description") as string || "");
@@ -356,6 +362,7 @@ export async function updateBidAction(formData: FormData) {
 }
 
 export async function deleteBidAction(formData: FormData) {
+  await requireAdmin();
   const id = formData.get("id") as string;
   await prisma.bid.delete({ where: { id } });
   revalidatePath("/admin/bids");
@@ -364,6 +371,7 @@ export async function deleteBidAction(formData: FormData) {
 }
 
 export async function reviewJobAction(formData: FormData) {
+  await requireAdmin();
   const title = (formData.get("title") as string || "").trim();
   const description = (formData.get("description") as string || "");
 
@@ -384,6 +392,7 @@ export async function reviewJobAction(formData: FormData) {
 }
 
 export async function reviewBidAction(formData: FormData) {
+  await requireAdmin();
   const title = (formData.get("title") as string || "").trim();
   const description = (formData.get("description") as string || "");
 
@@ -404,6 +413,7 @@ export async function reviewBidAction(formData: FormData) {
 }
 
 export async function saveJobDraftAction(formData: FormData) {
+  await requireAdmin();
   const id = (formData.get("id") as string || "").trim() || null;
   const title = (formData.get("title") as string || "").trim();
   const description = (formData.get("description") as string || "");
@@ -476,6 +486,7 @@ export async function saveJobDraftAction(formData: FormData) {
 }
 
 export async function attachBidFileAction(formData: FormData) {
+  await requireAdmin();
   const bidId = formData.get("bidId") as string;
   const name = (formData.get("name") as string || "").trim();
   const filePath = (formData.get("path") as string || "").trim();
@@ -495,6 +506,7 @@ export async function attachBidFileAction(formData: FormData) {
 }
 
 export async function detachBidFileAction(formData: FormData) {
+  await requireAdmin();
   const fileId = formData.get("fileId") as string;
   if (!fileId) return { error: "fileId is required." };
 
@@ -506,6 +518,7 @@ export async function detachBidFileAction(formData: FormData) {
 }
 
 export async function saveBidDraftAction(formData: FormData) {
+  await requireAdmin();
   const id = (formData.get("id") as string || "").trim() || null;
   const title = (formData.get("title") as string || "").trim();
   const description = (formData.get("description") as string || "");

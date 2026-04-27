@@ -1,8 +1,17 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function submitContactAction(formData: FormData) {
+  // Honeypot check
+  if (formData.get("hp_phone")) {
+    return { error: "Spam detected." };
+  }
+
+  const limiter = await rateLimit(2, 60000); // 2 messages per minute
+  if (!limiter.success) return { error: "Too many messages. Please try again later." };
+
   const name = (formData.get("name") as string || "").trim();
   const email = (formData.get("email") as string || "").trim();
   const subject = (formData.get("subject") as string || "").trim();

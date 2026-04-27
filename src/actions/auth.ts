@@ -6,7 +6,14 @@ import { verifyPassword, hashPassword, createToken } from "@/lib/auth";
 import { getSessionCookieName } from "@/lib/token";
 import { redirect } from "next/navigation";
 
+import { rateLimit } from "@/lib/rate-limit";
+
 export async function loginAction(formData: FormData) {
+  const limiter = await rateLimit(5, 60000); // 5 attempts per minute
+  if (!limiter.success) {
+    return { error: "Too many login attempts. Please try again later." };
+  }
+
   const email = (formData.get("email") as string || "").trim().toLowerCase();
   const password = formData.get("password") as string || "";
 
@@ -55,6 +62,16 @@ export async function loginAction(formData: FormData) {
 }
 
 export async function registerAction(formData: FormData) {
+  // Honeypot check
+  if (formData.get("hp_phone")) {
+    return { error: "Spam detected." };
+  }
+
+  const limiter = await rateLimit(3, 60000); // 3 registrations per minute
+  if (!limiter.success) {
+    return { error: "Too many requests. Please try again later." };
+  }
+
   const registrationEnabled = await prisma.siteConfig.findUnique({ where: { key: "registration_enabled" } });
   if (registrationEnabled && registrationEnabled.value === "false") {
     return { error: "Registration is currently disabled. Please contact the administrator." };
@@ -149,6 +166,9 @@ export async function sendOtpAction(email: string) {
 }
 
 export async function verifyOtpAction(formData: FormData) {
+  const limiter = await rateLimit(10, 60000);
+  if (!limiter.success) return { error: "Too many attempts. Please try again later." };
+
   const email = (formData.get("email") as string || "").trim().toLowerCase();
   const code = (formData.get("code") as string || "").trim();
 
@@ -187,6 +207,9 @@ export async function verifyOtpAction(formData: FormData) {
 }
 
 export async function forgotPasswordAction(formData: FormData) {
+  const limiter = await rateLimit(3, 60000);
+  if (!limiter.success) return { error: "Too many requests. Please try again later." };
+
   const enabled = await prisma.siteConfig.findUnique({ where: { key: "auth_forgot_password" } });
   if (enabled?.value === "false") {
     return { error: "Password reset is currently disabled. Please contact support." };
@@ -229,6 +252,9 @@ export async function forgotPasswordAction(formData: FormData) {
 }
 
 export async function resetPasswordAction(formData: FormData) {
+  const limiter = await rateLimit(5, 60000);
+  if (!limiter.success) return { error: "Too many requests. Please try again later." };
+
   const email = (formData.get("email") as string || "").trim().toLowerCase();
   const code = (formData.get("code") as string || "").trim();
   const password = formData.get("password") as string || "";

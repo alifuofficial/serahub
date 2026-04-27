@@ -28,7 +28,9 @@ export default async function PublicLayout({
             "social_link_facebook",
             "social_link_instagram",
             "social_link_tiktok",
-            "social_link_linkedin"
+            "social_link_linkedin",
+            "jobs_enabled",
+            "bids_enabled"
           ] 
         } 
       },
@@ -42,6 +44,8 @@ export default async function PublicLayout({
 
   const maintenanceEnabled = config["maintenance_enabled"] === "true";
   const comingSoonEnabled = config["coming_soon_enabled"] === "true";
+  const jobsEnabled = config["jobs_enabled"] !== "false";
+  const bidsEnabled = config["bids_enabled"] !== "false";
   const isAdmin = session?.role === "ADMIN";
   const logoUrl = config["appearance_logo_url"];
   const socials = {
@@ -112,7 +116,13 @@ export default async function PublicLayout({
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg">
         Skip to content
       </a>
-      <Navbar user={session ? { name: session.name, email: session.email, role: session.role } : null} siteName={config.site_name} logoUrl={config.appearance_logo_url} />
+      <Navbar 
+        user={session ? { name: session.name, email: session.email, role: session.role } : null} 
+        siteName={config.site_name} 
+        logoUrl={config.appearance_logo_url} 
+        jobsEnabled={jobsEnabled}
+        bidsEnabled={bidsEnabled}
+      />
       <main id="main-content" className="flex-1">{children}</main>
       <VisitTracker />
       <Footer siteName={config.site_name} logoUrl={config.appearance_logo_url} socials={socials} />

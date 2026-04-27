@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { createBidAction, updateBidAction, deleteBidAction, saveBidDraftAction, attachBidFileAction, detachBidFileAction, reviewBidAction } from "@/actions/admin";
-import { logoutAction } from "@/actions/auth";
 import { useAutoSave } from "@/hooks/useAutoSave";
 
 const Editor = dynamic(() => import("@/components/editor/Editor"), { ssr: false });
@@ -48,20 +47,7 @@ interface Props {
   filters: { q: string; status: string; category: string };
 }
 
-const navItems = [
-  { label: "Overview", href: "/admin", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> },
-  { label: "Jobs", href: "/admin/jobs", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> },
-  { label: "Bids", href: "/admin/bids", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg> },
-  { label: "Users", href: "/admin/users", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-  { label: "Categories", href: "/admin/categories", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg> },
-  { label: "Subscribers", href: "/admin/subscribers", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> },
-  { label: "Messages", href: "/admin/messages", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> },
-  { label: "AI Usage", href: "/admin/ai-usage", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> },
-  { label: "Settings", href: "/admin/settings", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></svg> },
-];
-
 export default function BidsClient({ user, bids, categories, filters }: Props) {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingBid, setEditingBid] = useState<Bid | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -101,91 +87,36 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
       inputs.forEach((el) => { fd.set(el.name, el.value); });
     }
     fd.set("description", descriptionData);
-    
-    // Status should be read from the form if available, otherwise fallback to editingBid status
-    const statusSelect = formEl?.querySelector<HTMLSelectElement>('select[name="status"]');
-    if (statusSelect) {
-      fd.set("status", statusSelect.value);
-    } else {
-      fd.set("status", editingBid?.status ?? "DRAFT");
-    }
-    
     return fd;
   }, [editingBid, descriptionData]);
 
-  const { lastSaved, isSaving: isAutoSaving, save: saveDraft } = useAutoSave({
-    onSave: saveBidDraftAction,
-    getFormData,
-    enabled: showForm,
+  const { isSaving, lastSaved } = useAutoSave({
+    onSave: async () => {
+      if (!showForm || editingBid) return;
+      const fd = getFormData();
+      const title = fd.get("title") as string;
+      if (!title || title.trim().length < 3) return;
+      
+      const result = await saveBidDraftAction(fd);
+      if (result.success && result.id) {
+        setEditingBid({ id: result.id } as any);
+      }
+    },
+    enabled: showForm && !editingBid,
+    debounceMs: 5000
   });
 
-  const handleDelete = (id: string) => {
-    if (!confirm("Are you sure you want to delete this bid?")) return;
-    const fd = new FormData();
-    fd.set("id", id);
-    startTransition(async () => {
-      await deleteBidAction(fd);
-      router.refresh();
-    });
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editingBid) return;
-    setFileError(null);
-    setUploadingFile(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) {
-        setFileError(data.error || "Upload failed");
-      } else {
-        const attachFd = new FormData();
-        attachFd.set("bidId", editingBid.id);
-        attachFd.set("name", file.name);
-        attachFd.set("path", data.url);
-        attachFd.set("size", String(file.size));
-        await attachBidFileAction(attachFd);
-        router.refresh();
-      }
-    } catch {
-      setFileError("Upload failed");
-    } finally {
-      setUploadingFile(false);
-      e.target.value = "";
-    }
-  };
-
-  const handleDetachFile = (fileId: string) => {
-    if (!confirm("Remove this file?")) return;
-    const fd = new FormData();
-    fd.set("fileId", fileId);
-    startTransition(async () => {
-      await detachBidFileAction(fd);
-      router.refresh();
-    });
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
-
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setError(null);
-    setAiResult(null);
     setIsSubmitting(true);
-    const action = editingBid ? updateBidAction : createBidAction;
-    if (editingBid) formData.set("id", editingBid.id);
-    formData.set("description", descriptionData);
-    if (!editingBid && reviewResult) {
-      formData.set("title", reviewResult.fixedTitle);
-    }
-    const result = await action(formData);
+    const fd = new FormData(e.currentTarget);
+    fd.set("description", descriptionData);
+    if (editingBid) fd.set("id", editingBid.id);
+
+    const result = editingBid ? await updateBidAction(fd) : await createBidAction(fd);
     setIsSubmitting(false);
+    
     if (result?.error) {
       setError(result.error);
     } else {
@@ -220,7 +151,7 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
       setReviewResult(result.review);
     }
   };
-  
+
   const applyAiReview = () => {
     if (!reviewResult) return;
     const formEl = document.querySelector<HTMLFormElement>('#bid-form');
@@ -243,382 +174,354 @@ export default function BidsClient({ user, bids, categories, filters }: Props) {
     setHasAppliedReview(true);
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure?")) return;
+    const fd = new FormData();
+    fd.set("id", id);
+    await deleteBidAction(fd);
+    router.refresh();
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!editingBid || !e.target.files?.[0]) return;
+    setFileError(null);
+    setUploadingFile(true);
+    const file = e.target.files[0];
+    const fd = new FormData();
+    fd.set("bidId", editingBid.id);
+    fd.set("file", file);
+    
+    const result = await attachBidFileAction(fd);
+    setUploadingFile(false);
+    if (result?.error) {
+      setFileError(result.error);
+    } else {
+      router.refresh();
+      const updatedBid = bids.find(b => b.id === editingBid.id);
+      if (updatedBid) setEditingBid(updatedBid);
+    }
+  };
+
+  const handleFileDetach = async (fileId: string) => {
+    if (!editingBid) return;
+    const fd = new FormData();
+    fd.set("bidId", editingBid.id);
+    fd.set("fileId", fileId);
+    await detachBidFileAction(fd);
+    router.refresh();
+    const updatedBid = bids.find(b => b.id === editingBid.id);
+    if (updatedBid) setEditingBid(updatedBid);
+  };
+
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
-        <div className="flex items-center justify-between h-16 px-4 lg:px-8">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-            </button>
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 overflow-hidden shadow-sm flex items-center justify-center">
-                <img src="/logo.png" alt="SeraHub" className="w-7 h-7 object-contain" />
+    <div className="p-6 lg:p-10 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            Manage <span className="text-primary">Bids</span>
+          </h1>
+          <p className="text-slate-500 mt-1 font-medium">Create, edit, and manage tender/bid opportunities.</p>
+        </div>
+        {!showForm && (
+          <button 
+            onClick={() => { 
+              setEditingBid(null); 
+              setAiResult(null);
+              setReviewResult(null);
+              setHasAppliedReview(false);
+              setDescriptionData(""); 
+              setShowForm(true); 
+              setFormKey(prev => prev + 1);
+            }} 
+            className="px-6 py-3 rounded-2xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+          >
+            Create New Bid
+          </button>
+        )}
+      </div>
+
+      {showForm ? (
+        <div className="bg-white rounded-[40px] border border-slate-200/50 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500">
+          <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
               </div>
-              <span className="font-bold text-slate-800 text-lg hidden sm:inline">SeraHub</span>
-              <span className="bg-primary/10 text-primary px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest">Admin</span>
+              <div>
+                <h2 className="text-xl font-black text-slate-900 tracking-tight">{editingBid ? "Edit Bid" : "Post a New Bid"}</h2>
+                <div className="flex items-center gap-2 mt-1">
+                  {isSaving ? (
+                    <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" /> Saving...
+                    </span>
+                  ) : lastSaved ? (
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Draft saved {lastSaved.toLocaleTimeString()}</span>
+                  ) : (
+                    <p className="text-sm text-slate-500 font-medium">Fill in the details below.</p>
+                  )}
+                </div>
+              </div>
             </div>
+            <button onClick={() => setShowForm(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
-          <div className="flex items-center gap-5">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-sm text-slate-600">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              {user.email}
-            </div>
-            <form action={logoutAction}>
-              <button type="submit" className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors px-3 py-1.5 rounded-full hover:bg-red-50">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-                <span className="hidden sm:inline">Sign Out</span>
-              </button>
+
+          <div className="p-8 lg:p-12">
+            <form id="bid-form" key={formKey} onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              <div className="lg:col-span-2 space-y-8">
+                <div>
+                  <label className="block text-sm font-bold text-slate-900 mb-2">Bid Title</label>
+                  <input type="text" name="title" defaultValue={editingBid?.title} required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[20px] text-slate-900 font-bold placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all" placeholder="e.g. Construction of New Office Block" />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-bold text-slate-900">Description</label>
+                    <button 
+                      type="button" 
+                      onClick={handleReview} 
+                      disabled={isReviewing || descriptionData.length < 50}
+                      className="text-xs font-black text-amber-500 uppercase tracking-widest hover:underline disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                      {isReviewing ? "Analyzing..." : "Optimize with AI"}
+                    </button>
+                  </div>
+                  <div className="border border-slate-100 rounded-[24px] overflow-hidden">
+                    <Editor value={editingBid?.description || ""} onChange={setDescriptionData} />
+                  </div>
+                </div>
+
+                {editingBid && (
+                  <div className="space-y-4">
+                    <label className="block text-sm font-bold text-slate-900">Attachments</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {editingBid.files.map(file => (
+                        <div key={file.id} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl group">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-slate-900 truncate">{file.name}</p>
+                              <p className="text-[10px] text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
+                            </div>
+                          </div>
+                          <button type="button" onClick={() => handleFileDetach(file.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-white rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          </button>
+                        </div>
+                      ))}
+                      <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-[32px] hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group">
+                        <input type="file" className="hidden" onChange={handleFileUpload} disabled={uploadingFile} />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-300 group-hover:text-primary mb-2 transition-colors"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span className="text-xs font-black text-slate-400 group-hover:text-primary uppercase tracking-widest">{uploadingFile ? "Uploading..." : "Add File"}</span>
+                      </label>
+                    </div>
+                    {fileError && <p className="text-xs font-bold text-red-500">{fileError}</p>}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-8">
+                <div className="bg-slate-50 p-8 rounded-[32px] border border-slate-100 space-y-6">
+                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest border-b border-slate-200 pb-4">Bid Details</h3>
+                  
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Category</label>
+                    <select name="categoryId" defaultValue={editingBid?.categoryId || ""} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-primary appearance-none">
+                      <option value="">Uncategorized</option>
+                      {categories.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Deadline</label>
+                    <input type="date" name="deadline" defaultValue={editingBid?.deadline ? new Date(editingBid.deadline).toISOString().split('T')[0] : ""} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none" />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Application Link</label>
+                    <input type="text" name="applyLink" defaultValue={editingBid?.applyLink || ""} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none" placeholder="Direct link to portal" />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Source URL</label>
+                    <input type="text" name="source" defaultValue={editingBid?.source || ""} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none" placeholder="Original source" />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Status</label>
+                    <select name="status" defaultValue={editingBid?.status || "PUBLISHED"} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-primary appearance-none">
+                      <option value="PUBLISHED">Published</option>
+                      <option value="DRAFT">Draft</option>
+                      <option value="CLOSED">Closed</option>
+                    </select>
+                  </div>
+                </div>
+
+                {reviewResult && (
+                  <div className="p-8 rounded-[32px] bg-amber-500 text-white shadow-xl shadow-amber-100 animate-in slide-in-from-right-4 duration-500">
+                    <h4 className="font-black text-lg tracking-tight mb-3 flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                      AI Review
+                    </h4>
+                    <p className="text-xs font-medium text-white/80 mb-6 leading-relaxed">AI has suggestions for your bid listing clarity.</p>
+                    <button 
+                      type="button" 
+                      onClick={applyAiReview} 
+                      className="w-full py-4 bg-white text-amber-500 rounded-2xl text-sm font-black shadow-lg shadow-amber-900/10 hover:scale-105 active:scale-95 transition-all"
+                    >
+                      Apply Enhancements
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="lg:col-span-3 pt-10 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  {editingBid && (
+                    <button type="button" onClick={() => handleDelete(editingBid.id)} className="text-sm font-bold text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all">
+                      Delete permanently
+                    </button>
+                  )}
+                  <button type="button" onClick={() => setShowForm(false)} className="text-sm font-bold text-slate-400 hover:text-slate-600 px-4 py-2 rounded-xl transition-all">Cancel</button>
+                </div>
+                <button type="submit" disabled={isSubmitting} className="w-full sm:w-auto px-10 py-4 bg-primary text-white rounded-[24px] font-black text-lg shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50">
+                  {isSubmitting ? "Processing..." : (editingBid ? "Save Changes" : "Publish Bid")}
+                </button>
+              </div>
             </form>
           </div>
         </div>
-      </header>
-
-      <div className="flex">
-        <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200/60 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
-          <div className="flex flex-col h-full">
-            <div className="p-6 pb-4">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 border border-slate-200/60">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00c087] to-[#00e5a0] flex items-center justify-center text-white font-bold text-sm">{(user.name || "A").charAt(0).toUpperCase()}</div>
-                <div className="min-w-0"><p className="text-sm font-semibold text-slate-800 truncate">{user.name || "Admin"}</p><p className="text-[11px] text-slate-400 truncate">{user.email}</p></div>
-              </div>
-            </div>
-            <nav className="px-4 space-y-1 flex-1">
-              {navItems.map((item) => (
-                <Link key={item.label} href={item.href} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${item.label === "Bids" ? "bg-gradient-to-r from-primary/10 to-[#00e5a0]/10 text-primary shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}>
-                  {item.icon}{item.label}
-                </Link>
-              ))}
-            </nav>
-            <div className="p-4 border-t border-slate-100">
-              <Link href="/" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                Back to Site
-              </Link>
-            </div>
+      ) : (
+        <div className="bg-white rounded-[40px] border border-slate-200/50 shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden">
+          <div className="p-8 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+             <div className="relative flex-1 max-w-md">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input 
+                  type="text" 
+                  placeholder="Search bids..." 
+                  className="w-full pl-12 pr-6 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:outline-none focus:border-primary transition-all"
+                  value={filters.q}
+                  onChange={(e) => {
+                    const params = new URLSearchParams(window.location.search);
+                    if (e.target.value) params.set('q', e.target.value); else params.delete('q');
+                    router.push(`/admin/bids?${params.toString()}`);
+                  }}
+                />
+             </div>
+             <div className="flex items-center gap-3">
+               <select 
+                 className="px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer"
+                 value={filters.status}
+                 onChange={(e) => {
+                   const params = new URLSearchParams(window.location.search);
+                   if (e.target.value) params.set('status', e.target.value); else params.delete('status');
+                   router.push(`/admin/bids?${params.toString()}`);
+                 }}
+               >
+                 <option value="">All Status</option>
+                 <option value="PUBLISHED">Published</option>
+                 <option value="DRAFT">Draft</option>
+                 <option value="CLOSED">Closed</option>
+               </select>
+               <select 
+                 className="px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer"
+                 value={filters.category}
+                 onChange={(e) => {
+                   const params = new URLSearchParams(window.location.search);
+                   if (e.target.value) params.set('category', e.target.value); else params.delete('category');
+                   router.push(`/admin/bids?${params.toString()}`);
+                 }}
+               >
+                 <option value="">All Categories</option>
+                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+               </select>
+             </div>
           </div>
-        </aside>
 
-        {mobileOpen && <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden" onClick={() => setMobileOpen(false)} />}
-
-        <main className="flex-1 min-w-0">
-          <div className="px-4 lg:px-8 py-6 lg:py-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">Bids</h1>
-                <p className="text-slate-500 mt-1">{bids.length} total bids</p>
-              </div>
-              <button onClick={() => { setEditingBid(null); setDescriptionData(""); setFormKey((k) => k + 1); setShowForm(true); }} className="btn-primary text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-                Add Bid
-              </button>
-            </div>
-
-            <form method="GET" action="/admin/bids" className="flex flex-col sm:flex-row gap-3 mb-6">
-              <input name="q" defaultValue={filters.q} placeholder="Search bids..." className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
-              <select name="status" defaultValue={filters.status} className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                <option value="">All Status</option>
-                <option value="PUBLISHED">Published</option>
-                <option value="DRAFT">Draft</option>
-              </select>
-              <select name="category" defaultValue={filters.category} className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                <option value="">All Categories</option>
-                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              <button type="submit" className="btn-primary text-sm px-5">Filter</button>
-            </form>
-
-            {showForm && (
-              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); }}>
-                <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                  <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-                    <div>
-                      <h2 className="text-lg font-bold text-slate-900">{editingBid ? "Edit Bid" : "Create Bid"}</h2>
-                      {isAutoSaving && <p className="text-xs text-slate-400 mt-0.5">Saving draft...</p>}
-                      {!isAutoSaving && lastSaved && <p className="text-xs text-emerald-500 mt-0.5">Draft saved {lastSaved.toLocaleTimeString()}</p>}
-                    </div>
-                    <button onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); }} className="p-1 text-slate-400 hover:text-slate-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-                    </button>
-                  </div>
-                   <form key={formKey} id="bid-form" action={handleSubmit} className="p-6 space-y-4">
-                    {error && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium">{error}</div>}
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Title *</label>
-                      <input name="title" defaultValue={editingBid?.title ?? ""} key={editingBid?.id ?? "new"} required className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description *</label>
-                      <Editor
-                        key={editingBid?.id ?? "new"}
-                        initialData={descriptionData}
-                        onChange={(data) => setDescriptionData(data)}
-                        placeholder="Write the bid description..."
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Source</label>
-                        <input name="source" defaultValue={editingBid?.source ?? ""} key={`source-${editingBid?.id ?? "new"}`} placeholder="e.g. Government Portal" className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Apply Link</label>
-                        <input name="applyLink" defaultValue={editingBid?.applyLink ?? ""} key={`apply-${editingBid?.id ?? "new"}`} placeholder="https://..." className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Deadline</label>
-                        <input name="deadline" type="date" defaultValue={editingBid?.deadline?.split("T")[0] ?? ""} key={`deadline-${editingBid?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Category <span className="text-[10px] font-normal text-primary">AI will auto-assign</span></label>
-                        <select name="categoryId" defaultValue={editingBid?.categoryId ?? ""} key={`cat-${editingBid?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                          <option value="">None (AI will suggest)</option>
-                          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                        </select>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Status</label>
-                      <select name="status" defaultValue={editingBid?.status ?? "PUBLISHED"} key={`status-${editingBid?.id ?? "new"}`} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
-                        <option value="PUBLISHED">Published</option>
-                        <option value="DRAFT">Draft</option>
-                      </select>
-                    </div>
-                    {editingBid && (
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Attachments</label>
-                        {editingBid.files.length > 0 && (
-                          <div className="space-y-2 mb-3">
-                            {editingBid.files.map((f) => (
-                              <div key={f.id} className="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5 border border-slate-200/60">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500 flex-shrink-0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                  <span className="text-sm text-slate-700 truncate">{f.name}</span>
-                                  <span className="text-xs text-slate-400 flex-shrink-0">({formatFileSize(f.size)})</span>
-                                </div>
-                                <button type="button" onClick={() => handleDetachFile(f.id)} className="text-slate-400 hover:text-red-500 p-1 flex-shrink-0" title="Remove">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        <label className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-slate-300 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors text-sm font-medium text-slate-500 hover:text-primary ${uploadingFile ? "opacity-50 pointer-events-none" : ""}`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                          {uploadingFile ? "Uploading..." : "Upload File"}
-                          <input type="file" className="hidden" onChange={handleFileUpload} disabled={uploadingFile} accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt,.csv,.png,.jpg,.jpeg,.gif,.svg,.webp" />
-                        </label>
-                        {fileError && <p className="text-xs text-red-500 mt-1">{fileError}</p>}
-                        <p className="text-xs text-slate-400 mt-1">Save the bid first, then attach files. Max 50MB per file.</p>
-                      </div>
-                    )}
-                    {!editingBid && (
-                      <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-4 text-center">
-                        <p className="text-sm text-slate-500">File attachments can be added after creating the bid.</p>
-                      </div>
-                    )}
-                    {isReviewing && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-teal-50 border border-teal-200">
-                        <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                        <span className="text-xs font-semibold text-teal-700">🔍 AI is reviewing your post for grammar, SEO, and fixes...</span>
-                      </div>
-                    )}
-                    {reviewResult && !editingBid && (
-                      <div className="p-5 rounded-2xl bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200 space-y-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                          </div>
-                          <h3 className="text-sm font-bold text-teal-900">AI Review Complete — Review changes before publishing</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50/50">
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Bid Information</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Analytics</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {bids.map((bid) => (
+                  <tr key={bid.id} className="group hover:bg-slate-50/50 transition-colors">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                         </div>
-                        {reviewResult.fixedTitle && (
-                          <div className="p-3 rounded-xl bg-white/70 border border-teal-100">
-                            <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider mb-1">Fixed Title</p>
-                            <div className="text-sm">
-                              <p className="text-slate-800 font-semibold">{reviewResult.fixedTitle}</p>
-                            </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-900 truncate group-hover:text-amber-600 transition-colors">{bid.title}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs font-bold text-slate-400">{bid.category?.name || 'Uncategorized'}</span>
+                            <span className="w-1 h-1 rounded-full bg-slate-300" />
+                            <span className="text-xs font-bold text-slate-400">{bid.source || 'Direct'}</span>
                           </div>
-                        )}
-                        {reviewResult.fixedDescriptionText && (
-                          <div className="p-3 rounded-xl bg-white/70 border border-teal-100">
-                            <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider mb-1">Fixed Description Text</p>
-                            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{reviewResult.fixedDescriptionText}</p>
-                          </div>
-                        )}
-                        {reviewResult.categoryName && (
-                          <div className="flex items-start gap-2">
-                            <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg></span>
-                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Category</p><p className="text-sm font-semibold text-slate-800">{reviewResult.categoryName}</p></div>
-                          </div>
-                        )}
-                        {reviewResult.metaDescription && (
-                          <div className="flex items-start gap-2">
-                            <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-blue-600"><polyline points="20 6 9 17 4 12"/></svg></span>
-                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">SEO Meta Description</p><p className="text-sm text-slate-700">{reviewResult.metaDescription}</p></div>
-                          </div>
-                        )}
-                        {reviewResult.keywords && reviewResult.keywords.length > 0 && (
-                          <div className="flex items-start gap-2">
-                            <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-amber-600"><polyline points="20 6 9 17 4 12"/></svg></span>
-                            <div>
-                              <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">SEO Keywords</p>
-                              <div className="flex flex-wrap gap-1.5 mt-1">{reviewResult.keywords.map((k: string) => <span key={k} className="bg-white text-slate-600 px-2 py-0.5 rounded-md text-xs font-medium border border-slate-200">{k}</span>)}</div>
-                            </div>
-                          </div>
-                        )}
-                        {reviewResult.grammarNotes && (
-                          <div className="flex items-start gap-2">
-                            <span className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-violet-600"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg></span>
-                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Grammar Notes</p><p className="text-sm text-slate-700">{reviewResult.grammarNotes}</p></div>
-                          </div>
-                        )}
-                        {reviewResult.warnings && reviewResult.warnings.length > 0 && (
-                          <div className="flex items-start gap-2">
-                            <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-600"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg></span>
-                            <div><p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Warnings</p>{reviewResult.warnings.map((w: string, i: number) => <p key={i} className="text-xs text-amber-700 flex items-start gap-1.5"><span className="mt-0.5">⚠️</span>{w}</p>)}</div>
-                          </div>
-                        )}
-                        <button type="button" onClick={applyAiReview} className="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                          Apply AI Suggestions
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                        bid.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 
+                        bid.status === 'DRAFT' ? 'bg-amber-50 text-amber-600' : 'bg-red-100 text-red-700'
+                      }`}>
+                        {bid.status}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-slate-900">{bid.views.toLocaleString()}</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Views</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => { 
+                            setEditingBid(bid); 
+                            setDescriptionData(bid.description); 
+                            setShowForm(true); 
+                            setAiResult(null);
+                            setReviewResult(null);
+                            setHasAppliedReview(false);
+                            setFormKey(prev => prev + 1);
+                          }} 
+                          className="p-2.5 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-xl transition-all"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                        </button>
+                        <button onClick={() => handleDelete(bid.id)} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                         </button>
                       </div>
-                    )}
-                    {isSubmitting && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50 border border-violet-200">
-                        <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                        <span className="text-xs font-semibold text-violet-700">✨ AI is analyzing your post for SEO, categorization, and grammar...</span>
+                    </td>
+                  </tr>
+                ))}
+                {bids.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-8 py-20 text-center flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 text-slate-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                       </div>
-                    )}
-                    {hasAppliedReview && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
-                        <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        </div>
-                        <span className="text-xs font-semibold text-emerald-700">AI suggestions applied! Your post is now optimized and ready to publish.</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex justify-end gap-3 pt-2">
-                      <button type="button" onClick={() => { setShowForm(false); setEditingBid(null); setDescriptionData(""); setAiResult(null); setReviewResult(null); setHasAppliedReview(false); }} className="btn-secondary text-sm">Cancel</button>
-                      <button type="button" onClick={() => saveDraft()} disabled={isAutoSaving} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50">{isAutoSaving ? "Saving..." : "Save Draft"}</button>
-                      {!editingBid && !reviewResult && !hasAppliedReview && (
-                        <button type="button" onClick={handleReview} disabled={isReviewing || isSubmitting} className="px-4 py-2 text-sm font-semibold text-teal-600 bg-teal-50 border border-teal-200 rounded-xl hover:bg-teal-100 transition-colors disabled:opacity-50">
-                          {isReviewing ? "Reviewing..." : "🔍 Review with AI"}
-                        </button>
-                      )}
-                      <button type="submit" disabled={isPending || isSubmitting || (!editingBid && !reviewResult && !hasAppliedReview)} className="btn-primary text-sm disabled:opacity-50">{isSubmitting ? "Processing..." : isPending ? "Publishing..." : editingBid ? "Update Bid" : (reviewResult || hasAppliedReview) ? "Publish" : "Review required"}</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
-
-            {aiResult && (
-              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setAiResult(null)}>
-                <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-                  <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                      </div>
-                      <h2 className="text-lg font-bold text-slate-900">AI Enhancements Applied</h2>
-                    </div>
-                    <button onClick={() => setAiResult(null)} className="p-1 text-slate-400 hover:text-slate-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-                    </button>
-                  </div>
-                  <div className="p-6 space-y-4">
-                    {aiResult.categoryName && (
-                      <div className="flex items-start gap-3">
-                        <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-600"><polyline points="20 6 9 17 4 12"/></svg></span>
-                        <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Auto-Categorized</p><p className="text-sm font-bold text-slate-800">{aiResult.categoryName}</p></div>
-                      </div>
-                    )}
-                    {aiResult.metaDescription && (
-                      <div className="flex items-start gap-3">
-                        <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-blue-600"><polyline points="20 6 9 17 4 12"/></svg></span>
-                        <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">SEO Meta Description</p><p className="text-sm text-slate-700">{aiResult.metaDescription}</p></div>
-                      </div>
-                    )}
-                    {aiResult.keywords && aiResult.keywords.length > 0 && (
-                      <div className="flex items-start gap-3">
-                        <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-amber-600"><polyline points="20 6 9 17 4 12"/></svg></span>
-                        <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">SEO Keywords</p><div className="flex flex-wrap gap-1.5 mt-1">{aiResult.keywords.map(k => <span key={k} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-xs font-medium">{k}</span>)}</div></div>
-                      </div>
-                    )}
-                    {aiResult.grammarNotes && (
-                      <div className="flex items-start gap-3">
-                        <span className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-violet-600"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg></span>
-                        <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Grammar Note</p><p className="text-sm text-slate-700">{aiResult.grammarNotes}</p></div>
-                      </div>
-                    )}
-                    {aiResult.warnings && aiResult.warnings.length > 0 && (
-                      <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
-                        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Warnings</p>
-                        {aiResult.warnings.map((w, i) => <p key={i} className="text-xs text-amber-700 flex items-start gap-1.5"><span className="mt-0.5">⚠️</span>{w}</p>)}
-                      </div>
-                    )}
-                    <button onClick={() => setAiResult(null)} className="w-full btn-primary text-sm mt-2">Got it!</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-100">
-                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Bid</th>
-                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Category</th>
-                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:table-cell">Views</th>
-                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Created</th>
-                      <th className="px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {bids.length === 0 ? (
-                      <tr><td colSpan={6} className="px-6 py-12 text-center text-slate-400 text-sm">No bids found. Create your first bid!</td></tr>
-                    ) : bids.map((bid) => (
-                      <tr key={bid.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center flex-shrink-0">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold text-slate-800 truncate max-w-[200px]">{bid.title}</p>
-                              <p className="text-xs text-slate-400 truncate max-w-[200px]">{bid.source || "No source"}{bid.files?.length ? ` · ${bid.files.length} file${bid.files.length > 1 ? "s" : ""}` : ""}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell"><span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">{bid.category?.name || "Uncategorized"}</span></td>
-                        <td className="px-6 py-4"><span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${bid.status === "PUBLISHED" ? "bg-amber-50 text-amber-600" : "bg-slate-100 text-slate-500"}`}>{bid.status === "PUBLISHED" ? "Live" : bid.status}</span></td>
-                        <td className="px-6 py-4 hidden sm:table-cell text-sm text-slate-500">{bid.views}</td>
-                        <td className="px-6 py-4 hidden lg:table-cell text-sm text-slate-400">{new Date(bid.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => { setEditingBid(bid); setDescriptionData(bid.description); setFormKey((k) => k + 1); setShowForm(true); }} className="p-2 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/5 transition-colors" title="Edit">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-                            </button>
-                            <button onClick={() => handleDelete(bid.id)} className="p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Delete">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 0-2 1-2h6c1 0 1 1 1 2v2"/></svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                      <p className="text-slate-400 font-bold">No bids found matching your criteria</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        </main>
-      </div>
+        </div>
+      )}
     </div>
-);
+  );
 }

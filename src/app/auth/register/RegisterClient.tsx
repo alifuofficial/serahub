@@ -145,6 +145,11 @@ export default function RegisterClient({
                   </div>
                 </div>
 
+                {/* Honeypot field - hidden from users */}
+                <div style={{ display: 'none' }} aria-hidden="true">
+                  <input type="text" name="hp_phone" tabIndex={-1} autoComplete="off" />
+                </div>
+
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="password">Password</label>
                   <div className="relative">

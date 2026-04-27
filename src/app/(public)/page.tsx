@@ -19,8 +19,11 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
+import { getModuleStatus } from "@/lib/config";
+
 export default async function Home() {
   const session = await getSession();
+  const { jobsEnabled, bidsEnabled } = await getModuleStatus();
 
   const [latestJobs, latestBids, userBookmarks, latest2Jobs, latest1Bid, partners, dbCategories] = await Promise.all([
     prisma.job.findMany({
@@ -217,19 +220,30 @@ export default async function Home() {
             </Link>
           </div>
 
-          {latestJobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {latestJobs.map((job) => (
-                <JobCard key={job.id} job={job} isBookmarked={bookmarkedJobIds.has(job.id)} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20 rounded-2xl bg-slate-50/50 border border-dashed border-slate-200">
-              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          {jobsEnabled ? (
+            latestJobs.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {latestJobs.map((job) => (
+                  <JobCard key={job.id} job={job} isBookmarked={bookmarkedJobIds.has(job.id)} />
+                ))}
               </div>
-              <p className="text-slate-500 font-medium">No jobs available right now.</p>
-              <p className="text-slate-400 text-sm mt-1">Check back soon for new opportunities.</p>
+            ) : (
+              <div className="text-center py-20 rounded-2xl bg-slate-50/50 border border-dashed border-slate-200">
+                <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </div>
+                <p className="text-slate-500 font-medium">No jobs available right now.</p>
+                <p className="text-slate-400 text-sm mt-1">Check back soon for new opportunities.</p>
+              </div>
+            )
+          ) : (
+            <div className="relative group overflow-hidden rounded-3xl bg-slate-50 border border-slate-100 p-12 text-center">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-16 -mt-16" />
+              <div className="w-20 h-20 rounded-2xl bg-white shadow-sm flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary animate-pulse-soft"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">Job Aggregator <span className="text-primary italic font-light">Coming Soon</span></h3>
+              <p className="text-slate-500 max-w-sm mx-auto">We are building a smart AI engine to match you with the best jobs in Ethiopia.</p>
             </div>
           )}
         </div>
@@ -267,23 +281,34 @@ export default async function Home() {
             </Link>
           </div>
 
-          {latestBids.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {latestBids.map((bid) => (
-                <BidCard key={bid.id} bid={bid} isBookmarked={bookmarkedBidIds.has(bid.id)} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20 rounded-2xl bg-slate-50/50 border border-dashed border-slate-200">
-              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+          {bidsEnabled ? (
+            latestBids.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {latestBids.map((bid) => (
+                  <BidCard key={bid.id} bid={bid} isBookmarked={bookmarkedBidIds.has(bid.id)} />
+                ))}
               </div>
-              <p className="text-slate-500 font-medium">No bids available right now.</p>
-              <p className="text-slate-400 text-sm mt-1">New tenders appear regularly.</p>
+            ) : (
+              <div className="text-center py-20 rounded-2xl bg-slate-50/50 border border-dashed border-slate-200">
+                <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <p className="text-slate-500 font-medium">No bids available right now.</p>
+                <p className="text-slate-400 text-sm mt-1">New tenders appear regularly.</p>
+              </div>
+            )
+          ) : (
+            <div className="relative group overflow-hidden rounded-3xl bg-slate-50 border border-slate-100 p-12 text-center">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/5 rounded-full blur-2xl -mr-16 -mt-16" />
+              <div className="w-20 h-20 rounded-2xl bg-white shadow-sm flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500 animate-pulse-soft"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">Tender & Bid Hub <span className="text-orange-500 italic font-light">Coming Soon</span></h3>
+              <p className="text-slate-500 max-w-sm mx-auto">Access the most comprehensive database of procurement opportunities and public tenders.</p>
             </div>
-)}
-         </div>
-       </section>
+          )}
+        </div>
+      </section>
 
       <section className="pb-16">
         <div className="container mx-auto px-4 max-w-6xl">

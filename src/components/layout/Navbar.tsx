@@ -16,9 +16,11 @@ interface NavbarProps {
   user: NavbarUser | null;
   siteName?: string;
   logoUrl?: string;
+  jobsEnabled?: boolean;
+  bidsEnabled?: boolean;
 }
 
-export default function Navbar({ user, siteName, logoUrl }: NavbarProps) {
+export default function Navbar({ user, siteName, logoUrl, jobsEnabled = true, bidsEnabled = true }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const name = siteName || "SeraHub";
@@ -33,19 +35,25 @@ export default function Navbar({ user, siteName, logoUrl }: NavbarProps) {
 
         <div className="hidden md:flex flex-1 max-w-3xl items-center justify-center gap-6 px-10">
           <div className="flex gap-2">
-            <Link href="/" className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-full">
+            <Link href="/" className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-full shadow-sm shadow-primary/20">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               Home
             </Link>
-            <Link href="/jobs" className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-colors">
+            <Link href="/jobs" className="group flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-all hover:bg-slate-50 relative">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
               Jobs
+              {!jobsEnabled && (
+                <span className="absolute -top-1 -right-2 bg-slate-100 text-slate-400 text-[10px] px-1.5 py-0.5 rounded-md font-bold border border-slate-200 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/20 transition-colors">SOON</span>
+              )}
             </Link>
-            <Link href="/bids" className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-colors">
+            <Link href="/bids" className="group flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-all hover:bg-slate-50 relative">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
               Bids
+              {!bidsEnabled && (
+                <span className="absolute -top-1 -right-2 bg-slate-100 text-slate-400 text-[10px] px-1.5 py-0.5 rounded-md font-bold border border-slate-200 group-hover:bg-orange-100 group-hover:text-orange-600 group-hover:border-orange-200 transition-colors">SOON</span>
+              )}
             </Link>
-            <Link href="/about" className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-colors">
+            <Link href="/about" className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-all hover:bg-slate-50">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
               About
             </Link>
@@ -108,12 +116,30 @@ export default function Navbar({ user, siteName, logoUrl }: NavbarProps) {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white">
+        <div className="md:hidden border-t border-slate-200 bg-white animate-in slide-in-from-top duration-300">
           <div className="px-4 py-3 space-y-1">
-            <Link href="/" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50">Home</Link>
-            <Link href="/jobs" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50">Jobs</Link>
-            <Link href="/bids" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50">Bids</Link>
-            <Link href="/about" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50">About</Link>
+            <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+               Home
+            </Link>
+            <Link href="/jobs" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+               <div className="flex items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                 Jobs
+               </div>
+               {!jobsEnabled && <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Soon</span>}
+            </Link>
+            <Link href="/bids" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+               <div className="flex items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                 Bids
+               </div>
+               {!bidsEnabled && <span className="bg-orange-100 text-orange-600 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Soon</span>}
+            </Link>
+            <Link href="/about" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+               About
+            </Link>
           </div>
           <div className="px-4 py-3 border-t border-slate-100 space-y-2">
             {user ? (
