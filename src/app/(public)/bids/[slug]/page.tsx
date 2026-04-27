@@ -5,7 +5,7 @@ import Link from "next/link";
 import AdSlot from "@/components/ads/AdSlot";
 import NewsletterSection from "@/components/common/NewsletterSection";
 import EditorJSRenderer, { getPlainText } from "@/components/editor/Renderer";
-import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { BreadcrumbJsonLd, BidPostingJsonLd } from "@/components/seo/JsonLd";
 import { getSession } from "@/lib/session";
 import BookmarkButton from "@/components/common/BookmarkButton";
 import SocialShare from "@/components/common/SocialShare";
@@ -65,6 +65,13 @@ export default async function BidDetailPage({ params }: Params) {
   
   return (
     <div className="min-h-screen">
+      <BidPostingJsonLd
+        title={bid.title}
+        description={getPlainText(bid.description)}
+        datePosted={bid.createdAt.toISOString()}
+        deadline={bid.deadline?.toISOString()}
+        category={bid.category?.name}
+      />
       <BreadcrumbJsonLd items={[
         { name: "Home", url: "https://serahub.com" },
         { name: "Bids", url: "https://serahub.com/bids" },

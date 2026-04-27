@@ -4,6 +4,7 @@ import "./globals.css";
 import AdSenseScript from "@/components/ads/AdSenseScript";
 import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
 import DynamicFavicon from "@/components/seo/DynamicFavicon";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -69,6 +70,7 @@ export const metadata: Metadata = {
   },
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -80,6 +82,8 @@ export default function RootLayout({
         <AdSenseScript />
         <GoogleAnalytics />
         <DynamicFavicon />
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         {children}

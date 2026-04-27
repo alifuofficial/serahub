@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -63,6 +64,11 @@ export default async function CategoryPage({ params }: PageProps) {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-6xl">
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "https://serahub.com" },
+        { name: "Categories", url: "https://serahub.com" },
+        { name: category.name, url: `https://serahub.com/categories/${category.slug}` },
+      ]} />
       <div className="mb-12">
         <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6">
           <Link href="/" className="hover:text-primary transition-colors">Home</Link>

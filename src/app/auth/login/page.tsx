@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { Metadata } from "next";
 import LoginClient from "./LoginClient";
+
+export const metadata: Metadata = {
+  title: "Login",
+  robots: { index: false, follow: true },
+};
 
 export const dynamic = "force-dynamic";
 

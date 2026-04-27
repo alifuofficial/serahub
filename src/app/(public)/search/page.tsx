@@ -5,10 +5,18 @@ import SearchForm from "@/components/common/SearchForm";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Search Results",
-  description: "Search for the latest jobs and bids on SeraHub.",
-};
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const { q } = await searchParams;
+  const query = q?.trim() || "";
+  
+  return {
+    title: query ? `Search results for "${query}"` : "Search Jobs & Bids",
+    description: query 
+      ? `Discover the latest jobs and bids matching "${query}" on SeraHub.` 
+      : "Search for the latest jobs and bids on SeraHub.",
+    robots: { index: false, follow: true }, // Don't index search result pages to avoid thin content
+  };
+}
 
 export const revalidate = 0; // Search results should be fresh
 
