@@ -51,6 +51,32 @@ export async function getAIConfig(): Promise<AIConfig> {
   };
 }
 
+async function logAIUsage(data: {
+  provider: string;
+  model: string;
+  type: string;
+  inputTokens?: number;
+  outputTokens?: number;
+  status?: string;
+  errorMessage?: string;
+}) {
+  try {
+    await prisma.aIUsage.create({
+      data: {
+        provider: data.provider,
+        model: data.model,
+        type: data.type,
+        inputTokens: data.inputTokens || 0,
+        outputTokens: data.outputTokens || 0,
+        status: data.status || "SUCCESS",
+        errorMessage: data.errorMessage,
+      }
+    });
+  } catch (err) {
+    console.error("[AI Usage Logging Failed]", err);
+  }
+}
+
 function getProviderKey(config: AIConfig): string | null {
   switch (config.provider) {
     case "gemini": return config.geminiKey || null;
@@ -160,18 +186,50 @@ async function callDeepSeek(prompt: string, apiKey: string): Promise<string> {
   return data.choices?.[0]?.message?.content?.trim() || "";
 }
 
-async function callAI(prompt: string, config: AIConfig): Promise<string> {
+async function callAI(prompt: string, config: AIConfig, type: string): Promise<string> {
+  let modelName = "";
   switch (config.provider) {
-    case "gemini": {
-      if (!config.geminiKey) throw new Error("Gemini API key not configured");
-      return callGemini(prompt, config.geminiKey);
+    case "gemini": modelName = "gemini-1.5-flash"; break;
+    case "deepseek": modelName = "deepseek-chat"; break;
+    default: modelName = "unknown";
+  }
+
+  try {
+    let result = "";
+    switch (config.provider) {
+      case "gemini": {
+        if (!config.geminiKey) throw new Error("Gemini API key not configured");
+        result = await callGemini(prompt, config.geminiKey);
+        break;
+      }
+      case "deepseek": {
+        if (!config.deepseekKey) throw new Error("DeepSeek API key not configured");
+        result = await callDeepSeek(prompt, config.deepseekKey);
+        break;
+      }
+      default:
+        throw new Error(`AI provider "${config.provider}" is not implemented`);
     }
-    case "deepseek": {
-      if (!config.deepseekKey) throw new Error("DeepSeek API key not configured");
-      return callDeepSeek(prompt, config.deepseekKey);
-    }
-    default:
-      throw new Error(`AI provider "${config.provider}" is not implemented`);
+
+    // Log success
+    await logAIUsage({
+      provider: config.provider,
+      model: modelName,
+      type: type,
+      status: "SUCCESS"
+    });
+
+    return result;
+  } catch (error: any) {
+    // Log error
+    await logAIUsage({
+      provider: config.provider,
+      model: modelName,
+      type: type,
+      status: "ERROR",
+      errorMessage: error.message
+    });
+    throw error;
   }
 }
 
@@ -215,7 +273,7 @@ export async function getAISuggestions(title: string, rawDescription: string): P
   }
 
   try {
-    const text = await callAI(SEO_PROMPT(title, description), config);
+    const text = await callAI(SEO_PROMPT(title, description), config, "seo");
     const parsed = parseAIResponse(text) as unknown as AISuggestions;
     console.log("[AI] Suggestions generated:", JSON.stringify(parsed, null, 2));
     return parsed;
@@ -251,7 +309,7 @@ export async function reviewContent(title: string, rawDescription: string): Prom
   }
 
   try {
-    const text = await callAI(REVIEW_PROMPT(title, description), config);
+    const text = await callAI(REVIEW_PROMPT(title, description), config, "review");
     const parsed = parseAIResponse(text) as unknown as AIReviewResult;
     console.log("[AI Review] Content reviewed:", JSON.stringify(parsed, null, 2));
     return parsed;
@@ -276,7 +334,7 @@ export async function generateNewsletter(jobs: { title: string, link: string, me
   const siteName = (await prisma.siteConfig.findUnique({ where: { key: "site_name" } }))?.value || "SeraHub";
 
   try {
-    const text = await callAI(NEWSLETTER_PROMPT(jobs, siteName), config);
+    const text = await callAI(NEWSLETTER_PROMPT(jobs, siteName), config, "newsletter");
     const parsed = parseAIResponse(text) as any;
     console.log("[AI Newsletter] Newsletter generated successfully.");
     return parsed;
@@ -311,7 +369,7 @@ Return ONLY a valid JSON object with these exact keys:
 `;
 
   try {
-    const text = await callAI(SEARCH_PROMPT, config);
+    const text = await callAI(SEARCH_PROMPT, config, "search");
     const parsed = parseAIResponse(text) as any;
     return parsed;
   } catch (error) {
@@ -319,3 +377,4 @@ Return ONLY a valid JSON object with these exact keys:
     return null;
   }
 }
+

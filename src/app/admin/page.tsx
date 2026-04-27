@@ -28,6 +28,7 @@ export default async function AdminPage() {
     categoryCount,
     userCount,
     subscriberCount,
+    aiCallCount,
     publishedJobs,
     publishedBids,
     draftJobs,
@@ -56,6 +57,7 @@ export default async function AdminPage() {
     prisma.category.count(),
     prisma.user.count(),
     prisma.subscriber.count(),
+    prisma.aIUsage.count(),
     prisma.job.count({ where: { status: "PUBLISHED" } }),
     prisma.bid.count({ where: { status: "PUBLISHED" } }),
     prisma.job.count({ where: { status: "DRAFT" } }),
@@ -185,7 +187,7 @@ export default async function AdminPage() {
   return (
     <AdminDashboard
       user={session}
-      stats={{ jobCount, bidCount, categoryCount, userCount, subscriberCount, publishedJobs, publishedBids, draftJobs, draftBids }}
+      stats={{ jobCount, bidCount, categoryCount, userCount, subscriberCount, aiCallCount, publishedJobs, publishedBids, draftJobs, draftBids }}
       totalViews={(totalJobViews._sum.views ?? 0) + (totalBidViews._sum.views ?? 0)}
       visitorStats={{
         totalPageViews: totalPageViews,
