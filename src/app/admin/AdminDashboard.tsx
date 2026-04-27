@@ -48,6 +48,7 @@ interface DashboardProps {
     categoryCount: number;
     userCount: number;
     subscriberCount: number;
+    aiCallCount: number;
     publishedJobs: number;
     publishedBids: number;
     draftJobs: number;
