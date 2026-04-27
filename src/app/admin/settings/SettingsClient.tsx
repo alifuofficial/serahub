@@ -524,6 +524,28 @@ export default function SettingsClient({ user, config }: Props) {
                             <textarea value={form.coming_soon_message ?? ""} onChange={(e) => update("coming_soon_message", e.target.value)} rows={3} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" placeholder="We are working hard to bring you the best experience..." />
                           </FormRow>
                         </div>
+
+                        <hr className="border-slate-100" />
+
+                        {/* Module Availability */}
+                        <div className="space-y-4">
+                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <span className="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
+                            Module Availability
+                          </h3>
+                          <p className="text-xs text-slate-500">Enable or disable specific modules. Disabled modules will show a "Coming Soon" page.</p>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                              <div><p className="text-sm font-semibold text-slate-800">Jobs Module</p></div>
+                              <Toggle checked={form.jobs_enabled !== "false"} onChange={(v) => update("jobs_enabled", v ? "true" : "false")} />
+                            </div>
+                            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                              <div><p className="text-sm font-semibold text-slate-800">Bids Module</p></div>
+                              <Toggle checked={form.bids_enabled !== "false"} onChange={(v) => update("bids_enabled", v ? "true" : "false")} />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>
@@ -608,6 +630,24 @@ export default function SettingsClient({ user, config }: Props) {
                           </FormRow>
                           <FormRow label="Facebook App Secret">
                             <input type="password" value={form.social_facebook_app_secret ?? ""} onChange={(e) => update("social_facebook_app_secret", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" />
+                          </FormRow>
+                        </div>
+
+                        <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-[#0077B5] flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                              </div>
+                              <div><p className="text-sm font-semibold text-slate-800">LinkedIn</p><p className="text-xs text-slate-500">Allow users to sign in with their LinkedIn account</p></div>
+                            </div>
+                            <Toggle checked={form.social_linkedin_enabled === "true"} onChange={(v) => update("social_linkedin_enabled", v ? "true" : "false")} />
+                          </div>
+                          <FormRow label="LinkedIn Client ID">
+                            <input type="text" value={form.social_linkedin_client_id ?? ""} onChange={(e) => update("social_linkedin_client_id", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="78xxxxxxxxxxxx" />
+                          </FormRow>
+                          <FormRow label="LinkedIn Client Secret">
+                            <input type="password" value={form.social_linkedin_client_secret ?? ""} onChange={(e) => update("social_linkedin_client_secret", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="••••••••" />
                           </FormRow>
                         </div>
                       </div>
