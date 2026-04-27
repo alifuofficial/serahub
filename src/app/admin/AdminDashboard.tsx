@@ -15,6 +15,7 @@ const Pie = dynamic(() => import("recharts").then((m) => m.Pie), { ssr: false })
 const Cell = dynamic(() => import("recharts").then((m) => m.Cell), { ssr: false });
 const AreaChart = dynamic(() => import("recharts").then((m) => m.AreaChart), { ssr: false });
 const Area = dynamic(() => import("recharts").then((m) => m.Area), { ssr: false });
+const CartesianGrid = dynamic(() => import("recharts").then((m) => m.CartesianGrid), { ssr: false });
 
 interface RecentJob {
   id: string;
