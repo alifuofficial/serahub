@@ -87,3 +87,37 @@ export function BreadcrumbJsonLd({ items }: { items: { name: string; url: string
     />
   );
 }
+
+export function BidPostingJsonLd({ title, description, datePosted, deadline, category }: {
+  title: string;
+  description: string;
+  datePosted: string;
+  deadline?: string | null;
+  category?: string;
+}) {
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: title,
+    description,
+    provider: {
+      "@type": "Organization",
+      name: "SeraHub"
+    },
+    serviceType: "Tender/Bid Opportunity"
+  };
+
+  if (category) jsonLd.category = category;
+  if (datePosted) (jsonLd as any).datePublished = datePosted;
+  if (deadline) (jsonLd as any).offers = {
+    "@type": "Offer",
+    "availabilityEnds": deadline
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
