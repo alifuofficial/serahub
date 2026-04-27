@@ -53,6 +53,7 @@ interface DashboardProps {
     publishedBids: number;
     draftJobs: number;
     draftBids: number;
+    totalEmailClicks: number;
   };
   totalViews: number;
   visitorStats: {
@@ -68,7 +69,7 @@ interface DashboardProps {
   recentBids: RecentBid[];
   categoryData: { name: string; jobs: number; bids: number }[];
   trendData: { month: string; jobs: number; bids: number; subscribers: number }[];
-  dailyViewsData: { day: string; views: number }[];
+  dailyViewsData: { day: string; views: number; emailClicks: number }[];
   topPagesData: { path: string; views: number }[];
   topReferrersData: { referrer: string; visits: number }[];
 }
@@ -107,14 +108,6 @@ export default function AdminDashboard({ user, stats, totalViews, visitorStats, 
     { label: "Messages", href: "/admin/messages", active: false, icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> },
     { label: "AI Usage", href: "/admin/ai-usage", active: false, icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> },
     { label: "Settings", href: "/admin/settings", active: false, icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></svg> },
-  ];
-
-  const statCards = [
-    { label: "Total Jobs", value: stats.jobCount, sub: `${stats.publishedJobs} published, ${stats.draftJobs} drafts`, icon: <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>, gradient: "from-[#00c087] to-[#00e5a0]" },
-    { label: "Total Bids", value: stats.bidCount, sub: `${stats.publishedBids} published, ${stats.draftBids} drafts`, icon: <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>, gradient: "from-amber-500 to-orange-400" },
-    { label: "Page Views", value: visitorStats.totalPageViews, sub: `${visitorStats.pageViewsToday} today`, icon: <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>, gradient: "from-violet-500 to-purple-500" },
-    { label: "Subscribers", value: stats.subscriberCount, sub: "Email subscribers", icon: <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>, gradient: "from-blue-500 to-cyan-500" },
-    { label: "AI API Calls", value: (stats as any).aiCallCount || 0, sub: "Usage tracked", icon: <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>, gradient: "from-violet-500 to-indigo-500" },
   ];
 
   const statusData = [
@@ -169,256 +162,274 @@ export default function AdminDashboard({ user, stats, totalViews, visitorStats, 
 
         <main className="flex-1 min-w-0">
           <div className="px-4 lg:px-8 py-6 lg:py-8">
-            <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm">
               <div>
-                <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">Welcome back, <span className="gradient-text">{user.name || "Admin"}</span></h1>
-                <p className="text-slate-500 mt-1">Here&apos;s what&apos;s happening on SeraHub today.</p>
+                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Welcome back, <span className="text-primary">{user.name || "Admin"}</span></h1>
+                <p className="text-slate-500 mt-1 text-sm">Here&apos;s your daily overview of SeraHub.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {[
+                  { href: "/admin/jobs", label: "Jobs", bg: "bg-[#00c087]/10", text: "text-[#00c087]", hover: "hover:bg-[#00c087]/20", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> },
+                  { href: "/admin/bids", label: "Bids", bg: "bg-amber-500/10", text: "text-amber-600", hover: "hover:bg-amber-500/20", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg> },
+                  { href: "/admin/users", label: "Users", bg: "bg-blue-500/10", text: "text-blue-600", hover: "hover:bg-blue-500/20", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> },
+                ].map((action) => (
+                  <Link key={action.label} href={action.href} className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${action.bg} ${action.text} ${action.hover}`}>
+                    {action.icon}
+                    <span className="hidden sm:inline">{action.label}</span>
+                  </Link>
+                ))}
               </div>
             </div>
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-5 mb-8">
-              {statCards.map((stat) => (
-                <div key={stat.label} className="relative overflow-hidden bg-white rounded-2xl border border-slate-200/60 p-5 group hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300">
-                  <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.gradient} opacity-[0.07] rounded-full -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-700`} />
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center text-white shadow-sm`}>{stat.icon}</div>
+            <div className="mb-8">
+              <h2 className="text-lg font-bold text-slate-900 mb-4 px-1">At a Glance</h2>
+              <div className="bg-white rounded-3xl p-6 shadow-sm">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 divide-x divide-slate-100">
+                  <div className="px-4 first:pl-0">
+                    <p className="text-sm font-semibold text-slate-500 mb-1">Total Jobs</p>
+                    <p className="text-3xl font-extrabold text-slate-900">{stats.jobCount.toLocaleString()}</p>
+                    <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-[#00c087]"/> {stats.publishedJobs} live</div>
                   </div>
-                  <p className="text-3xl font-extrabold text-slate-900 tracking-tight">{stat.value.toLocaleString()}</p>
-                  <p className="text-sm font-medium text-slate-500 mt-1">{stat.label}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{stat.sub}</p>
+                  <div className="px-4">
+                    <p className="text-sm font-semibold text-slate-500 mb-1">Total Bids</p>
+                    <p className="text-3xl font-extrabold text-slate-900">{stats.bidCount.toLocaleString()}</p>
+                    <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"/> {stats.publishedBids} live</div>
+                  </div>
+                  <div className="px-4">
+                    <p className="text-sm font-semibold text-slate-500 mb-1">Page Views</p>
+                    <p className="text-3xl font-extrabold text-slate-900">{visitorStats.totalPageViews.toLocaleString()}</p>
+                    <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-violet-500"/> {visitorStats.pageViewsToday.toLocaleString()} today</div>
+                  </div>
+                  <div className="px-4">
+                    <p className="text-sm font-semibold text-slate-500 mb-1">Subscribers</p>
+                    <p className="text-3xl font-extrabold text-slate-900">{stats.subscriberCount.toLocaleString()}</p>
+                    <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-500"/> Subscribed</div>
+                  </div>
+                  <div className="px-4">
+                    <p className="text-sm font-semibold text-slate-500 mb-1">Email Clicks</p>
+                    <p className="text-3xl font-extrabold text-slate-900">{stats.totalEmailClicks?.toLocaleString() || 0}</p>
+                    <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-pink-500"/> Via Newsletters</div>
+                  </div>
+                  <div className="px-4">
+                    <p className="text-sm font-semibold text-slate-500 mb-1">AI API Calls</p>
+                    <p className="text-3xl font-extrabold text-slate-900">{(stats as any).aiCallCount?.toLocaleString() || 0}</p>
+                    <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500"/> Tracked usage</div>
+                  </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Visitor Analytics Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:gap-5 mb-8">
-              <div className="bg-white rounded-2xl border border-slate-200/60 p-5">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Today</p>
-                <p className="text-2xl font-extrabold text-slate-900">{visitorStats.pageViewsToday.toLocaleString()}</p>
-                <p className="text-xs text-slate-400 mt-1">page views</p>
-              </div>
-              <div className="bg-white rounded-2xl border border-slate-200/60 p-5">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Yesterday</p>
-                <p className="text-2xl font-extrabold text-slate-900">{visitorStats.pageViewsYesterday.toLocaleString()}</p>
-                <p className="text-xs text-slate-400 mt-1">page views</p>
-              </div>
-              <div className="bg-white rounded-2xl border border-slate-200/60 p-5">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Last 7 Days</p>
-                <p className="text-2xl font-extrabold text-slate-900">{visitorStats.pageViewsLast7Days.toLocaleString()}</p>
-                <p className="text-xs text-slate-400 mt-1">{visitorStats.uniqueVisitors7d} unique pages</p>
-              </div>
-              <div className="bg-white rounded-2xl border border-slate-200/60 p-5">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Last 30 Days</p>
-                <p className="text-2xl font-extrabold text-slate-900">{visitorStats.pageViewsLast30Days.toLocaleString()}</p>
-                <p className="text-xs text-slate-400 mt-1">{visitorStats.uniqueVisitors30d} unique pages</p>
+                <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="px-4"><p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Views Yesterday</p><p className="text-xl font-bold text-slate-800">{visitorStats.pageViewsYesterday.toLocaleString()}</p></div>
+                  <div className="px-4"><p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Views (7d)</p><p className="text-xl font-bold text-slate-800">{visitorStats.pageViewsLast7Days.toLocaleString()}</p></div>
+                  <div className="px-4"><p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Unique (7d)</p><p className="text-xl font-bold text-slate-800">{visitorStats.uniqueVisitors7d.toLocaleString()}</p></div>
+                  <div className="px-4"><p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Unique (30d)</p><p className="text-xl font-bold text-slate-800">{visitorStats.uniqueVisitors30d.toLocaleString()}</p></div>
+                </div>
               </div>
             </div>
 
             {/* Charts Row */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-8">
-              <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-200/60 p-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+              <div className="xl:col-span-2 bg-white rounded-3xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-slate-900">Content Analytics</h2>
-                  <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl">
-                    <button onClick={() => setChartView("trend")} className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${chartView === "trend" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Trends</button>
-                    <button onClick={() => setChartView("category")} className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${chartView === "category" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>By Category</button>
+                  <div className="flex items-center gap-1 p-1 bg-slate-50 rounded-xl">
+                    <button onClick={() => setChartView("trend")} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${chartView === "trend" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Trends</button>
+                    <button onClick={() => setChartView("category")} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${chartView === "category" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Categories</button>
                   </div>
                 </div>
                 {chartView === "trend" ? (
                   <>
-                    <div className="flex items-center gap-4 text-xs mb-4">
-                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#00c087]" />Jobs</span>
-                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#f59e0b]" />Bids</span>
-                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#3b82f6]" />Subscribers</span>
+                    <div className="flex items-center gap-4 text-xs font-semibold mb-6">
+                      <span className="flex items-center gap-2 text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-[#00c087]" />Jobs</span>
+                      <span className="flex items-center gap-2 text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" />Bids</span>
+                      <span className="flex items-center gap-2 text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-blue-500" />Subscribers</span>
                     </div>
                     <ResponsiveContainer width="100%" height={280}>
-                      <BarChart data={trendData} barGap={4} barCategoryGap="20%">
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                        <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={30} />
-                        <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }} labelStyle={{ fontWeight: 600, color: "#0f172a" }} />
-                        <Bar dataKey="jobs" fill="#00c087" radius={[6, 6, 0, 0]} />
-                        <Bar dataKey="bids" fill="#f59e0b" radius={[6, 6, 0, 0]} />
-                        <Bar dataKey="subscribers" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                      <BarChart data={trendData} barGap={6} barCategoryGap="25%">
+                        <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 500 }} axisLine={false} tickLine={false} dy={10} />
+                        <YAxis tick={{ fontSize: 12, fill: "#cbd5e1", fontWeight: 500 }} axisLine={false} tickLine={false} dx={-10} />
+                        <Tooltip cursor={{ fill: "#f8fafc" }} contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", padding: "12px 16px" }} labelStyle={{ fontWeight: 700, color: "#0f172a", marginBottom: "8px" }} itemStyle={{ fontWeight: 600, fontSize: "13px" }} />
+                        <Bar dataKey="jobs" fill="#00c087" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="bids" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="subscribers" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </>
                 ) : (
                   <>
-                    <div className="flex items-center gap-4 text-xs mb-4">
-                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#00c087]" />Jobs</span>
-                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#f59e0b]" />Bids</span>
+                    <div className="flex items-center gap-4 text-xs font-semibold mb-6">
+                      <span className="flex items-center gap-2 text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-[#00c087]" />Jobs</span>
+                      <span className="flex items-center gap-2 text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" />Bids</span>
                     </div>
                     {categoryData.length > 0 ? (
                       <ResponsiveContainer width="100%" height={280}>
-                        <BarChart data={categoryData} barGap={4} barCategoryGap="20%">
-                          <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
-                          <YAxis tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={30} />
-                          <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }} labelStyle={{ fontWeight: 600, color: "#0f172a" }} />
-                          <Bar dataKey="jobs" fill="#00c087" radius={[6, 6, 0, 0]} />
-                          <Bar dataKey="bids" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                        <BarChart data={categoryData} barGap={6} barCategoryGap="25%">
+                          <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 500 }} axisLine={false} tickLine={false} dy={10} />
+                          <YAxis tick={{ fontSize: 12, fill: "#cbd5e1", fontWeight: 500 }} axisLine={false} tickLine={false} dx={-10} />
+                          <Tooltip cursor={{ fill: "#f8fafc" }} contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", padding: "12px 16px" }} labelStyle={{ fontWeight: 700, color: "#0f172a", marginBottom: "8px" }} itemStyle={{ fontWeight: 600, fontSize: "13px" }} />
+                          <Bar dataKey="jobs" fill="#00c087" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="bids" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className="flex items-center justify-center h-[280px] text-slate-400 text-sm">No category data yet</div>
+                      <div className="flex items-center justify-center h-[280px] text-slate-400 text-sm font-medium">No category data yet</div>
                     )}
                   </>
                 )}
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200/60 p-6">
-                <h2 className="text-lg font-bold text-slate-900 mb-6">Content Status</h2>
+              <div className="bg-white rounded-3xl p-6 shadow-sm">
+                <h2 className="text-lg font-bold text-slate-900 mb-8">Content Status</h2>
                 {(stats.publishedJobs + stats.draftJobs + stats.publishedBids + stats.draftBids) > 0 ? (
-                  <ResponsiveContainer width="100%" height={220}>
+                  <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
-                      <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={4} strokeWidth={0}>
+                      <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={2} strokeWidth={0}>
                         {statusData.map((entry, i) => (<Cell key={i} fill={entry.color} />))}
                       </Pie>
-                      <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0" }} />
+                      <Tooltip contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }} itemStyle={{ fontWeight: 600, fontSize: "13px" }} />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex items-center justify-center h-[220px] text-slate-400 text-sm">No content yet</div>
+                  <div className="flex items-center justify-center h-[200px] text-slate-400 text-sm font-medium">No content yet</div>
                 )}
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-[#00c087]" />Published Jobs ({stats.publishedJobs})</div>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-[#86efac]" />Draft Jobs ({stats.draftJobs})</div>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" />Published Bids ({stats.publishedBids})</div>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-[#fde68a]" />Draft Bids ({stats.draftBids})</div>
+                <div className="grid grid-cols-2 gap-y-4 mt-8 px-2">
+                  <div className="flex flex-col"><span className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold uppercase tracking-wider"><span className="w-2 h-2 rounded-full bg-[#00c087]" />Live Jobs</span><span className="text-lg font-bold text-slate-800 mt-1 pl-3.5">{stats.publishedJobs}</span></div>
+                  <div className="flex flex-col"><span className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold uppercase tracking-wider"><span className="w-2 h-2 rounded-full bg-[#86efac]" />Draft Jobs</span><span className="text-lg font-bold text-slate-800 mt-1 pl-3.5">{stats.draftJobs}</span></div>
+                  <div className="flex flex-col"><span className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold uppercase tracking-wider"><span className="w-2 h-2 rounded-full bg-amber-500" />Live Bids</span><span className="text-lg font-bold text-slate-800 mt-1 pl-3.5">{stats.publishedBids}</span></div>
+                  <div className="flex flex-col"><span className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold uppercase tracking-wider"><span className="w-2 h-2 rounded-full bg-amber-200" />Draft Bids</span><span className="text-lg font-bold text-slate-800 mt-1 pl-3.5">{stats.draftBids}</span></div>
                 </div>
               </div>
             </div>
 
             {/* Page Views Chart + Top Pages + Top Referrers */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-8">
-              <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-200/60 p-6">
-                <h2 className="text-lg font-bold text-slate-900 mb-6">Daily Page Views (Last 7 Days)</h2>
-                <ResponsiveContainer width="100%" height={220}>
-                  <AreaChart data={dailyViewsData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={30} />
-                    <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }} />
-                    <Area type="monotone" dataKey="views" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.1} strokeWidth={2} dot={{ r: 4, fill: "#8b5cf6" }} />
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+              <div className="xl:col-span-2 bg-white rounded-3xl p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-lg font-bold text-slate-900">Traffic (Last 7 Days)</h2>
+                  <div className="flex gap-4">
+                    <span className="flex items-center gap-2 text-xs font-semibold text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-violet-500" />Page Views</span>
+                    <span className="flex items-center gap-2 text-xs font-semibold text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-pink-500" />Email Clicks</span>
+                  </div>
+                </div>
+                <ResponsiveContainer width="100%" height={260}>
+                  <AreaChart data={dailyViewsData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorEmail" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ec4899" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 500 }} axisLine={false} tickLine={false} dy={10} />
+                    <YAxis tick={{ fontSize: 12, fill: "#cbd5e1", fontWeight: 500 }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", padding: "12px 16px" }} labelStyle={{ fontWeight: 700, color: "#0f172a", marginBottom: "8px" }} itemStyle={{ fontWeight: 600, fontSize: "13px" }} />
+                    <Area type="monotone" dataKey="views" name="Page Views" stroke="#8b5cf6" fill="url(#colorViews)" strokeWidth={3} activeDot={{ r: 6, strokeWidth: 0, fill: "#8b5cf6" }} dot={false} />
+                    <Area type="monotone" dataKey="emailClicks" name="Email Clicks" stroke="#ec4899" fill="url(#colorEmail)" strokeWidth={3} activeDot={{ r: 6, strokeWidth: 0, fill: "#ec4899" }} dot={false} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="space-y-5">
-                <div className="bg-white rounded-2xl border border-slate-200/60 p-6">
-                  <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-500"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+              <div className="space-y-6">
+                <div className="bg-white rounded-3xl p-6 shadow-sm">
+                  <h3 className="text-sm font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-violet-500"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
                     Top Pages
                   </h3>
                   {topPagesData.length > 0 ? (
-                    <div className="space-y-2.5">
-                      {topPagesData.slice(0, 5).map((p, i) => (
-                        <div key={p.path} className="flex items-center justify-between">
-                          <span className="text-sm text-slate-700 truncate max-w-[180px]" title={p.path}>{formatPath(p.path)}</span>
-                          <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">{p.views.toLocaleString()}</span>
+                    <div className="space-y-3">
+                      {topPagesData.slice(0, 5).map((p) => (
+                        <div key={p.path} className="flex items-center justify-between group">
+                          <span className="text-sm font-medium text-slate-600 truncate max-w-[180px] group-hover:text-violet-600 transition-colors" title={p.path}>{formatPath(p.path)}</span>
+                          <span className="text-xs font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg group-hover:bg-violet-50 group-hover:text-violet-600 transition-colors">{p.views.toLocaleString()}</span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400">No page views yet</p>
+                    <p className="text-sm text-slate-400 font-medium">No page views yet</p>
                   )}
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-200/60 p-6">
-                  <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <div className="bg-white rounded-3xl p-6 shadow-sm">
+                  <h3 className="text-sm font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                     Top Referrers
                   </h3>
                   {topReferrersData.length > 0 ? (
-                    <div className="space-y-2.5">
+                    <div className="space-y-3">
                       {topReferrersData.slice(0, 5).map((r) => (
-                        <div key={r.referrer} className="flex items-center justify-between">
-                          <span className="text-sm text-slate-700 truncate max-w-[160px]">{r.referrer}</span>
-                          <span className="text-xs font-semibold text-slate-500 bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{r.visits.toLocaleString()}</span>
+                        <div key={r.referrer} className="flex items-center justify-between group">
+                          <span className="text-sm font-medium text-slate-600 truncate max-w-[160px] group-hover:text-blue-600 transition-colors">{r.referrer}</span>
+                          <span className="text-xs font-bold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">{r.visits.toLocaleString()}</span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400">No referrers yet</p>
+                    <p className="text-sm text-slate-400 font-medium">No referrers yet</p>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:gap-4 mb-8">
-              {[
-                { href: "/admin/jobs", label: "Manage Jobs", gradient: "from-[#00c087] to-[#00e5a0]", shadowColor: "shadow-primary/20", icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> },
-                { href: "/admin/bids", label: "Manage Bids", gradient: "from-amber-500 to-orange-400", shadowColor: "shadow-amber-500/20", icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg> },
-                { href: "/admin/categories", label: "Categories", gradient: "from-violet-500 to-purple-500", shadowColor: "shadow-violet-500/20", icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg> },
-                { href: "/admin/users", label: "Manage Users", gradient: "from-blue-500 to-cyan-500", shadowColor: "shadow-blue-500/20", icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-              ].map((action) => (
-                <a key={action.label} href={action.href} className={`relative overflow-hidden flex flex-col items-center gap-2.5 p-5 rounded-2xl bg-white border border-slate-200/60 hover:border-slate-300 ${action.shadowColor} hover:shadow-lg transition-all duration-300 group`}>
-                  <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform`}>{action.icon}</div>
-                  <span className="text-sm font-semibold text-slate-700 group-hover:text-slate-900">{action.label}</span>
-                </a>
-              ))}
-            </div>
-
             {/* Recent Activity */}
-            <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
-              <div className="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+              <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h2 className="text-lg font-bold text-slate-900">Recent Activity</h2>
-                <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl">
-                  <button onClick={() => setActiveTab("jobs")} className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${activeTab === "jobs" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Jobs ({stats.jobCount})</button>
-                  <button onClick={() => setActiveTab("bids")} className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${activeTab === "bids" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Bids ({stats.bidCount})</button>
+                <div className="flex items-center gap-1 p-1 bg-slate-50 rounded-xl">
+                  <button onClick={() => setActiveTab("jobs")} className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${activeTab === "jobs" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Jobs</button>
+                  <button onClick={() => setActiveTab("bids")} className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${activeTab === "bids" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Bids</button>
                 </div>
               </div>
 
               {activeTab === "jobs" ? (
-                <div className="divide-y divide-slate-100">
+                <div className="px-2 pb-2">
                   {recentJobs.length > 0 ? recentJobs.map((job) => (
-                    <Link key={job.id} href={`/jobs/${job.slug}`} className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50/80 transition-colors group">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00c087]/10 to-[#00e5a0]/10 flex items-center justify-center flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <Link key={job.id} href={`/jobs/${job.slug}`} className="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-slate-50 transition-colors group">
+                      <div className="w-10 h-10 rounded-xl bg-[#00c087]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#00c087] transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#00c087] group-hover:text-white transition-colors"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 truncate group-hover:text-primary transition-colors">{job.title}</p>
+                        <p className="text-sm font-bold text-slate-800 truncate group-hover:text-[#00c087] transition-colors">{job.title}</p>
                         <div className="flex items-center gap-2 mt-0.5">
-                          {job.category && <span className="text-xs text-slate-400">{job.category}</span>}
+                          {job.category && <span className="text-xs font-medium text-slate-500">{job.category}</span>}
                           {job.category && <span className="text-slate-300">·</span>}
-                          <span className="text-xs text-slate-400">{job.source}</span>
+                          <span className="text-xs font-medium text-slate-400">{job.source}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 flex-shrink-0">
-                        <div className="hidden sm:flex items-center gap-1 text-xs text-slate-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>{job.views}
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>{job.views}
                         </div>
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${job.status === "PUBLISHED" ? "bg-[#e6fbf4] text-primary" : "bg-slate-100 text-slate-500"}`}>{job.status === "PUBLISHED" ? "Live" : job.status}</span>
-                        <span className="text-xs text-slate-400">{formatDate(job.createdAt)}</span>
+                        <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${job.status === "PUBLISHED" ? "bg-[#e6fbf4] text-[#00c087]" : "bg-slate-100 text-slate-500"}`}>{job.status === "PUBLISHED" ? "Live" : job.status}</span>
+                        <span className="text-xs font-medium text-slate-400 w-16 text-right">{formatDate(job.createdAt)}</span>
                       </div>
                     </Link>
                   )) : (
-                    <div className="px-6 py-12 text-center text-slate-400 text-sm">No jobs yet</div>
+                    <div className="px-6 py-12 text-center text-slate-400 text-sm font-medium">No jobs yet</div>
                   )}
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100">
+                <div className="px-2 pb-2">
                   {recentBids.length > 0 ? recentBids.map((bid) => (
-                    <Link key={bid.id} href={`/bids/${bid.slug}`} className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50/80 transition-colors group">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <Link key={bid.id} href={`/bids/${bid.slug}`} className="flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-slate-50 transition-colors group">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500 group-hover:text-white transition-colors"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 truncate group-hover:text-amber-600 transition-colors">{bid.title}</p>
-                        <span className="text-xs text-slate-400">{bid.source}</span>
+                        <p className="text-sm font-bold text-slate-800 truncate group-hover:text-amber-600 transition-colors">{bid.title}</p>
+                        <span className="text-xs font-medium text-slate-400">{bid.source}</span>
                       </div>
-                      <div className="flex items-center gap-3 flex-shrink-0">
-                        <div className="hidden sm:flex items-center gap-1 text-xs text-slate-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>{bid.views}
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>{bid.views}
                         </div>
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${bid.status === "PUBLISHED" ? "bg-amber-50 text-amber-600" : "bg-slate-100 text-slate-500"}`}>{bid.status === "PUBLISHED" ? "Live" : bid.status}</span>
-                        <span className="text-xs text-slate-400">{formatDate(bid.createdAt)}</span>
+                        <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${bid.status === "PUBLISHED" ? "bg-amber-50 text-amber-600" : "bg-slate-100 text-slate-500"}`}>{bid.status === "PUBLISHED" ? "Live" : bid.status}</span>
+                        <span className="text-xs font-medium text-slate-400 w-16 text-right">{formatDate(bid.createdAt)}</span>
                       </div>
                     </Link>
                   )) : (
-                    <div className="px-6 py-12 text-center text-slate-400 text-sm">No bids yet</div>
+                    <div className="px-6 py-12 text-center text-slate-400 text-sm font-medium">No bids yet</div>
                   )}
                 </div>
               )}

@@ -72,51 +72,48 @@ export default function SearchForm({
   if (variant === "hero") {
     return (
       <form onSubmit={handleSubmit} className={className}>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/5 border border-primary/10">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">AI-Powered Search</span>
-          </div>
-        </div>
         <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-violet-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200" />
-          <div className="relative bg-white border border-slate-200 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center p-1.5 shadow-xl shadow-slate-200/40">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary via-violet-500 to-emerald-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-pulse" />
+          <div className="relative bg-white border border-slate-200 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center p-2 shadow-xl shadow-slate-200/40">
             <div className="flex flex-1 items-center">
-              <div className="pl-4 pr-2 text-slate-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <div className="pl-4 pr-2 text-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-sparkle"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
               </div>
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={placeholder}
-                className={inputClassName || "flex-1 bg-transparent border-none outline-none py-3.5 px-2 text-slate-700 placeholder-slate-400 font-medium"}
+                placeholder="Find my next remote software job..."
+                className={inputClassName || "flex-1 bg-transparent border-none outline-none py-4 px-2 text-slate-700 placeholder-slate-400 font-medium text-lg"}
                 disabled={isLoading}
               />
             </div>
             <button 
               type="submit" 
               disabled={isLoading || !query.trim()}
-              className="relative overflow-hidden flex items-center justify-center gap-2.5 px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 disabled:opacity-50 transition-all text-sm group/btn"
+              className="relative overflow-hidden flex items-center justify-center gap-2.5 px-10 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 disabled:opacity-50 transition-all text-sm group/btn"
             >
               {isLoading ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                  <span>Processing...</span>
+                  <span>Thinking...</span>
                 </>
               ) : (
                 <>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-400 group-hover/btn:rotate-12 transition-transform"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                  <span>Find Opportunities</span>
+                  <span>Smart Search</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary group-hover/btn:scale-110 transition-transform"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                 </>
               )}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-shimmer" />
             </button>
           </div>
         </div>
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-2">
-           <p className="text-xs text-slate-400">
-             <span className="font-bold text-slate-500">Popular:</span> accountant, remote developer, construction bids
+        <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 px-2">
+           <p className="text-[11px] text-slate-400 font-medium">
+             <span className="font-bold text-slate-500 uppercase tracking-wider mr-2 text-[10px]">Try searching:</span> 
+             <button type="button" onClick={() => setQuery("Remote react jobs in Ethiopia")} className="hover:text-primary transition-colors cursor-pointer">"Remote react jobs in Ethiopia"</button>
+             <span className="mx-2 opacity-30">|</span>
+             <button type="button" onClick={() => setQuery("Construction bids for 2024")} className="hover:text-primary transition-colors cursor-pointer">"Construction bids for 2024"</button>
            </p>
         </div>
       </form>

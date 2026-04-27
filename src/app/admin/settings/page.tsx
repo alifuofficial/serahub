@@ -56,6 +56,12 @@ const SETTING_KEYS = [
   "social_facebook_enabled",
   "social_facebook_app_id",
   "social_facebook_app_secret",
+  "social_link_facebook",
+  "social_link_instagram",
+  "social_link_tiktok",
+  "social_link_linkedin",
+  "social_link_telegram",
+  "social_link_youtube",
 ];
 
 export default async function SettingsPage() {

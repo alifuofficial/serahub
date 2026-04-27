@@ -17,3 +17,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 }
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const url = searchParams.get("url");
+  const source = searchParams.get("source") || "newsletter";
+
+  if (!url) {
+    return NextResponse.json({ error: "Missing url parameter" }, { status: 400 });
+  }
+
+  try {
+    await prisma.emailClick.create({
+      data: {
+        url,
+        source,
+      },
+    });
+  } catch (error) {
+    console.error("[EmailClick Tracking Error]", error);
+  }
+
+  return NextResponse.redirect(url);
+}

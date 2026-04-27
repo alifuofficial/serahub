@@ -131,20 +131,20 @@ Return ONLY a valid JSON object with these exact keys:
 }
 `;
 
-const NEWSLETTER_PROMPT = (jobs: { title: string, link: string, metaDescription?: string }[], siteName: string) => `
+const NEWSLETTER_PROMPT = (jobs: { title: string, link: string, metaDescription?: string }[], siteName: string, siteUrl: string) => `
 You are a career expert at "${siteName}", an Ethiopian job and bid aggregation platform.
-Create a weekly newsletter for our subscribers featuring the following new opportunities.
+Create a weekly newsletter body for our subscribers featuring the following new opportunities.
 
 JOBS:
-${jobs.map((j, i) => `${i + 1}. TITLE: ${j.title}\n   LINK: ${j.link}\n   SUMMARY: ${j.metaDescription || "Click to see details."}`).join("\n\n")}
+${jobs.map((j, i) => `${i + 1}. TITLE: ${j.title}\n   LINK: ${siteUrl}/api/track?url=${encodeURIComponent(j.link)}&source=newsletter\n   SUMMARY: ${j.metaDescription || "Click to see details."}`).join("\n\n")}
 
 Guidelines:
 1. Subject line should be catchy, professional, and personalized (e.g. "Your Weekly Career Update from ${siteName}").
-2. The body should be in clean, professional HTML.
+2. The body should be in clean, professional HTML (do NOT include <html>, <head>, or <body> tags, just the inner HTML elements like <h1>, <h2>, <p>, <a>, <div>, etc.).
 3. Use a friendly but professional tone.
 4. Highlight why these opportunities are exciting.
-5. Include a clear call to action for each job.
-6. The HTML should be self-contained and suitable for email (inline styles).
+5. Create a visually appealing "card" for each job using <div class="card">, <h3 class="card-title">, <p class="card-company">, and <a class="btn"> classes.
+6. Make sure to use the exact tracking LINKS provided above for the calls to action.
 
 Please output your response exactly in this format:
 SUBJECT: [Your Subject Here]
@@ -330,9 +330,10 @@ export async function generateNewsletter(jobs: { title: string, link: string, me
   }
 
   const siteName = (await prisma.siteConfig.findUnique({ where: { key: "site_name" } }))?.value || "SeraHub";
+  const siteUrl = (await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } }))?.value || "https://serahub.com";
 
   try {
-    const text = await callAI(NEWSLETTER_PROMPT(jobs, siteName), config, "newsletter");
+    const text = await callAI(NEWSLETTER_PROMPT(jobs, siteName, siteUrl), config, "newsletter");
     
     // Parse the custom format
     const subjectMatch = text.match(/SUBJECT:\s*(.+)/i);

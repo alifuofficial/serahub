@@ -156,3 +156,9 @@ model AIUsage {
   createdAt     DateTime @default(now())
 }
 
+model EmailClick {
+  id        String   @id @default(uuid())
+  url       String
+  source    String   @default("newsletter")
+  createdAt DateTime @default(now())
+}

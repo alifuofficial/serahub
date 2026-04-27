@@ -51,6 +51,8 @@ export default async function AdminPage() {
     monthlyBids,
     monthlySubscribers,
     topReferrers,
+    totalEmailClicks,
+    dailyEmailClicks
   ] = await Promise.all([
     prisma.job.count(),
     prisma.bid.count(),
@@ -125,6 +127,12 @@ export default async function AdminPage() {
       orderBy: { _count: { referrer: "desc" } },
       take: 5,
     }),
+    prisma.emailClick.count(),
+    prisma.emailClick.groupBy({
+      by: ["createdAt"],
+      where: { createdAt: { gte: sevenDaysAgo } },
+      _count: true,
+    }),
   ]);
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -168,9 +176,19 @@ export default async function AdminPage() {
       last7[6 - daysAgo] += row._count;
     }
   }
+
+  const last7Emails = new Array(7).fill(0);
+  for (const row of dailyEmailClicks as TimeRow[]) {
+    const d = new Date(row.createdAt);
+    const daysAgo = Math.floor((now.getTime() - d.getTime()) / (24 * 60 * 60 * 1000));
+    if (daysAgo >= 0 && daysAgo < 7) {
+      last7Emails[6 - daysAgo] += row._count;
+    }
+  }
+
   const dailyViewsData = last7.map((count, i) => {
     const d = new Date(now.getTime() - (6 - i) * 24 * 60 * 60 * 1000);
-    return { day: dayLabels[d.getDay()], views: count };
+    return { day: dayLabels[d.getDay()], views: count, emailClicks: last7Emails[i] };
   });
 
   const topPagesData = topPages.map((p) => ({
@@ -187,7 +205,7 @@ export default async function AdminPage() {
   return (
     <AdminDashboard
       user={session}
-      stats={{ jobCount, bidCount, categoryCount, userCount, subscriberCount, aiCallCount, publishedJobs, publishedBids, draftJobs, draftBids }}
+      stats={{ jobCount, bidCount, categoryCount, userCount, subscriberCount, aiCallCount, publishedJobs, publishedBids, draftJobs, draftBids, totalEmailClicks }}
       totalViews={(totalJobViews._sum.views ?? 0) + (totalBidViews._sum.views ?? 0)}
       visitorStats={{
         totalPageViews: totalPageViews,

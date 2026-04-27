@@ -559,6 +559,12 @@ export default function SettingsClient({ user, config }: Props) {
                             <FormRow label="LinkedIn URL">
                               <input type="url" value={form.social_link_linkedin ?? ""} onChange={(e) => update("social_link_linkedin", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://linkedin.com/company/serahub" />
                             </FormRow>
+                            <FormRow label="Telegram URL">
+                              <input type="url" value={form.social_link_telegram ?? ""} onChange={(e) => update("social_link_telegram", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://t.me/serahub" />
+                            </FormRow>
+                            <FormRow label="YouTube URL">
+                              <input type="url" value={form.social_link_youtube ?? ""} onChange={(e) => update("social_link_youtube", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="https://youtube.com/@serahub" />
+                            </FormRow>
                           </div>
                         </div>
 

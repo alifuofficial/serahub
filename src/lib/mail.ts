@@ -30,16 +30,32 @@ export async function getTransporter() {
   });
 }
 
+import { getEmailTemplateHtml } from "./email-template";
+
 export async function sendMail({ to, subject, text, html }: { to: string, subject: string, text: string, html?: string }) {
   const transporter = await getTransporter();
-  const fromEmail = (await prisma.siteConfig.findUnique({ where: { key: "smtp_from" } }))?.value || "noreply@serahub.com";
-  const siteName = (await prisma.siteConfig.findUnique({ where: { key: "site_name" } }))?.value || "SeraHub";
+  const configRows = await prisma.siteConfig.findMany();
+  const config = configRows.reduce((acc, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const fromEmail = config.smtp_from || "noreply@serahub.com";
+  const siteName = config.site_name || "SeraHub";
+  const siteUrl = config.appearance_site_url || "https://serahub.com";
+
+  const finalHtml = html ? getEmailTemplateHtml(html, config, subject) : undefined;
 
   return transporter.sendMail({
     from: `"${siteName}" <${fromEmail}>`,
     to,
     subject,
     text,
-    html,
+    html: finalHtml,
+    headers: {
+      "List-Unsubscribe": `<${siteUrl}/unsubscribe?email=${encodeURIComponent(to)}>`,
+      "Precedence": "bulk",
+      "X-Auto-Response-Suppress": "OOF, AutoReply"
+    }
   });
 }
