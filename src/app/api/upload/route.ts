@@ -69,14 +69,13 @@ export async function POST(req: NextRequest) {
         port: parseInt(config.ftp_port || "21"),
         user: config.ftp_user,
         password: config.ftp_pass,
-        secure: false // Most shared hosting FTP is plain or explicit TLS which basic-ftp handles
+        secure: false 
       });
 
       const remoteRoot = config.ftp_root || "/";
       await client.ensureDir(remoteRoot);
       const remotePath = path.posix.join(remoteRoot, uniqueName);
       
-      // Ensure the buffer is sent as a readable stream or directly if supported
       const stream = new (require("stream").Readable)();
       stream.push(buffer);
       stream.push(null);
@@ -85,10 +84,26 @@ export async function POST(req: NextRequest) {
       await client.close();
 
       const publicUrl = config.ftp_public_url?.replace(/\/$/, "") || "";
+      const url = `${publicUrl}/${uniqueName}`;
+
+      // Save to Media model
+      const media = await prisma.media.create({
+        data: {
+          name: file.name,
+          url,
+          type: file.type,
+          size: file.size,
+          key: uniqueName,
+          storage: "ftp",
+        }
+      });
+
       return NextResponse.json({
-        url: `${publicUrl}/${uniqueName}`,
-        name: file.name,
-        size: file.size,
+        id: media.id,
+        url: media.url,
+        name: media.name,
+        size: media.size,
+        type: media.type,
       });
     } catch (err: any) {
       console.error("FTP Upload Error:", err);
@@ -104,9 +119,25 @@ export async function POST(req: NextRequest) {
   const filePath = path.join(uploadDir, uniqueName);
   await writeFile(filePath, buffer);
 
+  const url = `/uploads/${uniqueName}`;
+
+  // Save to Media model
+  const media = await prisma.media.create({
+    data: {
+      name: file.name,
+      url,
+      type: file.type,
+      size: file.size,
+      key: uniqueName,
+      storage: "local",
+    }
+  });
+
   return NextResponse.json({
-    url: `/uploads/${uniqueName}`,
-    name: file.name,
-    size: file.size,
+    id: media.id,
+    url: media.url,
+    name: media.name,
+    size: media.size,
+    type: media.type,
   });
 }

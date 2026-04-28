@@ -4,6 +4,7 @@ import VisitTracker from "@/components/seo/VisitTracker";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import MaintenancePage from "./maintenance/page";
+import SimpleSubscribeForm from "@/components/common/SimpleSubscribeForm";
 
 export default async function PublicLayout({
   children,
@@ -81,10 +82,7 @@ export default async function PublicLayout({
             <div className="p-1 rounded-2xl bg-slate-50 border border-slate-100">
                <div className="bg-white rounded-xl p-6 shadow-sm">
                  <p className="text-sm font-bold text-slate-800 mb-4">Notify me when we launch</p>
-                 <form action="/api/subscribe" method="POST" className="flex gap-2">
-                   <input type="email" name="email" placeholder="your@email.com" required className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                   <button type="submit" className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors">Notify Me</button>
-                 </form>
+                 <SimpleSubscribeForm />
                </div>
             </div>
 

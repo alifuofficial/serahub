@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import SimpleSubscribeForm from "@/components/common/SimpleSubscribeForm";
 
 export default async function MaintenancePage() {
   const session = await getSession();
@@ -48,10 +49,10 @@ export default async function MaintenancePage() {
         <div className="max-w-md mx-auto p-1 rounded-2xl bg-white border border-slate-200 shadow-sm">
            <div className="p-5">
              <p className="text-sm font-bold text-slate-800 mb-3 text-left">Get notified when we&apos;re back</p>
-             <form action="/api/subscribe" method="POST" className="flex gap-2">
-               <input type="email" name="email" placeholder="your@email.com" required className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
-               <button type="submit" className="px-5 py-2.5 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600 transition-colors">Notify Me</button>
-             </form>
+             <SimpleSubscribeForm 
+               buttonColor="bg-amber-500 hover:bg-amber-600" 
+               focusColor="focus:border-amber-500 focus:ring-amber-500"
+             />
            </div>
         </div>
 

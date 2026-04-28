@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import SimpleSubscribeForm from "./SimpleSubscribeForm";
 
 interface Props {
   title: string;
@@ -23,7 +24,7 @@ export default function ComingSoonModule({ title, message, icon }: Props) {
       <p className="text-lg text-slate-500 max-w-lg mx-auto mb-10 leading-relaxed">
         {message || "We are currently building this feature to provide you with the best experience. Stay tuned for updates!"}
       </p>
-      <div className="flex flex-col sm:flex-row items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
         <Link 
           href="/" 
           className="px-8 py-3.5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-lg hover:shadow-slate-200"
@@ -36,6 +37,13 @@ export default function ComingSoonModule({ title, message, icon }: Props) {
         >
           Contact Support
         </Link>
+      </div>
+
+      <div className="w-full max-w-md mx-auto p-1 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <div className="p-5">
+          <p className="text-sm font-bold text-slate-800 mb-3 text-center">Get notified when this module launches</p>
+          <SimpleSubscribeForm />
+        </div>
       </div>
       
       <div className="mt-20 flex items-center gap-8 grayscale opacity-40">
