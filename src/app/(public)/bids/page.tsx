@@ -40,6 +40,8 @@ export default async function BidsPage({ searchParams }: PageProps) {
     );
   }
 
+  const { q } = await searchParams;
+
   // 1. Track search (background)
   if (q) {
     trackUserAction("SEARCH", q);
