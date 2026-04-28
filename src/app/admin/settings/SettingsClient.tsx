@@ -451,10 +451,15 @@ export default function SettingsClient({ user, config }: Props) {
                               <p className="text-xs mt-1 leading-relaxed">{ftpTestStatus.msg}</p>
                               {ftpTestStatus.url && (
                                 <div className="mt-3 pt-3 border-t border-emerald-200/50">
-                                  <p className="text-[10px] uppercase font-bold text-emerald-600/70 tracking-wider">Test File URL</p>
-                                  <a href={ftpTestStatus.url} target="_blank" rel="noopener noreferrer" className="text-xs font-mono break-all text-primary hover:underline mt-1 block">
-                                    {ftpTestStatus.url}
+                                  <p className="text-[10px] uppercase font-bold text-emerald-600/70 tracking-wider flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                    Verify Accessibility
+                                  </p>
+                                  <a href={ftpTestStatus.url} target="_blank" rel="noopener noreferrer" className="text-xs font-mono break-all text-primary hover:underline mt-1.5 p-2 bg-white/50 rounded-lg border border-emerald-200/50 flex items-center justify-between group">
+                                    <span className="truncate">{ftpTestStatus.url}</span>
+                                    <svg className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
                                   </a>
+                                  <p className="text-[10px] text-emerald-600/60 mt-2 italic">If the link shows a 404 error, adjust your "Public URL" or "Root Directory".</p>
                                 </div>
                               )}
                             </div>

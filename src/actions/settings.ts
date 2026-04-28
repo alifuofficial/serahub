@@ -116,10 +116,13 @@ export async function testFtpAction() {
     await client.uploadFrom(stream, remotePath);
     await client.close();
 
-    const publicUrl = config.ftp_public_url?.replace(/\/$/, "") || "";
+    const publicUrl = config.ftp_public_url?.trim().replace(/\/$/, "") || "";
+    const fullUrl = publicUrl ? `${publicUrl}/${uniqueName}` : null;
+
     return { 
       success: true, 
-      url: `${publicUrl}/${uniqueName}` 
+      url: fullUrl,
+      msg: "FTP Connection Successful! Test file uploaded. " + (fullUrl ? "Please click the link below to verify it is publicly accessible." : "Warning: Public URL is not configured.")
     };
   } catch (err: any) {
     console.error("FTP Test Error:", err);

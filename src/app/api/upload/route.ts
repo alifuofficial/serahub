@@ -83,7 +83,11 @@ export async function POST(req: NextRequest) {
       await client.uploadFrom(stream, remotePath);
       await client.close();
 
-      const publicUrl = config.ftp_public_url?.replace(/\/$/, "") || "";
+      const publicUrl = config.ftp_public_url?.trim().replace(/\/$/, "") || "";
+      if (!publicUrl) {
+        throw new Error("FTP Public URL is not configured. Images will not be visible.");
+      }
+      
       const url = `${publicUrl}/${uniqueName}`;
 
       // Save to Media model
