@@ -422,7 +422,7 @@ export default function SettingsClient({ user, config }: Props) {
                                 if (res.error) {
                                   setFtpTestStatus({ type: "error", msg: res.error });
                                 } else {
-                                  setFtpTestStatus({ type: "success", msg: "FTP Connection Successful! Test file uploaded.", url: res.url });
+                                  setFtpTestStatus({ type: "success", msg: "FTP Connection Successful! Test file uploaded.", url: res.url || undefined });
                                 }
                                 setIsFtpTesting(false);
                               });
