@@ -87,7 +87,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-4">Explore Jobs</h1>
           <p className="text-secondary-foreground text-lg">
-            {search ? `${jobs.length} result${jobs.length !== 1 ? "s" : ""} for "${search}"` : `Discover ${jobs.length} opportunities from top employers and public institutions.`}
+            {q ? `${jobs.length} result${jobs.length !== 1 ? "s" : ""} for "${q}"` : `Discover ${jobs.length} opportunities from top employers and public institutions.`}
           </p>
         </div>
 
@@ -107,8 +107,8 @@ export default async function JobsPage({ searchParams }: PageProps) {
           </div>
         ) : (
           <div className="text-center py-20 bg-slate-50 border border-slate-100 rounded-xl">
-            <h3 className="text-xl font-semibold mb-2">{search ? "No Jobs Match Your Search" : "No Jobs Found"}</h3>
-            <p className="text-slate-500">{search ? "Try adjusting your search terms or browse all jobs." : "We are currently updating our database. Please check back later."}</p>
+            <h3 className="text-xl font-semibold mb-2">{q ? "No Jobs Match Your Search" : "No Jobs Found"}</h3>
+            <p className="text-slate-500">{q ? "Try adjusting your search terms or browse all jobs." : "We are currently updating our database. Please check back later."}</p>
           </div>
         )}
       </div>

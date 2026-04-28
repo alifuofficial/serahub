@@ -85,7 +85,7 @@ export default async function BidsPage({ searchParams }: PageProps) {
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-4">Tenders & Bids</h1>
           <p className="text-secondary-foreground text-lg">
-            {search ? `${bids.length} result${bids.length !== 1 ? "s" : ""} for "${search}"` : "Access procurement opportunities and business contracts."}
+            {q ? `${bids.length} result${bids.length !== 1 ? "s" : ""} for "${q}"` : "Access procurement opportunities and business contracts."}
           </p>
         </div>
 
@@ -105,8 +105,8 @@ export default async function BidsPage({ searchParams }: PageProps) {
           </div>
         ) : (
           <div className="text-center py-20 bg-slate-50 border border-slate-100 rounded-xl">
-            <h3 className="text-xl font-semibold mb-2">{search ? "No Bids Match Your Search" : "No Tenders Found"}</h3>
-            <p className="text-slate-500">{search ? "Try adjusting your search terms or browse all bids." : "We are currently updating our database. Please check back later."}</p>
+            <h3 className="text-xl font-semibold mb-2">{q ? "No Bids Match Your Search" : "No Tenders Found"}</h3>
+            <p className="text-slate-500">{q ? "Try adjusting your search terms or browse all bids." : "We are currently updating our database. Please check back later."}</p>
           </div>
         )}
       </div>
