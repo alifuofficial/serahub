@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   title: "Manage Subscriptions | SeraHub",
 };
 
-export default async function UnsubscribePage({ searchParams }: { searchParams: { email?: string } }) {
-  const email = searchParams.email || "";
+export default async function UnsubscribePage({ searchParams }: { searchParams: Promise<{ email?: string }> }) {
+  const { email = "" } = await searchParams;
 
   // Get current status if email provided
   let currentStatus = "NONE";

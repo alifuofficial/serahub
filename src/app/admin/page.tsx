@@ -138,14 +138,14 @@ export default async function AdminPage() {
     prisma.userInteraction.groupBy({
       by: ["value"],
       where: { type: "SEARCH" },
-      _count: { value: "desc" },
+      _count: { value: true },
       orderBy: { _count: { value: "desc" } },
       take: 10
     }),
     prisma.userInteraction.groupBy({
       by: ["value"],
       where: { type: "VIEW" }, // For views, value is slug. We'd need to join to get category, but we can approximate with SEARCH queries containing category names
-      _count: { value: "desc" },
+      _count: { value: true },
       orderBy: { _count: { value: "desc" } },
       take: 10
     })
