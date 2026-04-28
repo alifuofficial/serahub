@@ -29,7 +29,7 @@ interface Props {
 
 type Tab = "overview" | "bookmarks" | "profile" | "newsletter";
 
-export default function DashboardClient({ user, bookmarks }: Props) {
+export default function DashboardClient({ user, bookmarks, allCategories }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [isPending, startTransition] = useTransition();
   const [msg, setMsg] = useState({ type: "", text: "" });
