@@ -3,7 +3,7 @@ import JobCard from "@/components/ui/JobCard";
 import SearchForm from "@/components/common/SearchForm";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
-import { trackUserAction } from "@/actions/user";
+import { trackUserAction } from "@/lib/tracking";
 import { expandSearchQuery } from "@/lib/semantic-search";
 
 export const metadata: Metadata = {
