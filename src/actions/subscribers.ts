@@ -18,6 +18,45 @@ export async function subscribeAction(formData: FormData) {
   }
 
   await prisma.subscriber.create({ data: { email } });
+
+  // Send Welcome Email
+  try {
+    const configRows = await prisma.siteConfig.findMany();
+    const config = configRows.reduce((acc, curr) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {} as Record<string, string>);
+
+    const welcomeSubject = `Welcome to ${config.site_name || "SeraHub"}!`;
+    const welcomeHtml = `
+      <div style="text-align: center; padding: 20px 0;">
+        <h2 style="color: #00c087; font-size: 24px; margin-bottom: 16px;">You're officially on the list!</h2>
+        <p style="font-size: 16px; color: #475569; line-height: 1.6; margin-bottom: 24px;">
+          Thank you for subscribing to <strong>${config.site_name || "SeraHub"}</strong>. 
+          You'll now be the first to know about the best job opportunities and bid announcements in Ethiopia, curated by our smart engine.
+        </p>
+        <div style="margin: 32px 0;">
+          <a href="${config.appearance_site_url || "https://serahub.click"}" 
+             style="display: inline-block; background: linear-gradient(105deg, #047857, #059669); color: #ffffff; padding: 14px 32px; border-radius: 60px; font-weight: 700; font-size: 15px; text-decoration: none;">
+            Explore Latest Jobs
+          </a>
+        </div>
+        <p style="font-size: 14px; color: #64748b; margin-top: 40px;">
+          We're excited to help you find your next big opportunity!
+        </p>
+      </div>
+    `;
+
+    await sendMail({
+      to: email,
+      subject: welcomeSubject,
+      text: `Welcome to ${config.site_name || "SeraHub"}! We're glad to have you. Explore latest jobs at ${config.appearance_site_url || "https://serahub.click"}`,
+      html: welcomeHtml
+    });
+  } catch (error) {
+    console.error("[Welcome Email] Failed to send:", error);
+  }
+
   revalidatePath("/admin/subscribers");
   return { success: true };
 }

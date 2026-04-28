@@ -110,3 +110,36 @@ export async function updateMediaAction(id: string, data: { name: string }) {
   revalidatePath("/admin/media");
   return { success: true };
 }
+
+export async function getMediaStatsAction() {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") {
+    throw new Error("Unauthorized");
+  }
+
+  const stats = await prisma.media.groupBy({
+    by: ["storage"],
+    _sum: { size: true },
+    _count: { id: true },
+  });
+
+  const result = {
+    local: { size: 0, count: 0 },
+    ftp: { size: 0, count: 0 },
+    total: { size: 0, count: 0 }
+  };
+
+  stats.forEach(s => {
+    if (s.storage === "local") {
+      result.local.size = s._sum.size || 0;
+      result.local.count = s._count.id || 0;
+    } else if (s.storage === "ftp") {
+      result.ftp.size = s._sum.size || 0;
+      result.ftp.count = s._count.id || 0;
+    }
+    result.total.size += s._sum.size || 0;
+    result.total.count += s._count.id || 0;
+  });
+
+  return result;
+}

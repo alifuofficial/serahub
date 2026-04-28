@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { getMediaAction, deleteMediaAction, updateMediaAction } from "@/actions/media";
+import { getMediaAction, deleteMediaAction, updateMediaAction, getMediaStatsAction } from "@/actions/media";
 import { toast } from "react-hot-toast";
 
 interface MediaItem {
@@ -29,13 +29,19 @@ export default function MediaLibrary({ onSelect, allowSelection = false }: Props
   const [totalPages, setTotalPages] = useState(1);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
+  const [stats, setStats] = useState<{ local: any, ftp: any, total: any } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const fetchMedia = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getMediaAction({ page, q, type });
+      const [res, statsRes] = await Promise.all([
+        getMediaAction({ page, q, type }),
+        getMediaStatsAction()
+      ]);
       setItems(res.items as any);
       setTotalPages(res.totalPages);
+      setStats(statsRes);
     } catch (err) {
       toast.error("Failed to load media");
     } finally {
@@ -47,8 +53,14 @@ export default function MediaLibrary({ onSelect, allowSelection = false }: Props
     fetchMedia();
   }, [fetchMedia]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement> | File[]) => {
+    let files: FileList | File[] | null = null;
+    if (Array.isArray(e)) {
+      files = e;
+    } else {
+      files = e.target.files;
+    }
+
     if (!files || files.length === 0) return;
 
     setUploading(true);
@@ -72,6 +84,24 @@ export default function MediaLibrary({ onSelect, allowSelection = false }: Props
     }
   };
 
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const onDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      handleUpload(files);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this file?")) return;
     try {
@@ -92,8 +122,60 @@ export default function MediaLibrary({ onSelect, allowSelection = false }: Props
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  const renderFileIcon = (type: string, name: string, size: "sm" | "lg" = "lg") => {
+    const isPdf = type === "application/pdf" || name.toLowerCase().endsWith(".pdf");
+    const isDoc = type.includes("word") || type.includes("officedocument") || name.toLowerCase().endsWith(".doc") || name.toLowerCase().endsWith(".docx");
+    const isSheet = type.includes("excel") || type.includes("officedocument.spreadsheetml") || name.toLowerCase().endsWith(".xls") || name.toLowerCase().endsWith(".xlsx");
+    const iconSize = size === "sm" ? 20 : 32;
+
+    if (isPdf) {
+      return (
+        <div className="flex flex-col items-center justify-center text-red-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18V12"/><path d="M9 15h6"/></svg>
+          {size === "lg" && <span className="text-[10px] font-bold mt-1 uppercase">PDF</span>}
+        </div>
+      );
+    }
+    if (isDoc) {
+      return (
+        <div className="flex flex-col items-center justify-center text-blue-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>
+          {size === "lg" && <span className="text-[10px] font-bold mt-1 uppercase">DOC</span>}
+        </div>
+      );
+    }
+    if (isSheet) {
+      return (
+        <div className="flex flex-col items-center justify-center text-emerald-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M8 10h8v10H8z"/><path d="M8 15h8"/><path d="M12 10v10"/></svg>
+          {size === "lg" && <span className="text-[10px] font-bold mt-1 uppercase">XLS</span>}
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col items-center justify-center text-slate-400">
+        <svg xmlns="http://www.w3.org/2000/svg" width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+    );
+  };
+
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+    <div 
+      className="flex flex-col h-full bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm relative"
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+    >
+      {/* Drag & Drop Overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 z-50 bg-primary/10 backdrop-blur-sm border-4 border-dashed border-primary flex flex-col items-center justify-center pointer-events-none">
+          <div className="bg-white p-8 rounded-full shadow-2xl animate-bounce">
+            <svg className="text-primary" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+          </div>
+          <p className="mt-6 text-xl font-bold text-primary">Drop files to upload</p>
+          <p className="text-sm text-primary/60">Release your mouse to start uploading</p>
+        </div>
+      )}
       {/* Toolbar */}
       <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -155,11 +237,11 @@ export default function MediaLibrary({ onSelect, allowSelection = false }: Props
                   onClick={() => setSelectedItem(item)}
                   className={`group relative aspect-square rounded-xl border-2 transition-all cursor-pointer overflow-hidden ${selectedItem?.id === item.id ? "border-primary ring-2 ring-primary/20" : "border-slate-100 hover:border-slate-300"}`}
                 >
-                  {item.type.startsWith("image") ? (
+          {item.type.startsWith("image") ? (
                     <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-slate-50 flex items-center justify-center">
-                      <svg className="text-slate-400" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {renderFileIcon(item.type, item.name, "lg")}
                     </div>
                   )}
                   <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/60 to-transparent translate-y-full group-hover:translate-y-0 transition-transform">
@@ -180,8 +262,8 @@ export default function MediaLibrary({ onSelect, allowSelection = false }: Props
                     {item.type.startsWith("image") ? (
                       <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <svg className="text-slate-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      <div className="w-full h-full flex items-center justify-center bg-slate-50">
+                        {renderFileIcon(item.type, item.name, "sm")}
                       </div>
                     )}
                   </div>
@@ -207,7 +289,7 @@ export default function MediaLibrary({ onSelect, allowSelection = false }: Props
                 <img src={selectedItem.url} alt={selectedItem.name} className="w-full h-full object-contain p-2" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <svg className="text-slate-200" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  {renderFileIcon(selectedItem.type, selectedItem.name, "lg")}
                 </div>
               )}
             </div>
@@ -235,6 +317,33 @@ export default function MediaLibrary({ onSelect, allowSelection = false }: Props
                   <p className="text-sm font-semibold text-slate-800 uppercase">{selectedItem.storage}</p>
                 </div>
               </div>
+              
+              {stats && (
+                <div className="pt-6 mt-6 border-t border-slate-200 space-y-4">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Storage Usage</h4>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-white border border-slate-100 rounded-xl">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Local</span>
+                        <span className="text-xs font-bold text-slate-700">{formatSize(stats.local.size)}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400">{stats.local.count} files</p>
+                    </div>
+                    <div className="p-3 bg-white border border-slate-100 rounded-xl">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[10px] font-bold text-emerald-500 uppercase">FTP</span>
+                        <span className="text-xs font-bold text-slate-700">{formatSize(stats.ftp.size)}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400">{stats.ftp.count} files</p>
+                    </div>
+                    <div className="pt-2 border-t border-slate-100 flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-slate-900 uppercase">Total Used</span>
+                      <span className="text-xs font-extrabold text-primary">{formatSize(stats.total.size)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="pt-4 flex flex-col gap-2">
                 {allowSelection && onSelect && (
                   <button onClick={() => onSelect(selectedItem)} className="w-full py-2.5 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all">
