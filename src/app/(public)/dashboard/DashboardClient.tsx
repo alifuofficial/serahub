@@ -340,11 +340,11 @@ export default function DashboardClient({ user, bookmarks, allCategories }: Prop
 
                     <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/5 to-emerald-400/5 border border-primary/10">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="text-xl">🤖</span>
-                        <h4 className="text-sm font-bold text-slate-800">AI Learning Enabled</h4>
+                        <span className="text-xl">✨</span>
+                        <h4 className="text-sm font-bold text-slate-800">Smart Personalization</h4>
                       </div>
                       <p className="text-xs text-slate-500 leading-relaxed">
-                        By using the platform, our AI learns your behavior (searches and views) to automatically refine these recommendations even further.
+                        We automatically refine your recommendations based on your activity to ensure you only receive the most relevant job and bid updates.
                       </p>
                     </div>
 
