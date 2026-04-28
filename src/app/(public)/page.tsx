@@ -77,102 +77,99 @@ export default async function Home() {
     <>
       <OrganizationJsonLd />
       <WebSiteJsonLd />
-      <section className="relative pt-24 pb-20 overflow-hidden hero-mesh">
+      <section className="relative pt-16 pb-12 overflow-hidden hero-mesh">
         <div className="absolute inset-0 hero-grid pointer-events-none" />
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] animate-float" />
-          <div className="absolute top-40 right-[-10%] w-[400px] h-[400px] bg-emerald-400/8 rounded-full blur-[80px] animate-float-delayed" />
-          <div className="absolute -bottom-20 left-1/3 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px] animate-float-slow" />
+          <div className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[100px] animate-float" />
+          <div className="absolute top-40 right-[-10%] w-[400px] h-[400px] bg-emerald-400/10 rounded-full blur-[80px] animate-float-delayed" />
         </div>
 
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
-              <div className="pill-tag-primary mb-6 animate-fade-in-up inline-flex">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                Your gateway to opportunities
+              <div className="ai-badge mb-6 animate-fade-in-up inline-flex">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                AI-Driven Matching Engine Live
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 text-slate-900 leading-[1.1]">
-                Find Your Next{" "}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-slate-900 leading-[1.1]">
+                Find Your Next<br/>
                 <span className="gradient-text">Opportunity</span>
               </h1>
 
-              <p className="text-lg text-slate-500 mb-10 max-w-lg leading-relaxed">
-                Discover projects, submit bids, and grow your career. Connect with top companies and talented professionals.
+              <p className="text-base text-slate-500 mb-8 max-w-lg leading-relaxed">
+                Aggregating the best jobs and bids across Ethiopia. Our smart engine connects you with the right opportunities, instantly.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/jobs" className="btn-primary text-base px-8 py-3.5 gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <div className="flex flex-wrap gap-4 mb-8">
+                <Link href="/jobs" className="btn-primary text-sm px-6 py-3 gap-2 ai-glow">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                   Browse Jobs
                 </Link>
-                <Link href="/bids" className="btn-secondary text-base px-8 py-3.5 gap-2">
-                  Browse Bids
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                <Link href="/bids" className="btn-secondary text-sm px-6 py-3 gap-2">
+                  Explore Tenders
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </Link>
               </div>
+
+              <SearchForm
+                variant="hero"
+                placeholder="Search jobs, projects, opportunities..."
+                className="max-w-xl lg:mx-0 shadow-2xl shadow-primary/10 rounded-2xl"
+              />
             </div>
 
-            <div className="hidden lg:block">
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-2xl scale-95" />
-                <div className="relative bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-3xl p-8 shadow-xl shadow-slate-200/40">
-                  <div className="space-y-5">
-                    {heroItems.map((item, idx) => (
-                      <Link 
-                        key={item.id}
-                        href={item.type === "JOB" ? `/jobs/${item.slug}` : `/bids/${item.slug}`}
-                        className="flex items-center gap-4 p-4 bg-slate-50/80 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-md transition-all group/hero"
-                      >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
-                          idx === 0 ? "bg-gradient-to-br from-primary to-emerald-400 shadow-primary/20" :
-                          idx === 1 ? "bg-gradient-to-br from-orange-400 to-amber-500 shadow-orange-200" :
-                          "bg-gradient-to-br from-violet-400 to-purple-500 shadow-purple-200"
-                        }`}>
-                          {item.type === "JOB" ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                          ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-slate-800 text-sm truncate group-hover/hero:text-primary transition-colors">{item.title}</p>
-                          <p className="text-xs text-slate-400 mt-0.5">{(item as any).company || item.source || "SeraHub"} · {item.type === "JOB" ? "Job" : "Bid"}</p>
-                        </div>
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
-                          idx === 0 ? "pill-tag-primary" :
-                          idx === 1 ? "bg-orange-50 text-orange-600" :
-                          "bg-violet-50 text-violet-600"
-                        }`}>
-                          {idx === 0 ? "New" : idx === 1 ? "Bid" : "Hot"}
-                        </span>
-                      </Link>
-                    ))}
+            <div className="hidden lg:block relative">
+              <div className="absolute -inset-4 bg-primary/10 rounded-[40px] blur-3xl opacity-50 animate-pulse-soft" />
+              <div className="ai-card rounded-[32px] p-6 lg:p-8 ai-scan-line relative">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-900/40">Recent Pulse</h3>
+                  <div className="flex gap-1">
+                    {[1,2,3].map(i => <div key={i} className="w-1 h-1 rounded-full bg-primary/30" />)}
                   </div>
-                  <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex -space-x-2.5">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-emerald-400 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold">A</div>
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold">M</div>
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold">K</div>
-                      <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-slate-500 text-[10px] font-bold">+9</div>
-                    </div>
-                    <p className="text-xs text-slate-400"><span className="font-semibold text-slate-600">2,400+</span> people already joined</p>
+                </div>
+                <div className="space-y-4">
+                  {heroItems.map((item, idx) => (
+                    <Link 
+                      key={item.id}
+                      href={item.type === "JOB" ? `/jobs/${item.slug}` : `/bids/${item.slug}`}
+                      className="flex items-center gap-4 p-3.5 bg-white/60 hover:bg-white rounded-2xl border border-white/50 hover:border-primary/20 hover:shadow-xl transition-all group/hero"
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
+                        idx === 0 ? "bg-primary text-white" :
+                        idx === 1 ? "bg-orange-400 text-white" :
+                        "bg-violet-400 text-white"
+                      }`}>
+                        {item.type === "JOB" ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-slate-800 text-xs truncate group-hover/hero:text-primary transition-colors">{item.title}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">{(item as any).company || item.source || "SeraHub"} · {item.type === "JOB" ? "Job" : "Bid"}</p>
+                      </div>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-slate-200 group-hover/hero:text-primary transition-colors"><path d="m9 18 6-6-6-6"/></svg>
+                    </Link>
+                  ))}
+                </div>
+                <div className="mt-6 pt-4 border-t border-slate-200/40 flex items-center justify-between">
+                  <div className="flex -space-x-2">
+                    {[1,2,3,4].map(i => <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-black">{String.fromCharCode(64 + i)}</div>)}
                   </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Members: <span className="text-slate-900">2,400+</span></p>
                 </div>
               </div>
             </div>
           </div>
 
-          <SearchForm
-            variant="hero"
-            placeholder="Search jobs, projects, opportunities..."
-            className="mt-14 max-w-2xl mx-auto lg:mx-0"
-          />
-
-          <div className="mt-16 pt-8 border-t border-slate-100/60">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 text-center lg:text-left">
-              Trusted by leading organizations
+          <div className="mt-12 pt-8 border-t border-slate-200/40">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 text-center lg:text-left">
+              Aggregating data from trusted partners
             </p>
             <PartnerMarquee partners={partners} />
           </div>

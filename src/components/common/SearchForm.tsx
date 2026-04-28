@@ -84,7 +84,7 @@ export default function SearchForm({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Find my next remote software job..."
-                className={inputClassName || "flex-1 bg-transparent border-none outline-none py-4 px-2 text-slate-700 placeholder-slate-400 font-medium text-lg"}
+                className={inputClassName || "flex-1 bg-transparent border-none outline-none py-3 px-2 text-slate-700 placeholder-slate-400 font-medium text-base"}
                 disabled={isLoading}
               />
             </div>

@@ -72,6 +72,10 @@ interface DashboardProps {
   dailyViewsData: { day: string; views: number; emailClicks: number }[];
   topPagesData: { path: string; views: number }[];
   topReferrersData: { referrer: string; visits: number }[];
+  behavioralStats: {
+    topSearches: { term: string; count: number }[];
+    topInterests: { term: string; count: number }[];
+  };
 }
 
 function formatDate(iso: string) {
@@ -92,7 +96,7 @@ function formatPath(path: string) {
   return path.length > 35 ? path.substring(0, 35) + "..." : path;
 }
 
-export default function AdminDashboard({ user, stats, totalViews, visitorStats, recentJobs, recentBids, categoryData, trendData, dailyViewsData, topPagesData, topReferrersData }: DashboardProps) {
+export default function AdminDashboard({ user, stats, totalViews, visitorStats, recentJobs, recentBids, categoryData, trendData, dailyViewsData, topPagesData, topReferrersData, behavioralStats }: DashboardProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"jobs" | "bids">("jobs");
   const [chartView, setChartView] = useState<"category" | "trend">("trend");
@@ -305,31 +309,49 @@ export default function AdminDashboard({ user, stats, totalViews, visitorStats, 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
               <div className="xl:col-span-2 bg-white rounded-3xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-lg font-bold text-slate-900">Traffic (Last 7 Days)</h2>
-                  <div className="flex gap-4">
-                    <span className="flex items-center gap-2 text-xs font-semibold text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-violet-500" />Page Views</span>
-                    <span className="flex items-center gap-2 text-xs font-semibold text-slate-600"><span className="w-2.5 h-2.5 rounded-full bg-pink-500" />Email Clicks</span>
+                  <h2 className="text-lg font-bold text-slate-900">Market Intelligence: Trending Searches</h2>
+                  <div className="px-3 py-1 rounded-full bg-emerald-50 text-primary text-[10px] font-bold uppercase tracking-widest">Real-time Demand</div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Popular Search Queries</h3>
+                    <div className="space-y-4">
+                      {behavioralStats.topSearches.length > 0 ? behavioralStats.topSearches.map((s, i) => (
+                        <div key={i} className="group">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors">{s.term}</span>
+                            <span className="text-xs font-bold text-slate-400">{s.count} searches</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-primary to-[#00e5a0] rounded-full transition-all duration-1000" 
+                              style={{ width: `${Math.min(100, (s.count / behavioralStats.topSearches[0].count) * 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      )) : <p className="text-sm text-slate-400">No search data yet</p>}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Content Gaps (High Interest)</h3>
+                    <div className="space-y-4">
+                       {behavioralStats.topInterests.length > 0 ? behavioralStats.topInterests.map((s, i) => (
+                        <div key={i} className="group">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-sm font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">{s.term}</span>
+                            <span className="text-xs font-bold text-slate-400">{s.count} views</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-1000" 
+                              style={{ width: `${Math.min(100, (s.count / behavioralStats.topInterests[0].count) * 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      )) : <p className="text-sm text-slate-400">No interest data yet</p>}
+                    </div>
                   </div>
                 </div>
-                <ResponsiveContainer width="100%" height={260}>
-                  <AreaChart data={dailyViewsData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorEmail" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ec4899" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#ec4899" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 500 }} axisLine={false} tickLine={false} dy={10} />
-                    <YAxis tick={{ fontSize: 12, fill: "#cbd5e1", fontWeight: 500 }} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", padding: "12px 16px" }} labelStyle={{ fontWeight: 700, color: "#0f172a", marginBottom: "8px" }} itemStyle={{ fontWeight: 600, fontSize: "13px" }} />
-                    <Area type="monotone" dataKey="views" name="Page Views" stroke="#8b5cf6" fill="url(#colorViews)" strokeWidth={3} activeDot={{ r: 6, strokeWidth: 0, fill: "#8b5cf6" }} dot={false} />
-                    <Area type="monotone" dataKey="emailClicks" name="Email Clicks" stroke="#ec4899" fill="url(#colorEmail)" strokeWidth={3} activeDot={{ r: 6, strokeWidth: 0, fill: "#ec4899" }} dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
               </div>
 
               <div className="space-y-6">

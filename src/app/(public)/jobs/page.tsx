@@ -3,7 +3,8 @@ import JobCard from "@/components/ui/JobCard";
 import SearchForm from "@/components/common/SearchForm";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
-import { trackUserAction } from "@/lib/tracking";
+import { trackUserAction } from "@/actions/user";
+import { expandSearchQuery } from "@/lib/semantic-search";
 
 export const metadata: Metadata = {
   title: "All Jobs",
@@ -40,32 +41,36 @@ export default async function JobsPage({ searchParams }: PageProps) {
   }
 
   const { q } = await searchParams;
-  const search = q?.trim() || "";
   const session = await getSession();
 
-  // Track search
-  if (search) {
-    await trackUserAction("SEARCH", search);
+  // 1. Track search (background)
+  if (q) {
+    trackUserAction("SEARCH", q);
+  }
+
+  // 2. Expand query semantically
+  let searchTerms = [q || ""];
+  if (q && q.length > 2) {
+    searchTerms = await expandSearchQuery(q);
+  }
+
+  const where: any = { status: "PUBLISHED" };
+  if (q) {
+    where.OR = searchTerms.map(term => ({
+      OR: [
+        { title: { contains: term, mode: "insensitive" } },
+        { description: { contains: term, mode: "insensitive" } },
+        { company: { contains: term, mode: "insensitive" } },
+        { locationType: { contains: term, mode: "insensitive" } },
+        { employmentType: { contains: term, mode: "insensitive" } },
+        { careerLevel: { contains: term, mode: "insensitive" } },
+      ]
+    }));
   }
 
   const [jobs, userBookmarks] = await Promise.all([
     prisma.job.findMany({
-      where: {
-        status: "PUBLISHED",
-        ...(search
-          ? {
-              OR: [
-                { title: { contains: search } },
-                { source: { contains: search } },
-                { company: { contains: search } },
-                { locationType: { contains: search } },
-                { employmentType: { contains: search } },
-                { careerLevel: { contains: search } },
-                { description: { contains: search } },
-              ],
-            }
-          : {}),
-      },
+      where,
       orderBy: { createdAt: "desc" },
     }),
     session ? prisma.bookmark.findMany({

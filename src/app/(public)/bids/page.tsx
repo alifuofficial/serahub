@@ -3,7 +3,8 @@ import BidCard from "@/components/ui/BidCard";
 import SearchForm from "@/components/common/SearchForm";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
-import { trackUserAction } from "@/lib/tracking";
+import { trackUserAction } from "@/actions/user";
+import { expandSearchQuery } from "@/lib/semantic-search";
 
 export const metadata: Metadata = {
   title: "Tenders & Bids",
@@ -39,30 +40,33 @@ export default async function BidsPage({ searchParams }: PageProps) {
     );
   }
 
-  const { q } = await searchParams;
-  const search = q?.trim() || "";
+  // 1. Track search (background)
+  if (q) {
+    trackUserAction("SEARCH", q);
+  }
 
-  // Track search
-  if (search) {
-    await trackUserAction("SEARCH", search);
+  // 2. Expand query semantically
+  let searchTerms = [q || ""];
+  if (q && q.length > 2) {
+    searchTerms = await expandSearchQuery(q);
+  }
+
+  const where: any = { status: "PUBLISHED" };
+  if (q) {
+    where.OR = searchTerms.map(term => ({
+      OR: [
+        { title: { contains: term, mode: "insensitive" } },
+        { description: { contains: term, mode: "insensitive" } },
+        { source: { contains: term, mode: "insensitive" } },
+      ]
+    }));
   }
 
   const session = await getSession();
 
   const [bids, userBookmarks] = await Promise.all([
     prisma.bid.findMany({
-      where: {
-        status: "PUBLISHED",
-        ...(search
-          ? {
-              OR: [
-                { title: { contains: search } },
-                { source: { contains: search } },
-                { description: { contains: search } },
-              ],
-            }
-          : {}),
-      },
+      where,
       orderBy: { createdAt: "desc" },
     }),
     session ? prisma.bookmark.findMany({

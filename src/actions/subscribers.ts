@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/mail";
 import { generateNewsletter, curatePersonalizedNewsletter } from "@/lib/ai";
+import { createMagicToken } from "@/lib/magic";
 
 export async function subscribeAction(formData: FormData) {
   const email = (formData.get("email") as string || "").trim().toLowerCase();
@@ -147,11 +148,19 @@ export async function triggerNewsletterAction() {
         );
 
         if (content) {
+          const magicToken = await createMagicToken(user.email);
+          const prefsLink = `${siteUrl.replace(/\/$/, "")}/api/auth/magic?token=${magicToken}&callbackUrl=/dashboard`;
+          
+          // Append preferences link to HTML if not already handled by AI
+          const enhancedHtml = content.html.includes("/dashboard") 
+            ? content.html.replace(/\/dashboard/g, prefsLink)
+            : content.html + `<div style="text-align: center; margin-top: 30px;"><a href="${prefsLink}" style="color: #059669; font-weight: bold; text-decoration: none;">Update your preferences →</a></div>`;
+
           await sendMail({
             to: user.email,
             subject: content.subject,
             text: "Personalized update from SeraHub",
-            html: content.html,
+            html: enhancedHtml,
             type: "NEWSLETTER"
           });
           await prisma.user.update({ where: { id: user.id }, data: { lastNewsletterAt: new Date() } });

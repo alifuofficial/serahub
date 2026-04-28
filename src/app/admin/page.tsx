@@ -52,7 +52,9 @@ export default async function AdminPage() {
     monthlySubscribers,
     topReferrers,
     totalEmailClicks,
-    dailyEmailClicks
+    dailyEmailClicks,
+    topSearches,
+    topCategoriesByInterest
   ] = await Promise.all([
     prisma.job.count(),
     prisma.bid.count(),
@@ -133,6 +135,20 @@ export default async function AdminPage() {
       where: { createdAt: { gte: sevenDaysAgo } },
       _count: true,
     }),
+    prisma.userInteraction.groupBy({
+      by: ["value"],
+      where: { type: "SEARCH" },
+      _count: { value: "desc" },
+      orderBy: { _count: { value: "desc" } },
+      take: 10
+    }),
+    prisma.userInteraction.groupBy({
+      by: ["value"],
+      where: { type: "VIEW" }, // For views, value is slug. We'd need to join to get category, but we can approximate with SEARCH queries containing category names
+      _count: { value: "desc" },
+      orderBy: { _count: { value: "desc" } },
+      take: 10
+    })
   ]);
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -245,6 +261,10 @@ export default async function AdminPage() {
       dailyViewsData={dailyViewsData}
       topPagesData={topPagesData}
       topReferrersData={topReferrersData}
+      behavioralStats={{
+        topSearches: topSearches.map(s => ({ term: s.value, count: s._count.value })),
+        topInterests: topCategoriesByInterest.map(s => ({ term: s.value, count: s._count.value }))
+      }}
     />
   );
 }
