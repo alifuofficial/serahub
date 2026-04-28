@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
-import { updateProfileAction, removeBookmarkAction, updatePasswordAction } from "@/actions/user";
+import { updateProfileAction, removeBookmarkAction, updatePasswordAction, updateNewsletterPreferencesAction } from "@/actions/user";
 import { logoutAction } from "@/actions/auth";
 
 interface User {
@@ -10,6 +10,8 @@ interface User {
   email: string;
   name: string | null;
   role: string;
+  newsletterFrequency: string | null;
+  preferredCategories: { categoryId: string }[];
 }
 
 interface Bookmark {
@@ -22,9 +24,10 @@ interface Bookmark {
 interface Props {
   user: User;
   bookmarks: Bookmark[];
+  allCategories: { id: string, name: string }[];
 }
 
-type Tab = "overview" | "bookmarks" | "profile";
+type Tab = "overview" | "bookmarks" | "profile" | "newsletter";
 
 export default function DashboardClient({ user, bookmarks }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
@@ -57,6 +60,7 @@ export default function DashboardClient({ user, bookmarks }: Props) {
   const navItems = [
     { id: "overview", label: "Overview", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> },
     { id: "bookmarks", label: "My Bookmarks", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> },
+    { id: "newsletter", label: "Newsletter", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> },
     { id: "profile", label: "Profile Settings", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
   ];
 
@@ -254,6 +258,103 @@ export default function DashboardClient({ user, bookmarks }: Props) {
                     </div>
                   )}
                 </section>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "newsletter" && (
+            <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <div className="mb-8">
+                <h1 className="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Newsletter Preferences</h1>
+                <p className="text-slate-500">Personalize your email updates and AI recommendations.</p>
+              </div>
+
+              <div className="bg-white rounded-3xl border border-slate-200/60 overflow-hidden shadow-sm">
+                <div className="p-8">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-slate-900">Email Updates</h2>
+                      <p className="text-xs text-slate-400">Choose how often you want to hear from us.</p>
+                    </div>
+                  </div>
+
+                  {msg.text && msg.type.includes("newsletter") && (
+                    <div className={`mb-6 p-4 rounded-2xl flex items-center gap-3 ${msg.type === "newsletter-success" ? "bg-[#e6fbf4] text-primary border border-primary/20" : "bg-red-50 text-red-600 border border-red-100"}`}>
+                      {msg.type === "newsletter-success" ? <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> : <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>}
+                      <span className="text-sm font-bold">{msg.text}</span>
+                    </div>
+                  )}
+
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const fd = new FormData(e.currentTarget);
+                      startTransition(async () => {
+                        const res = await updateNewsletterPreferencesAction(fd);
+                        if (res.error) setMsg({ type: "newsletter-error", text: res.error });
+                        else {
+                          setMsg({ type: "newsletter-success", text: "Newsletter preferences saved!" });
+                          setTimeout(() => setMsg({ type: "", text: "" }), 3000);
+                        }
+                      });
+                    }}
+                    className="space-y-8"
+                  >
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-4 ml-1">Frequency</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {["DAILY", "WEEKLY", "NONE"].map((freq) => (
+                          <label key={freq} className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${user.newsletterFrequency === freq ? "border-primary bg-primary/5 ring-4 ring-primary/5" : "border-slate-100 bg-slate-50 hover:border-slate-200"}`}>
+                            <input type="radio" name="frequency" value={freq} defaultChecked={user.newsletterFrequency === freq} className="hidden" />
+                            <span className="text-sm font-bold text-slate-800 capitalize">{freq.toLowerCase()}</span>
+                            <span className="text-[10px] text-slate-400 mt-1">{freq === "DAILY" ? "Every morning" : freq === "WEEKLY" ? "Once a week" : "No emails"}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-4 ml-1">Interests & Categories</label>
+                      <p className="text-xs text-slate-400 mb-4 ml-1">We&apos;ll prioritize these categories in your AI-curated newsletter.</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {allCategories.map((cat) => {
+                          const isPreferred = user.preferredCategories.some(pc => pc.categoryId === cat.id);
+                          return (
+                            <label key={cat.id} className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-primary/20 transition-all cursor-pointer group">
+                              <input 
+                                type="checkbox" 
+                                name="categories" 
+                                value={cat.id} 
+                                defaultChecked={isPreferred}
+                                className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary"
+                              />
+                              <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">{cat.name}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/5 to-emerald-400/5 border border-primary/10">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-xl">🤖</span>
+                        <h4 className="text-sm font-bold text-slate-800">AI Learning Enabled</h4>
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        By using the platform, our AI learns your behavior (searches and views) to automatically refine these recommendations even further.
+                      </p>
+                    </div>
+
+                    <div className="pt-4">
+                      <button disabled={isPending} className="w-full sm:w-auto btn-primary px-8 py-3 font-bold text-sm disabled:opacity-50">
+                        {isPending ? "Saving..." : "Save Preferences"}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           )}

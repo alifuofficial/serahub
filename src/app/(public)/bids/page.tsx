@@ -3,6 +3,7 @@ import BidCard from "@/components/ui/BidCard";
 import SearchForm from "@/components/common/SearchForm";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
+import { trackUserAction } from "@/lib/tracking";
 
 export const metadata: Metadata = {
   title: "Tenders & Bids",
@@ -40,6 +41,11 @@ export default async function BidsPage({ searchParams }: PageProps) {
 
   const { q } = await searchParams;
   const search = q?.trim() || "";
+
+  // Track search
+  if (search) {
+    await trackUserAction("SEARCH", search);
+  }
 
   const session = await getSession();
 

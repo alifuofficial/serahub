@@ -1,7 +1,10 @@
+export type EmailType = "NEWSLETTER" | "TRANSACTIONAL";
+
 export function getEmailTemplateHtml(
   bodyHtml: string,
   config: Record<string, string>,
-  title: string = "SeraHub Notification"
+  title: string = "SeraHub Notification",
+  type: EmailType = "NEWSLETTER"
 ) {
   const siteName = config.site_name || "SeraHub";
   const primaryColor = config.appearance_primary_color || "#00c087";
@@ -26,6 +29,56 @@ export function getEmailTemplateHtml(
         </a>`
     )
     .join("");
+
+  const headerHtml = type === "NEWSLETTER" 
+    ? `<!-- NEWSLETTER HEADER -->
+        <tr>
+          <td class="header" style="background: linear-gradient(135deg, #022c22 0%, #0a5c42 100%); padding: 44px 32px;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td>
+                  <div style="background-color: rgba(255,255,255,0.2); display: inline-block; padding: 4px 12px; border-radius: 20px; color: #d1fae5; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 12px;">AI • CURATED</div>
+                  <span style="color: #a7f3d0; font-size: 12px; margin-left: 8px;">weekly digest</span>
+                  <h1 style="color: #ffffff; font-size: 42px; font-weight: 800; margin: 0; letter-spacing: -0.02em;">
+                    ${siteName.toLowerCase()}<span style="color: #a7f3d0; font-weight: 300;">/jobs</span>
+                  </h1>
+                  <p style="color: #d1fae5; font-size: 16px; line-height: 1.5; margin: 12px 0 0 0; max-width: 320px; opacity: 0.9;">
+                    Smart aggregated jobs & bids — fresh opportunities, delivered weekly to your inbox.
+                  </p>
+                  <div style="width: 64px; height: 4px; background-color: #34d399; border-radius: 2px; margin-top: 24px;"></div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>`
+    : `<!-- TRANSACTIONAL HEADER -->
+        <tr>
+          <td class="header" style="background: #ffffff; padding: 32px; border-bottom: 1px solid #f1f5f9;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td align="center">
+                  <div style="margin-bottom: 8px;">
+                    <span style="font-weight: 800; color: #1e293b; font-size: 24px; letter-spacing: -0.02em;">${siteName}<span style="color: #047857;">/jobs</span></span>
+                  </div>
+                  <div style="width: 40px; height: 3px; background-color: #34d399; border-radius: 2px;"></div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>`;
+
+  const curatedBadgeHtml = type === "NEWSLETTER"
+    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 32px;">
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+               <span style="font-size: 20px;">🤖</span>
+               <span style="color: #374151; font-size: 14px; font-weight: 600; margin-left: 8px;">Curated by <span style="background-color: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 12px; font-size: 12px;">Smart Match 2.0</span></span>
+            </div>
+          </td>
+        </tr>
+      </table>`
+    : "";
 
   return `
 <!DOCTYPE html>
@@ -107,49 +160,23 @@ export function getEmailTemplateHtml(
       <td align="center" style="padding: 32px 16px;">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 32px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); border: 1px solid #d1fae5;">
           
-          <!-- HEADER -->
-          <tr>
-            <td class="header" style="background: linear-gradient(135deg, #022c22 0%, #0a5c42 100%); padding: 44px 32px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td>
-                    <div style="background-color: rgba(255,255,255,0.2); display: inline-block; padding: 4px 12px; border-radius: 20px; color: #d1fae5; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 12px;">AI • CURATED</div>
-                    <span style="color: #a7f3d0; font-size: 12px; margin-left: 8px;">weekly digest</span>
-                    <h1 style="color: #ffffff; font-size: 42px; font-weight: 800; margin: 0; letter-spacing: -0.02em;">
-                      ${siteName.toLowerCase()}<span style="color: #a7f3d0; font-weight: 300;">/jobs</span>
-                    </h1>
-                    <p style="color: #d1fae5; font-size: 16px; line-height: 1.5; margin: 12px 0 0 0; max-width: 320px; opacity: 0.9;">
-                      Smart aggregated jobs & bids — fresh opportunities, delivered weekly to your inbox.
-                    </p>
-                    <div style="width: 64px; height: 4px; background-color: #34d399; border-radius: 2px; margin-top: 24px;"></div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+          ${headerHtml}
 
           <!-- BODY -->
           <tr>
             <td class="body" style="padding: 40px 32px; background-color: #ffffff;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 32px;">
-                <tr>
-                  <td>
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                       <span style="font-size: 20px;">🤖</span>
-                       <span style="color: #374151; font-size: 14px; font-weight: 600; margin-left: 8px;">Curated by <span style="background-color: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 12px; font-size: 12px;">Smart Match 2.0</span></span>
-                    </div>
-                  </td>
-                </tr>
-              </table>
+              ${curatedBadgeHtml}
 
               <div class="email-body" style="color: #334155;">
                 ${bodyHtml}
               </div>
 
+              ${type === "NEWSLETTER" ? `
               <div style="text-align: center; margin-top: 40px;">
                 <p style="color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Curated by ${siteName} engine • Updated every week</p>
                 <div style="border-top: 1px solid #f1f5f9;"></div>
               </div>
+              ` : ""}
             </td>
           </tr>
 

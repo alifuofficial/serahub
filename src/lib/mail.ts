@@ -30,9 +30,9 @@ export async function getTransporter() {
   });
 }
 
-import { getEmailTemplateHtml } from "./email-template";
+import { getEmailTemplateHtml, EmailType } from "./email-template";
 
-export async function sendMail({ to, subject, text, html }: { to: string, subject: string, text: string, html?: string }) {
+export async function sendMail({ to, subject, text, html, type = "TRANSACTIONAL" }: { to: string, subject: string, text: string, html?: string, type?: EmailType }) {
   const transporter = await getTransporter();
   const configRows = await prisma.siteConfig.findMany();
   const config = configRows.reduce((acc, curr) => {
@@ -44,7 +44,7 @@ export async function sendMail({ to, subject, text, html }: { to: string, subjec
   const siteName = config.site_name || "SeraHub";
   const siteUrl = config.appearance_site_url || "https://serahub.click";
 
-  const finalHtml = html ? getEmailTemplateHtml(html, config, subject) : undefined;
+  const finalHtml = html ? getEmailTemplateHtml(html, config, subject, type) : undefined;
 
   return transporter.sendMail({
     from: `"${siteName}" <${fromEmail}>`,
@@ -54,7 +54,7 @@ export async function sendMail({ to, subject, text, html }: { to: string, subjec
     html: finalHtml,
     headers: {
       "List-Unsubscribe": `<${siteUrl}/unsubscribe?email=${encodeURIComponent(to)}>`,
-      "Precedence": "bulk",
+      "Precedence": type === "NEWSLETTER" ? "bulk" : "transactional",
       "X-Auto-Response-Suppress": "OOF, AutoReply"
     }
   });

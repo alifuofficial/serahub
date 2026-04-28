@@ -3,6 +3,7 @@ import JobCard from "@/components/ui/JobCard";
 import SearchForm from "@/components/common/SearchForm";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
+import { trackUserAction } from "@/lib/tracking";
 
 export const metadata: Metadata = {
   title: "All Jobs",
@@ -41,6 +42,11 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const { q } = await searchParams;
   const search = q?.trim() || "";
   const session = await getSession();
+
+  // Track search
+  if (search) {
+    await trackUserAction("SEARCH", search);
+  }
 
   const [jobs, userBookmarks] = await Promise.all([
     prisma.job.findMany({

@@ -9,42 +9,51 @@ export default async function DashboardPage() {
     redirect("/auth/login?callbackUrl=/dashboard");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.id },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-    },
-  });
+  const [user, allCategories, bookmarks] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        newsletterFrequency: true,
+        preferredCategories: {
+          select: { categoryId: true }
+        }
+      },
+    }),
+    prisma.category.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: "asc" }
+    }),
+    prisma.bookmark.findMany({
+      where: { userId: session.id },
+      include: {
+        job: {
+          select: {
+            title: true,
+            slug: true,
+            source: true,
+            category: { select: { name: true } },
+          },
+        },
+        bid: {
+          select: {
+            title: true,
+            slug: true,
+            source: true,
+            category: { select: { name: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    })
+  ]);
 
   if (!user) {
     redirect("/auth/login");
   }
-
-  const bookmarks = await prisma.bookmark.findMany({
-    where: { userId: user.id },
-    include: {
-      job: {
-        select: {
-          title: true,
-          slug: true,
-          source: true,
-          category: { select: { name: true } },
-        },
-      },
-      bid: {
-        select: {
-          title: true,
-          slug: true,
-          source: true,
-          category: { select: { name: true } },
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
 
   // Convert dates and handle nulls for client component
   const formattedBookmarks = bookmarks.map((b) => ({
@@ -64,5 +73,5 @@ export default async function DashboardPage() {
     } : null,
   }));
 
-  return <DashboardClient user={user} bookmarks={formattedBookmarks} />;
+  return <DashboardClient user={user as any} bookmarks={formattedBookmarks} allCategories={allCategories} />;
 }

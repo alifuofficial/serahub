@@ -398,4 +398,65 @@ Return ONLY a valid JSON object with these exact keys:
     return null;
   }
 }
+export async function curatePersonalizedNewsletter(
+  recipient: { name: string | null, email: string, interactions: any[], preferredCategories: string[] },
+  availableItems: { id: string, title: string, type: string, category?: string, descriptionSnippet: string, link: string }[]
+): Promise<{ subject: string, html: string } | null> {
+  const config = await getAIConfig();
+  if (!config.enabled) return null;
 
+  const siteName = (await prisma.siteConfig.findUnique({ where: { key: "site_name" } }))?.value || "SeraHub";
+  const siteUrl = (await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } }))?.value || "https://serahub.click";
+
+  const PERSONAL_PROMPT = `
+You are a career expert at "${siteName}". You are writing a personalized newsletter to ${recipient.name || "a valued subscriber"}.
+
+USER PROFILE:
+- Preferred Categories: ${recipient.preferredCategories.join(", ") || "None specified"}
+- Recent Behavior: ${recipient.interactions.map(i => `${i.type}: ${i.query || i.targetSlug}`).join(", ") || "No recent activity"}
+
+AVAILABLE NEW OPPORTUNITIES:
+${availableItems.map((item, i) => `${i + 1}. [${item.type}] ${item.title} (Category: ${item.category || "General"})
+   LINK: ${item.link}
+   SUMMARY: ${item.descriptionSnippet}`).join("\n\n")}
+
+TASK:
+1. Select the top 3-5 most relevant items for this specific user based on their profile and behavior.
+2. Create an engaging SUBJECT line.
+3. Write a personalized INTRO that "humanizes" the selection (e.g., "We noticed you've been looking for ${recipient.interactions[0]?.query || "new opportunities"}, so we've hand-picked these for you...").
+4. If the user is NOT a registered account holder (guest), include a polite "PROMPT" at the end of the intro or in the outro suggesting they create a free account for even better personalization.
+5. Create the newsletter HTML body.
+
+HTML STRUCTURE:
+For each selected item, use this card structure:
+<div class="card">
+  <h2 class="card-title">{{Title}}</h2>
+  <p class="card-company">{{Type}} · {{Category}}</p>
+  <p class="card-desc">{{A personalized 2-sentence explanation of why this item was picked for them}}</p>
+  <div style="margin-top: 15px;">
+    <a href="{{LINK}}" class="btn">View Opportunity →</a>
+  </div>
+</div>
+
+Return ONLY the response in this exact format:
+SUBJECT: [Your Subject]
+HTML:
+[Your HTML code]
+`;
+
+  try {
+    const text = await callAI(PERSONAL_PROMPT, config, "newsletter-personalized");
+    
+    const subjectMatch = text.match(/SUBJECT:\s*(.+)/i);
+    let htmlPart = text.split(/HTML:/i)[1] || text;
+    htmlPart = htmlPart.replace(/```(?:html)?\s*([\s\S]*?)```/i, "$1");
+    
+    return {
+      subject: subjectMatch ? subjectMatch[1].trim() : `Personalized Opportunities for you from ${siteName}`,
+      html: htmlPart.trim()
+    };
+  } catch (error) {
+    console.error("[AI Personalization] Error:", error);
+    return null;
+  }
+}

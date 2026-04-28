@@ -7,15 +7,19 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(uuid())
-  email         String     @unique
-  password      String     // hashed password
-  name          String?
-  role          String     @default("USER") // ADMIN or USER
-  emailVerified DateTime?
-  bookmarks     Bookmark[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id                String            @id @default(uuid())
+  email             String            @unique
+  password          String            // hashed password
+  name              String?
+  role              String            @default("USER") // ADMIN or USER
+  emailVerified     DateTime?
+  bookmarks         Bookmark[]
+  newsletterFrequency String?         @default("WEEKLY") // DAILY, WEEKLY, NONE
+  preferredCategories UserCategory[]
+  interactions      UserInteraction[]
+  lastNewsletterAt  DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 model OtpToken {
@@ -27,13 +31,32 @@ model OtpToken {
 }
 
 model Category {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  slug      String   @unique
+  id        String         @id @default(uuid())
+  name      String         @unique
+  slug      String         @unique
   jobs      Job[]
   bids      Bid[]
+  users     UserCategory[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model UserCategory {
+  userId     String
+  categoryId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@id([userId, categoryId])
+}
+
+model UserInteraction {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email     String?  // for guest tracking
+  type      String   // SEARCH, VIEW, BOOKMARK
+  value     String   // search query or slug
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Job {
@@ -117,9 +140,12 @@ model Media {
 }
 
 model Subscriber {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
+  id                  String   @id @default(uuid())
+  email               String   @unique
+  frequency           String?  @default("WEEKLY")
+  preferredCategories String?  // JSON or comma separated IDs for guests
+  lastNewsletterAt    DateTime?
+  createdAt           DateTime @default(now())
 }
 
 model SiteConfig {

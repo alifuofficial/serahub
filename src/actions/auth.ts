@@ -156,7 +156,8 @@ export async function sendOtpAction(email: string) {
           <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #0f172a; margin: 30px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">${code}</div>
           <p style="font-size: 14px; color: #64748b;">This code will expire in 10 minutes.</p>
         </div>
-      `
+      `,
+      type: "TRANSACTIONAL"
     });
     return { success: true };
   } catch (error) {
@@ -242,7 +243,8 @@ export async function forgotPasswordAction(formData: FormData) {
           <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #0f172a; margin: 30px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">${code}</div>
           <p style="font-size: 14px; color: #64748b;">If you didn't request this, you can safely ignore this email.</p>
         </div>
-      `
+      `,
+      type: "TRANSACTIONAL"
     });
     return { success: true };
   } catch (error) {

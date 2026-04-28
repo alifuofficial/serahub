@@ -9,6 +9,7 @@ import { BreadcrumbJsonLd, BidPostingJsonLd } from "@/components/seo/JsonLd";
 import { getSession } from "@/lib/session";
 import BookmarkButton from "@/components/common/BookmarkButton";
 import SocialShare from "@/components/common/SocialShare";
+import { trackUserAction } from "@/lib/tracking";
 
 interface Params {
   params: Promise<{ slug: string }>;
@@ -77,6 +78,9 @@ export default async function BidDetailPage({ params }: Params) {
     where: { id: bid.id },
     data: { views: { increment: 1 } }
   });
+
+  // Track behavior
+  await trackUserAction("VIEW", bid.slug);
 
   const isBookmarked = session ? await prisma.bookmark.findFirst({
     where: { userId: session.id, bidId: bid.id }

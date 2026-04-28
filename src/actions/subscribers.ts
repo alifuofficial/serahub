@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/mail";
-import { generateNewsletter } from "@/lib/ai";
+import { generateNewsletter, curatePersonalizedNewsletter } from "@/lib/ai";
 
 export async function subscribeAction(formData: FormData) {
   const email = (formData.get("email") as string || "").trim().toLowerCase();
@@ -51,7 +51,8 @@ export async function subscribeAction(formData: FormData) {
       to: email,
       subject: welcomeSubject,
       text: `Welcome to ${config.site_name || "SeraHub"}! We're glad to have you. Explore latest jobs at ${config.appearance_site_url || "https://serahub.click"}`,
-      html: welcomeHtml
+      html: welcomeHtml,
+      type: "TRANSACTIONAL"
     });
   } catch (error) {
     console.error("[Welcome Email] Failed to send:", error);
@@ -70,60 +71,123 @@ export async function deleteSubscriberAction(formData: FormData) {
 
 export async function triggerNewsletterAction() {
   try {
-    // 1. Fetch subscribers
-    const subscribers = await prisma.subscriber.findMany({ select: { email: true } });
-    if (subscribers.length === 0) return { error: "No subscribers found." };
+    // 1. Fetch Recipients (Users and Subscribers)
+    const [users, guestSubscribers] = await Promise.all([
+      prisma.user.findMany({
+        where: { newsletterFrequency: { not: "NONE" } },
+        include: {
+          preferredCategories: { include: { category: true } },
+          interactions: { orderBy: { createdAt: "desc" }, take: 10 }
+        }
+      }),
+      prisma.subscriber.findMany({
+        where: { frequency: { not: "NONE" } }
+      })
+    ]);
 
-    // 2. Fetch jobs posted in the last 7 days that are not expired
+    // 2. Fetch new content (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const jobs = await prisma.job.findMany({
-      where: {
-        createdAt: { gte: sevenDaysAgo },
-        status: "PUBLISHED",
-        OR: [
-          { deadline: null },
-          { deadline: { gte: new Date() } }
-        ]
-      },
-      orderBy: { createdAt: "desc" },
-      take: 10 // Only top 10 for newsletter
-    });
+    const [jobs, bids] = await Promise.all([
+      prisma.job.findMany({
+        where: { createdAt: { gte: sevenDaysAgo }, status: "PUBLISHED" },
+        include: { category: true },
+        orderBy: { createdAt: "desc" },
+        take: 15
+      }),
+      prisma.bid.findMany({
+        where: { createdAt: { gte: sevenDaysAgo }, status: "PUBLISHED" },
+        include: { category: true },
+        orderBy: { createdAt: "desc" },
+        take: 15
+      })
+    ]);
 
-    if (jobs.length === 0) return { error: "No new jobs found in the last 7 days." };
+    if (jobs.length === 0 && bids.length === 0) {
+      return { error: "No new content found to send." };
+    }
 
-    // 3. Generate newsletter content with AI
     const siteUrl = (await prisma.siteConfig.findUnique({ where: { key: "appearance_site_url" } }))?.value || "https://serahub.click";
-    const newsletterJobs = jobs.map(j => {
-      const jobUrl = `${siteUrl.replace(/\/$/, "")}/jobs/${j.slug}`;
-      const trackingLink = `${siteUrl.replace(/\/$/, "")}/api/track?url=${encodeURIComponent(jobUrl)}&source=newsletter`;
-      return {
+    
+    // Prepare items for AI
+    const allAvailableItems = [
+      ...jobs.map(j => ({
+        id: j.id,
         title: j.title,
-        link: trackingLink,
-        metaDescription: j.metaDescription ?? undefined
-      };
-    });
-
-    const content = await generateNewsletter(newsletterJobs);
-    if (!content) return { error: "Failed to generate newsletter with AI." };
-
-    // 4. Send to all subscribers
-    const results = await Promise.allSettled(
-      subscribers.map(s => sendMail({
-        to: s.email,
-        subject: content.subject,
-        text: "Please view this email in an HTML compatible mail client.",
-        html: content.html
+        type: "JOB",
+        category: j.category?.name,
+        descriptionSnippet: j.metaDescription || j.description.substring(0, 150),
+        link: `${siteUrl.replace(/\/$/, "")}/api/track?url=${encodeURIComponent(`${siteUrl.replace(/\/$/, "")}/jobs/${j.slug}`)}&source=newsletter`
+      })),
+      ...bids.map(b => ({
+        id: b.id,
+        title: b.title,
+        type: "BID",
+        category: b.category?.name,
+        descriptionSnippet: b.metaDescription || b.description.substring(0, 150),
+        link: `${siteUrl.replace(/\/$/, "")}/api/track?url=${encodeURIComponent(`${siteUrl.replace(/\/$/, "")}/bids/${b.slug}`)}&source=newsletter`
       }))
-    );
+    ];
 
-    const successCount = results.filter(r => r.status === "fulfilled").length;
-    const failureCount = results.length - successCount;
+    let successCount = 0;
+    let failureCount = 0;
+
+    // 3. Process Users (Personalized)
+    for (const user of users) {
+      try {
+        const content = await curatePersonalizedNewsletter(
+          {
+            name: user.name,
+            email: user.email,
+            interactions: user.interactions.map(i => ({ type: i.type, query: i.value, targetSlug: i.value })),
+            preferredCategories: user.preferredCategories.map(pc => pc.category.name)
+          },
+          allAvailableItems
+        );
+
+        if (content) {
+          await sendMail({
+            to: user.email,
+            subject: content.subject,
+            text: "Personalized update from SeraHub",
+            html: content.html,
+            type: "NEWSLETTER"
+          });
+          await prisma.user.update({ where: { id: user.id }, data: { lastNewsletterAt: new Date() } });
+          successCount++;
+        }
+      } catch (err) {
+        console.error(`Failed to send user newsletter to ${user.email}:`, err);
+        failureCount++;
+      }
+    }
+
+    // 4. Process Guest Subscribers (Standard AI Curation)
+    // For guests, we use the simpler generateNewsletter or a generic curation
+    const guestContent = await generateNewsletter(allAvailableItems.slice(0, 8)); // Just top 8 generic items
+    if (guestContent) {
+      for (const guest of guestSubscribers) {
+        try {
+          await sendMail({
+            to: guest.email,
+            subject: guestContent.subject,
+            text: "Weekly update from SeraHub",
+            html: guestContent.html,
+            type: "NEWSLETTER"
+          });
+          await prisma.subscriber.update({ where: { id: guest.id }, data: { lastNewsletterAt: new Date() } });
+          successCount++;
+        } catch (err) {
+          console.error(`Failed to send guest newsletter to ${guest.email}:`, err);
+          failureCount++;
+        }
+      }
+    }
 
     return { 
       success: true, 
-      message: `Newsletter sent successfully to ${successCount} subscribers. ${failureCount > 0 ? `${failureCount} failed.` : ""}` 
+      message: `Newsletter sent successfully to ${successCount} recipients. ${failureCount > 0 ? `${failureCount} failed.` : ""}` 
     };
   } catch (error: any) {
     console.error("[Newsletter] Trigger Error:", error);

@@ -117,3 +117,41 @@ export async function removeBookmarkAction(bookmarkId: string) {
     return { error: "Failed to remove bookmark" };
   }
 }
+
+export async function updateNewsletterPreferencesAction(formData: FormData) {
+  const session = await getSession();
+  if (!session) return { error: "Not authenticated" };
+
+  const frequency = formData.get("frequency") as string;
+  const categories = formData.getAll("categories") as string[];
+
+  try {
+    // 1. Update frequency
+    await prisma.user.update({
+      where: { id: session.id },
+      data: { newsletterFrequency: frequency }
+    });
+
+    // 2. Update preferred categories
+    // First, delete existing ones
+    await prisma.userCategory.deleteMany({
+      where: { userId: session.id }
+    });
+
+    // Then, create new ones
+    if (categories.length > 0) {
+      await prisma.userCategory.createMany({
+        data: categories.map(catId => ({
+          userId: session.id,
+          categoryId: catId
+        }))
+      });
+    }
+
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[Newsletter Settings] Update error:", err);
+    return { error: "Failed to update preferences" };
+  }
+}
