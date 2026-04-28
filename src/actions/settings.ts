@@ -102,6 +102,7 @@ export async function testFtpAction() {
       secure: false
     });
 
+    const initialDir = await client.pwd();
     const remoteRoot = config.ftp_root || "/";
     await client.ensureDir(remoteRoot);
     
@@ -110,7 +111,7 @@ export async function testFtpAction() {
     
     // Create a simple text stream for the test file
     const stream = new (require("stream").Readable)();
-    stream.push("SeraHub FTP Connection Test\nStatus: Successful\nTime: " + new Date().toISOString() + "\nThis file can be safely deleted.");
+    stream.push("SeraHub FTP Connection Test\nStatus: Successful\nInitial PWD: " + initialDir + "\nTarget Path: " + remotePath + "\nTime: " + new Date().toISOString());
     stream.push(null);
 
     await client.uploadFrom(stream, remotePath);
@@ -122,7 +123,7 @@ export async function testFtpAction() {
     return { 
       success: true, 
       url: fullUrl,
-      msg: "FTP Connection Successful! Test file uploaded. " + (fullUrl ? "Please click the link below to verify it is publicly accessible." : "Warning: Public URL is not configured.")
+      msg: `FTP Connected. Starting dir: "${initialDir}". Test file uploaded to: "${remotePath}". ` + (fullUrl ? "Please verify the link below." : "")
     };
   } catch (err: any) {
     console.error("FTP Test Error:", err);

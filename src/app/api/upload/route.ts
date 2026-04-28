@@ -74,7 +74,10 @@ export async function POST(req: NextRequest) {
 
       const remoteRoot = config.ftp_root || "/";
       await client.ensureDir(remoteRoot);
-      const remotePath = path.posix.join(remoteRoot, uniqueName);
+      
+      // Use manual join to ensure absolute control over the path structure
+      const remotePath = (remoteRoot.endsWith("/") ? remoteRoot : remoteRoot + "/") + uniqueName;
+      console.log(`[FTP Upload] Target path: ${remotePath}`);
       
       const stream = new (require("stream").Readable)();
       stream.push(buffer);
