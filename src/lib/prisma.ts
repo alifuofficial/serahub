@@ -22,7 +22,7 @@ function createPrismaClient(): PrismaClient {
   sqlite.pragma('journal_mode = WAL');
   sqlite.pragma('synchronous = NORMAL'); // Extra speed boost for WAL
 
-  const adapter = new PrismaBetterSqlite3(sqlite);
+  const adapter = new PrismaBetterSqlite3(sqlite, { url });
   return new PrismaClient({ adapter });
 }
 
