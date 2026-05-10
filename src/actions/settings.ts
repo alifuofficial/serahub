@@ -83,7 +83,7 @@ export async function testFtpAction() {
     where: { key: { in: ["ftp_host", "ftp_port", "ftp_user", "ftp_pass", "ftp_root", "ftp_public_url"] } }
   });
   const config: Record<string, string> = {};
-  configRows.forEach(row => config[row.key] = row.value);
+  configRows.forEach((row: { key: string; value: string }) => config[row.key] = row.value);
 
   if (!config.ftp_host || !config.ftp_user || !config.ftp_pass) {
     return { error: "FTP Host, User, and Password are required for testing." };

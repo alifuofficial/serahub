@@ -62,7 +62,7 @@ export async function deleteMediaAction(id: string) {
       where: { key: { in: ["ftp_host", "ftp_port", "ftp_user", "ftp_pass", "ftp_root"] } }
     });
     const config: Record<string, string> = {};
-    configRows.forEach((row: any) => config[row.key] = row.value);
+    configRows.forEach((row: { key: string; value: string }) => config[row.key] = row.value);
 
     const client = new ftp.Client();
     try {
