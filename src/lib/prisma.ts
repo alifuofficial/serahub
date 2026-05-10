@@ -1,27 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import path from "path";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const getDbUrl = () => {
-  const url = process.env.DATABASE_URL || "file:./dev.db";
-  if (url.startsWith("file:.") && typeof process !== "undefined") {
-    const dbPath = url.replace("file:", "");
-    return `file:${path.resolve(process.cwd(), dbPath)}`;
-  }
-  return url;
-};
-
-// Use type assertion to bypass build-time type mismatches while ensuring a valid config object
-const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  datasources: {
-    db: {
-      url: getDbUrl(),
-    },
-  },
-} as any);
+// DATABASE_URL is now provided via Dockerfile or environment
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

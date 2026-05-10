@@ -15,6 +15,7 @@ RUN npx prisma generate
 
 # Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV DATABASE_URL="file:/app/prisma/dev.db"
 RUN npm run build
 
 # Stage 2: Runner
