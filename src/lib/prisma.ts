@@ -5,16 +5,23 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Ensure DATABASE_URL is set even during build time to prevent initialization errors
-if (typeof process !== "undefined" && !process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = `file:${path.resolve(process.cwd(), "dev.db")}`;
-} else if (typeof process !== "undefined" && process.env.DATABASE_URL?.startsWith("file:.")) {
-  // Normalize relative paths to absolute paths
-  const dbPath = process.env.DATABASE_URL.replace("file:", "");
-  process.env.DATABASE_URL = `file:${path.resolve(process.cwd(), dbPath)}`;
-}
+const getDbUrl = () => {
+  const url = process.env.DATABASE_URL || "file:./dev.db";
+  if (url.startsWith("file:.") && typeof process !== "undefined") {
+    const dbPath = url.replace("file:", "");
+    return `file:${path.resolve(process.cwd(), dbPath)}`;
+  }
+  return url;
+};
 
-const prisma = globalForPrisma.prisma ?? new PrismaClient();
+// Use type assertion to bypass build-time type mismatches while ensuring a valid config object
+const prisma = globalForPrisma.prisma ?? new PrismaClient({
+  datasources: {
+    db: {
+      url: getDbUrl(),
+    },
+  },
+} as any);
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
@@ -23,7 +30,7 @@ if (process.env.NODE_ENV !== "production") {
 // Enable SQLite WAL mode for performance
 if (typeof window === "undefined") {
   prisma.$executeRawUnsafe('PRAGMA journal_mode = WAL;')
-    .catch(() => {}); // Ignore errors during build/prerendering
+    .catch(() => {}); // Ignore errors during build if DB is not ready
   prisma.$executeRawUnsafe('PRAGMA synchronous = NORMAL;')
     .catch(() => {});
 }
