@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
     remotePatterns: [],
   },
   serverExternalPackages: ["@prisma/client", "prisma"],
+  experimental: {
+    turbo: {
+      resolveAlias: {
+        ".prisma/client/index-browser": "./node_modules/.prisma/client/default",
+      },
+    },
+  },
   async headers() {
     return [
       {
