@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [],
   },
+  serverExternalPackages: ["@prisma/client", "prisma"],
   async headers() {
     return [
       {
