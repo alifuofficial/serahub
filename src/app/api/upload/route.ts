@@ -4,6 +4,7 @@ import path from "path";
 import * as ftp from "basic-ftp";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { fileTypeFromBuffer } from "file-type";
 
 const IMAGE_TYPES = ["image/png", "image/jpeg", "image/gif", "image/svg+xml", "image/x-icon", "image/vnd.microsoft.icon", "image/webp"];
 const DOC_TYPES = [
@@ -37,11 +38,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
-  if (!ALL_ALLOWED.includes(file.type) && !file.name.match(/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|txt|csv|png|jpg|jpeg|gif|svg|ico|webp)$/i)) {
-    return NextResponse.json({ error: "Invalid file type." }, { status: 400 });
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  // Buffer-based file type verification for security
+  const detectedType = await fileTypeFromBuffer(buffer);
+  const mimeType = detectedType?.mime || file.type;
+
+  // Check if the detected type is allowed
+  // Note: plain text, csv, and some icons might not be detected by file-type buffer check
+  const isPlainOrCsv = file.name.match(/\.(txt|csv)$/i) || ["text/plain", "text/csv"].includes(file.type);
+  
+  if (!isPlainOrCsv && !ALL_ALLOWED.includes(mimeType)) {
+    return NextResponse.json({ error: "Security check failed: File content does not match allowed types." }, { status: 400 });
   }
 
-  const isImage = IMAGE_TYPES.includes(file.type) || /\.(png|jpg|jpeg|gif|svg|ico|webp)$/i.test(file.name);
+  const isImage = IMAGE_TYPES.includes(mimeType) || /\.(png|jpg|jpeg|gif|svg|ico|webp)$/i.test(file.name);
   const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_DOC_SIZE;
 
   if (file.size > maxSize) {
@@ -50,8 +62,6 @@ export async function POST(req: NextRequest) {
 
   const ext = file.name.split(".").pop() || "bin";
   const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
 
   // Check FTP Settings
   const configRows = await prisma.siteConfig.findMany({

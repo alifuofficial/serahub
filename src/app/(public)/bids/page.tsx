@@ -17,11 +17,19 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 interface PageProps {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ 
+    q?: string; 
+    page?: string;
+    category?: string;
+  }>;
 }
 
 import { getModuleStatus } from "@/lib/config";
 import ComingSoonModule from "@/components/common/ComingSoonModule";
+import Pagination from "@/components/common/Pagination";
+import FilterSidebar from "@/components/common/FilterSidebar";
+
+const PAGE_SIZE = 12;
 
 export default async function BidsPage({ searchParams }: PageProps) {
   const { bidsEnabled } = await getModuleStatus();
@@ -40,7 +48,9 @@ export default async function BidsPage({ searchParams }: PageProps) {
     );
   }
 
-  const { q } = await searchParams;
+  const { q, page: pageParam, category } = await searchParams;
+  const currentPage = Number(pageParam) || 1;
+  const skip = (currentPage - 1) * PAGE_SIZE;
 
   // 1. Track search (background)
   if (q) {
@@ -64,12 +74,22 @@ export default async function BidsPage({ searchParams }: PageProps) {
     }));
   }
 
+  if (category) where.categoryId = category;
+
   const session = await getSession();
 
-  const [bids, userBookmarks] = await Promise.all([
+  const [bids, totalCount, categories, userBookmarks] = await Promise.all([
     prisma.bid.findMany({
       where,
       orderBy: { createdAt: "desc" },
+      skip,
+      take: PAGE_SIZE,
+      include: { category: { select: { name: true } } }
+    }),
+    prisma.bid.count({ where }),
+    prisma.category.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: "asc" }
     }),
     session ? prisma.bookmark.findMany({
       where: { userId: session.id },
@@ -81,34 +101,56 @@ export default async function BidsPage({ searchParams }: PageProps) {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-10 text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-4">Tenders & Bids</h1>
-          <p className="text-secondary-foreground text-lg">
-            {q ? `${bids.length} result${bids.length !== 1 ? "s" : ""} for "${q}"` : "Access procurement opportunities and business contracts."}
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mb-4">Tenders & Bids</h1>
+          <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+            {q ? `Showing ${totalCount} results for "${q}"` : `Access ${totalCount} procurement opportunities and business contracts.`}
           </p>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-12">
           <SearchForm
             placeholder="Search tenders and bids..."
-            className="max-w-xl mx-auto"
-            inputClassName="w-full bg-slate-50 border border-slate-200 text-sm pl-10 pr-4 py-2.5 rounded-xl focus:bg-white focus:border-orange-400 focus:ring-1 focus:ring-orange-400/20 outline-none transition-all"
+            className="max-w-2xl mx-auto"
           />
         </div>
 
-        {bids.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {bids.map((bid) => (
-              <BidCard key={bid.id} bid={bid} isBookmarked={bookmarkedBidIds.has(bid.id)} />
-            ))}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar */}
+          <aside className="w-full lg:w-64 flex-shrink-0">
+            <FilterSidebar categories={categories} type="bids" />
+          </aside>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            {bids.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {bids.map((bid) => (
+                    <BidCard key={bid.id} bid={bid} isBookmarked={bookmarkedBidIds.has(bid.id)} />
+                  ))}
+                </div>
+
+                <Pagination 
+                  currentPage={currentPage}
+                  totalCount={totalCount}
+                  pageSize={PAGE_SIZE}
+                  baseUrl="/bids"
+                  searchParams={{ q, category }}
+                />
+              </>
+            ) : (
+              <div className="text-center py-24 bg-slate-50 border border-slate-100 rounded-3xl">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4 text-slate-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">No tenders match your filters</h3>
+                <p className="text-slate-500 max-w-sm mx-auto">Try adjusting your filters or search terms to find what you are looking for.</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="text-center py-20 bg-slate-50 border border-slate-100 rounded-xl">
-            <h3 className="text-xl font-semibold mb-2">{q ? "No Bids Match Your Search" : "No Tenders Found"}</h3>
-            <p className="text-slate-500">{q ? "Try adjusting your search terms or browse all bids." : "We are currently updating our database. Please check back later."}</p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

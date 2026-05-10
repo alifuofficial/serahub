@@ -57,6 +57,9 @@ model UserInteraction {
   type      String   // SEARCH, VIEW, BOOKMARK
   value     String   // search query or slug
   createdAt DateTime @default(now())
+
+  @@index([userId, type])
+  @@index([createdAt])
 }
 
 model Job {
@@ -81,6 +84,10 @@ model Job {
   metaDescription String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+
+  @@index([status, createdAt])
+  @@index([categoryId])
+  @@index([deadline])
 }
 
 model Bid {
@@ -101,6 +108,10 @@ model Bid {
   metaDescription String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+
+  @@index([status, createdAt])
+  @@index([categoryId])
+  @@index([deadline])
 }
 
 model Bookmark {
@@ -159,6 +170,9 @@ model PageView {
   referrer  String   @default("")
   country   String   @default("")
   createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
 }
 
 model ContactMessage {
@@ -194,6 +208,8 @@ model AIUsage {
   status        String   @default("SUCCESS") // SUCCESS or ERROR
   errorMessage  String?
   createdAt     DateTime @default(now())
+
+  @@index([type, createdAt])
 }
 
 model EmailClick {
@@ -201,6 +217,8 @@ model EmailClick {
   url       String
   source    String   @default("newsletter")
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }
 model MagicToken {
   id         String   @id @default(uuid())

@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import path from "path";
 
+import Database from "better-sqlite3";
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
@@ -10,13 +12,17 @@ function createPrismaClient(): PrismaClient {
   let url = process.env.DATABASE_URL || "file:./dev.db";
   
   // Ensure absolute path for SQLite file URLs to prevent issues with different CWDs
+  let dbPath = url.replace("file:", "");
   if (url.startsWith("file:.") && !url.includes(":memory:")) {
-    const dbRelativePath = url.replace("file:", "");
-    const dbPath = path.resolve(process.cwd(), dbRelativePath);
-    url = `file:${dbPath}`;
+    dbPath = path.resolve(process.cwd(), dbPath);
   }
 
-  const adapter = new PrismaBetterSqlite3({ url });
+  // Use better-sqlite3 directly to enable WAL mode
+  const sqlite = new Database(dbPath);
+  sqlite.pragma('journal_mode = WAL');
+  sqlite.pragma('synchronous = NORMAL'); // Extra speed boost for WAL
+
+  const adapter = new PrismaBetterSqlite3(sqlite);
   return new PrismaClient({ adapter });
 }
 
