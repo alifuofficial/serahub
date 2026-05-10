@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import AdSenseScript from "@/components/ads/AdSenseScript";
 import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
-import DynamicFavicon from "@/components/seo/DynamicFavicon";
+import { prisma } from "@/lib/prisma";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -14,62 +14,65 @@ const jakarta = Plus_Jakarta_Sans({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://serahub.click";
 
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await prisma.siteConfig.findMany({
+    where: {
+      key: { in: ["site_name", "site_description", "site_keywords", "appearance_favicon_url"] }
+    }
+  });
+
+  const settings: Record<string, string> = {};
+  config.forEach(row => settings[row.key] = row.value);
+
+  const siteName = settings.site_name || "SeraHub";
+  const siteDescription = settings.site_description || "Discover the latest jobs, bids, and tender opportunities.";
+  const favicon = settings.appearance_favicon_url || "/favicon.ico";
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: `${siteName} | Job & Bid Aggregator`,
+      template: `%s | ${siteName}`,
+    },
+    description: siteDescription,
+    keywords: settings.site_keywords?.split(",").map(k => k.trim()) || ["jobs", "bids", "tenders", "Ethiopia"],
+    icons: {
+      icon: favicon,
+      shortcut: favicon,
+      apple: favicon,
+    },
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: SITE_URL,
+      siteName: siteName,
+      title: `${siteName} | Job & Bid Aggregator`,
+      description: siteDescription,
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: `${siteName} - Job & Bid Aggregator`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${siteName} | Job & Bid Aggregator`,
+      description: siteDescription,
+      images: ["/og-image.png"],
+    },
+  };
+}
+
+
 export const viewport: Viewport = {
   themeColor: "#00c087",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
 };
-
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: "SeraHub | Job & Bid Aggregator",
-    template: "%s | SeraHub",
-  },
-  description: "Discover the latest jobs, bids, and tender opportunities. SeraHub connects you with top companies and talented professionals in Ethiopia and beyond.",
-  keywords: ["jobs", "bids", "tenders", "Ethiopia", "opportunities", "careers", "freelance", "contract", "procurement", "vacancies"],
-  authors: [{ name: "SeraHub" }],
-  creator: "SeraHub",
-  publisher: "SeraHub",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: SITE_URL,
-    siteName: "SeraHub",
-    title: "SeraHub | Job & Bid Aggregator",
-    description: "Discover the latest jobs, bids, and tender opportunities. SeraHub connects you with top companies and talented professionals.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "SeraHub - Job & Bid Aggregator",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "SeraHub | Job & Bid Aggregator",
-    description: "Discover the latest jobs, bids, and tender opportunities.",
-    images: ["/og-image.png"],
-  },
-  alternates: {
-    canonical: SITE_URL,
-  },
-};
-
 
 export default function RootLayout({
   children,
@@ -81,7 +84,6 @@ export default function RootLayout({
       <head>
         <AdSenseScript />
         <GoogleAnalytics />
-        <DynamicFavicon />
         <OrganizationJsonLd />
         <WebSiteJsonLd />
       </head>
