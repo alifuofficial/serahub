@@ -44,4 +44,4 @@ EXPOSE 3000
 RUN mkdir -p /app/data
 
 # Start command
-CMD npx prisma db push && npx tsx prisma/seed.ts && node server.js
+CMD npx prisma db push --accept-data-loss && npx tsx prisma/seed.ts && node server.js
