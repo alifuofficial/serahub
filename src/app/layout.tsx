@@ -15,14 +15,18 @@ const jakarta = Plus_Jakarta_Sans({
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://serahub.click";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const config = await prisma.siteConfig.findMany({
-    where: {
-      key: { in: ["site_name", "site_description", "site_keywords", "appearance_favicon_url"] }
-    }
-  });
-
   const settings: Record<string, string> = {};
-  config.forEach(row => settings[row.key] = row.value);
+  
+  try {
+    const config = await prisma.siteConfig.findMany({
+      where: {
+        key: { in: ["site_name", "site_description", "site_keywords", "appearance_favicon_url"] }
+      }
+    });
+    config.forEach(row => settings[row.key] = row.value);
+  } catch (error) {
+    console.warn("[Metadata] Database not ready, using defaults.");
+  }
 
   const siteName = settings.site_name || "SeraHub";
   const siteDescription = settings.site_description || "Discover the latest jobs, bids, and tender opportunities.";
