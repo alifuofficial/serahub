@@ -69,9 +69,4 @@ export default withSentryConfig(nextConfig, {
 
   // Route browser requests to Sentry through a self-hosted tunnel to avoid ad blockers
   tunnelRoute: "/monitoring",
-
-  // Hides source maps from visitors
-  sourcemaps: {
-    hideSourceMaps: true,
-  },
 });
