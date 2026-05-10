@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json package-lock.json* ./
+RUN apk add --no-cache libc6-compat
 RUN npm install
 
 # Copy source and prisma schema
@@ -22,6 +23,7 @@ RUN npm run build
 
 # Stage 2: Runner
 FROM node:22-alpine AS runner
+RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
