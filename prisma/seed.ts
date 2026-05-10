@@ -28,6 +28,23 @@ async function main() {
     console.log("Created admin user:", admin.email);
   }
 
+  // Update existing users who might have a null password after schema change
+  console.log("Checking for users without passwords...");
+  const usersWithoutPassword = await prisma.user.findMany({
+    where: { password: null }
+  });
+
+  if (usersWithoutPassword.length > 0) {
+    const defaultHashedPassword = await bcrypt.hash("@mySerahub@303", 10);
+    for (const user of usersWithoutPassword) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { password: defaultHashedPassword }
+      });
+      console.log(`Updated password for user: ${user.email}`);
+    }
+  }
+
   console.log("Initializing site configuration...");
   const configs = [
     { key: "site_name", value: "SeraHub" },
