@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
         key: { in: ["site_name", "site_description", "site_keywords", "appearance_favicon_url"] }
       }
     });
-    config.forEach(row => settings[row.key] = row.value);
+    config.forEach((row: any) => settings[row.key] = row.value);
   } catch (error) {
     console.warn("[Metadata] Database not ready, using defaults.");
   }

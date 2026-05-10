@@ -62,7 +62,7 @@ export async function deleteMediaAction(id: string) {
       where: { key: { in: ["ftp_host", "ftp_port", "ftp_user", "ftp_pass", "ftp_root"] } }
     });
     const config: Record<string, string> = {};
-    configRows.forEach(row => config[row.key] = row.value);
+    configRows.forEach((row: any) => config[row.key] = row.value);
 
     const client = new ftp.Client();
     try {
@@ -129,7 +129,7 @@ export async function getMediaStatsAction() {
     total: { size: 0, count: 0 }
   };
 
-  stats.forEach(s => {
+  stats.forEach((s: any) => {
     if (s.storage === "local") {
       result.local.size = s._sum.size || 0;
       result.local.count = s._count.id || 0;

@@ -12,7 +12,7 @@ export async function getModuleStatus() {
       }
     });
 
-    const configMap = configs.reduce((acc, curr) => {
+    const configMap = configs.reduce((acc, curr: any) => {
       acc[curr.key] = curr.value;
       return acc;
     }, {} as Record<string, string>);
