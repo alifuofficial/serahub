@@ -20,13 +20,7 @@ function createPrismaClient() {
     dbPath = ":memory:";
   }
 
-  const db = new Database(dbPath);
-  
-  // Basic SQLite optimizations
-  db.pragma('journal_mode = WAL');
-  db.pragma('synchronous = NORMAL');
-
-  const adapter = new PrismaBetterSqlite3(db);
+  const adapter = new PrismaBetterSqlite3({ url: dbPath });
   
   return new PrismaClient({
     adapter,
