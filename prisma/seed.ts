@@ -13,24 +13,36 @@ async function main() {
   });
 
   if (existingAdmin) {
-    console.log("Admin user already exists, skipping seed.");
-    return;
+    console.log("Admin user already exists.");
+  } else {
+    console.log("Creating admin user...");
+    const hashedPassword = await bcrypt.hash("@mySerahub@303", 10);
+    const admin = await prisma.user.create({
+      data: {
+        name: "Admin",
+        email: "alifuhaji@gmail.com",
+        password: hashedPassword,
+        role: "ADMIN",
+      },
+    });
+    console.log("Created admin user:", admin.email);
   }
 
-  console.log("Creating admin user...");
+  console.log("Initializing site configuration...");
+  const configs = [
+    { key: "site_name", value: "SeraHub" },
+    { key: "jobs_enabled", value: "true" },
+    { key: "bids_enabled", value: "true" },
+  ];
 
-  const hashedPassword = await bcrypt.hash("@mySerahub@303", 10);
-
-  const admin = await prisma.user.create({
-    data: {
-      name: "Admin",
-      email: "alifuhaji@gmail.com",
-      password: hashedPassword,
-      role: "ADMIN",
-    },
-  });
-
-  console.log("Created admin user:", admin.email);
+  for (const config of configs) {
+    await prisma.siteConfig.upsert({
+      where: { key: config.key },
+      update: {},
+      create: config,
+    });
+  }
+  console.log("Site configuration initialized.");
 }
 
 main()
