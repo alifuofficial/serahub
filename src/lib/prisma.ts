@@ -1,22 +1,37 @@
 import { PrismaClient } from "@prisma/client";
+import path from "path";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const prisma = globalForPrisma.prisma ?? new PrismaClient();
+const getDbUrl = () => {
+  const url = process.env.DATABASE_URL || "file:./dev.db";
+  if (url.startsWith("file:.") && typeof process !== "undefined") {
+    const dbPath = url.replace("file:", "");
+    return `file:${path.resolve(process.cwd(), dbPath)}`;
+  }
+  return url;
+};
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient({
+  datasources: {
+    db: {
+      url: getDbUrl(),
+    },
+  },
+});
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 
 // Enable SQLite WAL mode for performance
-// This is safe to run multiple times and ensures the DB is optimized for 10k+ records
 if (typeof window === "undefined") {
   prisma.$executeRawUnsafe('PRAGMA journal_mode = WAL;')
-    .catch(err => console.error("Failed to enable WAL mode:", err));
+    .catch(() => {}); // Ignore errors during build if DB is not ready
   prisma.$executeRawUnsafe('PRAGMA synchronous = NORMAL;')
-    .catch(err => {});
+    .catch(() => {});
 }
 
 export { prisma };
