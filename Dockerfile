@@ -28,6 +28,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV DATABASE_URL="file:/app/data/prod.db"
 
 # Copy only what is needed for the runtime
 COPY --from=builder /app/public ./public
@@ -45,4 +46,4 @@ EXPOSE 3000
 # Start command
 # We use the node_modules bundled in standalone for server.js
 # and the ones in the root (which standalone provides) for prisma/tsx
-CMD npx prisma db push && npx tsx prisma/seed.ts && node server.js
+CMD npx prisma db push --accept-data-loss && npx tsx prisma/seed.ts && node server.js
