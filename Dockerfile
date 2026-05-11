@@ -24,29 +24,25 @@ RUN npm run build
 # Stage 2: Runner
 FROM node:22-alpine AS runner
 RUN apk add --no-cache libc6-compat
-
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Copy necessary files from builder
+# Copy only what is needed for the runtime
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/package.json ./package.json
 
-# Copy pre-built node_modules from builder (includes prisma CLI, tsx, bcrypt, better-sqlite3 already compiled)
-COPY --from=builder /app/node_modules ./node_modules
+# Ensure data directory exists
+RUN mkdir -p /app/data
 
 # Expose port
 EXPOSE 3000
 
-# Set up data directory for SQLite persistence
-RUN mkdir -p /app/data
-
 # Start command
+# We use the node_modules bundled in standalone for server.js
+# and the ones in the root (which standalone provides) for prisma/tsx
 CMD npx prisma db push && npx tsx prisma/seed.ts && node server.js
