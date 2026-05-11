@@ -23,7 +23,7 @@ export async function subscribeAction(formData: FormData) {
   // Send Welcome Email
   try {
     const configRows = await prisma.siteConfig.findMany();
-    const config = configRows.reduce((acc, curr) => {
+    const config = configRows.reduce((acc: Record<string, string>, curr: { key: string; value: string }) => {
       acc[curr.key] = curr.value;
       return acc;
     }, {} as Record<string, string>);

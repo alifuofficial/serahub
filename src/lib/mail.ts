@@ -10,7 +10,7 @@ export async function getTransporter() {
     }
   });
 
-  const configMap = configs.reduce((acc, curr: any) => {
+  const configMap = configs.reduce((acc: Record<string, string>, curr: { key: string; value: string }) => {
     acc[curr.key] = curr.value;
     return acc;
   }, {} as Record<string, string>);
@@ -35,7 +35,7 @@ import { getEmailTemplateHtml, EmailType } from "./email-template";
 export async function sendMail({ to, subject, text, html, type = "TRANSACTIONAL" }: { to: string, subject: string, text: string, html?: string, type?: EmailType }) {
   const transporter = await getTransporter();
   const configRows = await prisma.siteConfig.findMany();
-  const config = configRows.reduce((acc, curr: any) => {
+  const config = configRows.reduce((acc: Record<string, string>, curr: { key: string; value: string }) => {
     acc[curr.key] = curr.value;
     return acc;
   }, {} as Record<string, string>);

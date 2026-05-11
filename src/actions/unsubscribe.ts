@@ -17,7 +17,7 @@ export async function handleUnsubscribeAction(formData: FormData) {
       prisma.subscriber.findUnique({ where: { email } })
     ]);
 
-    const updates = [];
+    const updates: ReturnType<typeof prisma.user.update>[] = [];
     if (user) {
       updates.push(prisma.user.update({
         where: { email },

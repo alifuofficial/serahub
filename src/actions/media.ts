@@ -129,16 +129,18 @@ export async function getMediaStatsAction() {
     total: { size: 0, count: 0 }
   };
 
-  stats.forEach((s: any) => {
+  stats.forEach((s: { storage: string; _sum?: { size?: bigint | null; }; _count?: { id?: number | null } }) => {
+    const size = typeof s._sum?.size === 'bigint' ? Number(s._sum.size) : (s._sum?.size || 0);
+    const count = s._count?.id || 0;
     if (s.storage === "local") {
-      result.local.size = s._sum.size || 0;
-      result.local.count = s._count.id || 0;
+      result.local.size = size;
+      result.local.count = count;
     } else if (s.storage === "ftp") {
-      result.ftp.size = s._sum.size || 0;
-      result.ftp.count = s._count.id || 0;
+      result.ftp.size = size;
+      result.ftp.count = count;
     }
-    result.total.size += s._sum.size || 0;
-    result.total.count += s._count.id || 0;
+    result.total.size += size;
+    result.total.count += count;
   });
 
   return result;

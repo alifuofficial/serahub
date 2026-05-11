@@ -48,7 +48,6 @@ export default function Editor({ initialData, onChange, placeholder }: EditorPro
       const Delimiter = (await import("@editorjs/delimiter")).default as any;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const InlineCode = (await import("@editorjs/inline-code")).default as any;
-      // @ts-expect-error -- @editorjs/embed lacks proper ESM type exports
       const Embed = (await import("@editorjs/embed")).default;
       const EditorJSModule = (await import("@editorjs/editorjs")).default;
 

@@ -34,7 +34,7 @@ export async function createJobAction(formData: FormData) {
   }
 
   // AI Suggestions
-  let suggestions = null;
+  let suggestions: import("@/lib/ai").AISuggestions | null = null;
   let keywords: string | null = null;
   let metaDescription: string | null = null;
 
@@ -127,7 +127,7 @@ export async function updateJobAction(formData: FormData) {
   }
 
   // Re-run AI on update to refresh SEO and categorization
-  let suggestions = null;
+  let suggestions: import("@/lib/ai").AISuggestions | null = null;
   let keywords: string | null = null;
   let metaDescription: string | null = null;
 
@@ -217,7 +217,7 @@ export async function createBidAction(formData: FormData) {
   }
 
   // AI Suggestions
-  let suggestions = null;
+  let suggestions: import("@/lib/ai").AISuggestions | null = null;
   let keywords: string | null = null;
   let metaDescription: string | null = null;
 
@@ -300,7 +300,7 @@ export async function updateBidAction(formData: FormData) {
   }
 
   // Re-run AI on update to refresh SEO and categorization
-  let suggestions = null;
+  let suggestions: import("@/lib/ai").AISuggestions | null = null;
   let keywords: string | null = null;
   let metaDescription: string | null = null;
 
