@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import JobCard from "@/components/ui/JobCard";
+import Link from "next/link";
 import SearchForm from "@/components/common/SearchForm";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
@@ -153,12 +154,12 @@ export default async function JobsPage({ searchParams }: PageProps) {
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">No results match your filters</h3>
                 <p className="text-slate-500 max-w-sm mx-auto">Try adjusting your filters or search terms to find what you are looking for.</p>
-                <button 
-                  onClick={() => {/* This would ideally be a link to /jobs */}}
-                  className="mt-6 text-primary font-semibold hover:underline"
+                <Link 
+                  href="/jobs"
+                  className="mt-6 inline-block text-primary font-semibold hover:underline"
                 >
                   Clear all filters
-                </button>
+                </Link>
               </div>
             )}
           </div>

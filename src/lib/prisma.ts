@@ -39,9 +39,11 @@ function createPrismaClient() {
               console.warn(`[Prisma] Table ${model} does not exist. Returning empty result during build.`);
               
               // Return appropriate empty values based on the operation
-              if (operation.includes('findMany') || operation.includes('findFirst') === false && operation.includes('findUnique') === false) {
-                return [];
-              }
+              if (operation.includes('count')) return 0;
+              if (operation.includes('aggregate')) return { _sum: {}, _avg: {}, _count: {}, _min: {}, _max: {} };
+              if (operation.includes('groupBy')) return [];
+              if (operation.includes('findMany')) return [];
+              
               return null;
             }
             throw error;
