@@ -67,7 +67,7 @@ export default async function Home() {
       <WebSiteJsonLd />
       
       {/* Hero Section */}
-      <section className="relative pt-20 pb-24 overflow-hidden bg-[#020806]">
+      <section className="relative pt-16 pb-16 overflow-hidden bg-[#020806]">
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-20" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-gradient-to-b from-emerald-500/20 via-transparent to-transparent blur-[120px] pointer-events-none" />
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
@@ -121,9 +121,9 @@ export default async function Home() {
       </section>
 
       {/* Social Proof */}
-      <section className="py-12 bg-[#0a0f1d] border-t border-white/5">
+      <section className="py-12 bg-[#020806] border-t border-white/5">
         <div className="container mx-auto px-4 max-w-6xl">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 text-center">Trusted by forward-thinking companies</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-500/60 mb-8 text-center">Trusted by forward-thinking companies</p>
           <PartnerMarquee partners={partners} />
         </div>
       </section>
