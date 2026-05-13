@@ -11,10 +11,11 @@ interface Props {
   config: Record<string, string>;
 }
 
-type Section = "general" | "seo" | "smtp" | "ads" | "appearance" | "storage" | "ai" | "maintenance" | "social" | "verification" | "monetization" | "subscriptions" | "danger";
+type Section = "general" | "seo" | "smtp" | "ads" | "appearance" | "storage" | "ai" | "maintenance" | "social" | "verification" | "monetization" | "danger";
 
 const navItems = [
   { label: "Overview", href: "/admin", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> },
+  { label: "Modules", href: "/admin/modules", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5"/><path d="M12 12v9"/><path d="M12 12L4 7.5"/><path d="M16 5.25l-8 4.5"/></svg> },
   { label: "Jobs", href: "/admin/jobs", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> },
   { label: "Bids", href: "/admin/bids", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg> },
   { label: "Media", href: "/admin/media", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg> },
@@ -37,7 +38,6 @@ const sections: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: "social", label: "Social Login", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> },
   { id: "verification", label: "Bank Verification", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg> },
   { id: "monetization", label: "Monetization", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-  { id: "subscriptions", label: "SaaS Subscriptions", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
   { id: "danger", label: "Danger Zone", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> },
 ];
 
@@ -769,74 +769,7 @@ export default function SettingsClient({ user, config }: Props) {
                   </div>
                 )}
 
-                {activeSection === "subscriptions" && (
-                  <div className="space-y-6">
-                    <div className="bg-white rounded-2xl border border-slate-200/60 p-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-                        <div><h2 className="text-lg font-bold text-slate-900">SaaS Subscriptions</h2><p className="text-sm text-slate-500">Configure recurring subscription plans and free trials.</p></div>
-                      </div>
-                      
-                      <div className="space-y-8">
-                        {/* Job Seeker Pro */}
-                        <div className="space-y-4">
-                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                            <span className="w-1.5 h-4 bg-primary rounded-full"></span>
-                            Job Seeker Pro Plan
-                          </h3>
-                          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
-                            <div><p className="text-sm font-semibold text-slate-800">Enable Pro Job Plan</p><p className="text-xs text-slate-500 mt-0.5">Allow job seekers to subscribe for premium job-related features</p></div>
-                            <Toggle checked={form.sub_pro_job_enabled === "true"} onChange={(v) => update("sub_pro_job_enabled", v ? "true" : "false")} />
-                          </div>
-                          <FormRow label="Monthly Price (ETB)" hint="Amount for a 30-day subscription">
-                            <div className="relative">
-                              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">ETB</span>
-                              <input type="number" value={form.sub_pro_job_price || "150"} onChange={(e) => update("sub_pro_job_price", e.target.value)} className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="150" />
-                            </div>
-                          </FormRow>
-                        </div>
 
-                        <hr className="border-slate-100" />
-
-                        {/* Business Pro */}
-                        <div className="space-y-4">
-                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                            <span className="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
-                            Business Pro Plan
-                          </h3>
-                          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
-                            <div><p className="text-sm font-semibold text-slate-800">Enable Pro Bid Plan</p><p className="text-xs text-slate-500 mt-0.5">Allow businesses to subscribe for premium bid/tender features</p></div>
-                            <Toggle checked={form.sub_pro_bid_enabled === "true"} onChange={(v) => update("sub_pro_bid_enabled", v ? "true" : "false")} />
-                          </div>
-                          <FormRow label="Monthly Price (ETB)" hint="Amount for a 30-day subscription">
-                            <div className="relative">
-                              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">ETB</span>
-                              <input type="number" value={form.sub_pro_bid_price || "500"} onChange={(e) => update("sub_pro_bid_price", e.target.value)} className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="500" />
-                            </div>
-                          </FormRow>
-                        </div>
-
-                        <hr className="border-slate-100" />
-
-                        {/* Free Trial */}
-                        <div className="space-y-4">
-                          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                            <span className="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
-                            Free Trial Settings
-                          </h3>
-                          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
-                            <div><p className="text-sm font-semibold text-slate-800">Enable Free Trial</p><p className="text-xs text-slate-500 mt-0.5">Allow users to try premium features for a limited time</p></div>
-                            <Toggle checked={form.sub_trial_enabled === "true"} onChange={(v) => update("sub_trial_enabled", v ? "true" : "false")} />
-                          </div>
-                          <FormRow label="Trial Duration (Days)" hint="How many days the trial should last">
-                            <input type="number" value={form.sub_trial_days || "7"} onChange={(e) => update("sub_trial_days", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="7" />
-                          </FormRow>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>
-                  </div>
-                )}
 
                 {activeSection === "danger" && (
                   <div className="bg-white rounded-2xl border border-red-200/60 p-6">
