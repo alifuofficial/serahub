@@ -9,7 +9,7 @@ export default async function DashboardPage() {
     redirect("/auth/login?callbackUrl=/dashboard");
   }
 
-  const [user, allCategories, bookmarks] = await Promise.all([
+  const [user, allCategories, bookmarks, siteConfigs, cvAnalysis] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.id },
       select: {
@@ -48,6 +48,14 @@ export default async function DashboardPage() {
         },
       },
       orderBy: { createdAt: "desc" },
+    }),
+    prisma.siteConfig.findMany({
+      where: { key: { in: ["cvanalyzer_enabled", "cvanalyzer_price_etb"] } }
+    }),
+    prisma.cVAnalysis.findFirst({
+      where: { userId: session.id },
+      orderBy: { createdAt: "desc" },
+      include: { transaction: true }
     })
   ]);
 
@@ -73,5 +81,32 @@ export default async function DashboardPage() {
     } : null,
   }));
 
-  return <DashboardClient user={user as any} bookmarks={formattedBookmarks} allCategories={allCategories} />;
+  const config: Record<string, string> = {};
+  siteConfigs.forEach(c => config[c.key] = c.value);
+
+  const cvAnalyzerConfig = {
+    enabled: config.cvanalyzer_enabled === "true",
+    price: parseInt(config.cvanalyzer_price_etb || "150", 10)
+  };
+
+  const formattedCvAnalysis = cvAnalysis ? {
+    id: cvAnalysis.id,
+    fileName: cvAnalysis.fileName,
+    status: cvAnalysis.status,
+    skills: cvAnalysis.skills ? JSON.parse(cvAnalysis.skills) : [],
+    experience: cvAnalysis.experience,
+    matchedJobs: cvAnalysis.matchedJobs ? JSON.parse(cvAnalysis.matchedJobs) : [],
+    transactionStatus: cvAnalysis.transaction?.status || "PENDING",
+    createdAt: cvAnalysis.createdAt.toISOString()
+  } : null;
+
+  return (
+    <DashboardClient 
+      user={user as any} 
+      bookmarks={formattedBookmarks} 
+      allCategories={allCategories} 
+      cvAnalyzerConfig={cvAnalyzerConfig}
+      cvAnalysis={formattedCvAnalysis}
+    />
+  );
 }

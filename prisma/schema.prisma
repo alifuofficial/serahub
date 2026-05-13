@@ -21,6 +21,7 @@ model User {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   transactions      Transaction[]
+  cvAnalyses        CVAnalysis[]
 }
 
 model OtpToken {
@@ -244,7 +245,33 @@ model Transaction {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
+  cvAnalysis     CVAnalysis?
+
   @@index([userId])
   @@index([status])
   @@index([reference])
 }
+
+model CVAnalysis {
+  id             String      @id @default(uuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactionId  String?     @unique
+  transaction    Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+  
+  fileUrl        String      // URL of the uploaded CV PDF
+  fileName       String
+  
+  status         String      @default("PENDING") // PENDING, PAID, ANALYZING, COMPLETED, FAILED
+  parsedText     String?     // Raw text extracted from PDF
+  skills         String?     // Extracted skills (JSON array or comma separated)
+  experience     String?     // Extracted experience summary
+  education      String?
+  matchedJobs    String?     // JSON array of matched job IDs or slugs
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([userId])
+}
+

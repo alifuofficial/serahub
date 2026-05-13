@@ -73,6 +73,8 @@ const SETTING_KEYS = [
   "verifyet_enabled",
   "verifyet_api_key",
   "verifyet_environment",
+  "cvanalyzer_enabled",
+  "cvanalyzer_price_etb",
 ];
 
 export default async function SettingsPage() {
