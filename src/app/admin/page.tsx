@@ -21,6 +21,8 @@ export default async function AdminPage() {
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
   const [
     jobCount,
@@ -54,7 +56,11 @@ export default async function AdminPage() {
     totalEmailClicks,
     dailyEmailClicks,
     topSearches,
-    topCategoriesByInterest
+    topCategoriesByInterest,
+    totalRevenueAgg,
+    thisMonthRevenueAgg,
+    lastMonthRevenueAgg,
+    monthlyTransactions
   ] = await Promise.all([
     prisma.job.count(),
     prisma.bid.count(),
@@ -148,6 +154,22 @@ export default async function AdminPage() {
       _count: { value: true },
       orderBy: { _count: { value: "desc" } },
       take: 10
+    }),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { status: "SUCCESS" }
+    }),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { status: "SUCCESS", createdAt: { gte: startOfThisMonth } }
+    }),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { status: "SUCCESS", createdAt: { gte: startOfLastMonth, lt: startOfThisMonth } }
+    }),
+    prisma.transaction.findMany({
+      where: { status: "SUCCESS", createdAt: { gte: sixMonthsAgo } },
+      select: { amount: true, createdAt: true }
     })
   ]);
 
@@ -175,6 +197,25 @@ export default async function AdminPage() {
   const jobsMonthly = buildMonthly(monthlyJobs as TimeRow[]);
   const bidsMonthly = buildMonthly(monthlyBids as TimeRow[]);
   const subsMonthly = buildMonthly(monthlySubscribers as TimeRow[]);
+
+  // Build monthly revenue
+  const revenueMap: Record<string, number> = {};
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    revenueMap[key] = 0;
+  }
+  for (const row of monthlyTransactions) {
+    const d = new Date(row.createdAt);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    if (key in revenueMap) {
+      revenueMap[key] += row.amount;
+    }
+  }
+  const revenueMonthlyData = Object.entries(revenueMap).map(([key, amount]) => {
+    const [, m] = key.split("-").map(Number);
+    return { month: monthNames[m - 1], revenue: amount };
+  });
 
   const trendData = jobsMonthly.map((j, i) => ({
     month: j.month,
@@ -264,6 +305,12 @@ export default async function AdminPage() {
       behavioralStats={{
         topSearches: topSearches.map(s => ({ term: s.value, count: s._count.value })),
         topInterests: topCategoriesByInterest.map(s => ({ term: s.value, count: s._count.value }))
+      }}
+      financialStats={{
+        totalRevenue: totalRevenueAgg._sum.amount || 0,
+        thisMonthRevenue: thisMonthRevenueAgg._sum.amount || 0,
+        lastMonthRevenue: lastMonthRevenueAgg._sum.amount || 0,
+        monthlyTrend: revenueMonthlyData
       }}
     />
   );

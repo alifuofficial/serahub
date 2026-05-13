@@ -76,6 +76,12 @@ interface DashboardProps {
     topSearches: { term: string; count: number }[];
     topInterests: { term: string; count: number }[];
   };
+  financialStats: {
+    totalRevenue: number;
+    thisMonthRevenue: number;
+    lastMonthRevenue: number;
+    monthlyTrend: { month: string; revenue: number }[];
+  };
 }
 
 function formatDate(iso: string) {
@@ -96,7 +102,7 @@ function formatPath(path: string) {
   return path.length > 35 ? path.substring(0, 35) + "..." : path;
 }
 
-export default function AdminDashboard({ user, stats, totalViews, visitorStats, recentJobs, recentBids, categoryData, trendData, dailyViewsData, topPagesData, topReferrersData, behavioralStats }: DashboardProps) {
+export default function AdminDashboard({ user, stats, totalViews, visitorStats, recentJobs, recentBids, categoryData, trendData, dailyViewsData, topPagesData, topReferrersData, behavioralStats, financialStats }: DashboardProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"jobs" | "bids">("jobs");
   const [chartView, setChartView] = useState<"category" | "trend">("trend");
@@ -190,11 +196,28 @@ export default function AdminDashboard({ user, stats, totalViews, visitorStats, 
             <div className="mb-8">
               <h2 className="text-lg font-bold text-slate-900 mb-4 px-1">At a Glance</h2>
               <div className="bg-white rounded-3xl p-6 shadow-sm">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 divide-x divide-slate-100">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-6 divide-x divide-slate-100">
                   <div className="px-4 first:pl-0">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Total Jobs</p>
                     <p className="text-3xl font-extrabold text-slate-900">{stats.jobCount.toLocaleString()}</p>
                     <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-[#00c087]"/> {stats.publishedJobs} live</div>
+                  </div>
+                  <div className="px-4">
+                    <p className="text-sm font-semibold text-slate-500 mb-1">Total Revenue</p>
+                    <p className="text-3xl font-extrabold text-emerald-600">{financialStats.totalRevenue.toLocaleString()} <span className="text-sm text-emerald-600/70">ETB</span></p>
+                    <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5">
+                      {financialStats.thisMonthRevenue >= financialStats.lastMonthRevenue ? (
+                        <span className="text-emerald-500 flex items-center gap-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                          Up this month
+                        </span>
+                      ) : (
+                        <span className="text-rose-500 flex items-center gap-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+                          Down this month
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="px-4">
                     <p className="text-sm font-semibold text-slate-500 mb-1">Total Bids</p>
@@ -229,6 +252,40 @@ export default function AdminDashboard({ user, stats, totalViews, visitorStats, 
                   <div className="px-4"><p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Unique (30d)</p><p className="text-xl font-bold text-slate-800">{visitorStats.uniqueVisitors30d.toLocaleString()}</p></div>
                 </div>
               </div>
+            </div>
+
+            {/* Financial Overview Row */}
+            <div className="mb-8 bg-white rounded-3xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">Financial Overview</h2>
+                  <p className="text-xs text-slate-500 mt-1">Revenue generated from CV analysis and verifications.</p>
+                </div>
+                <div className="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-emerald-600/70 uppercase tracking-widest">This Month</p>
+                    <p className="text-base font-extrabold text-emerald-700">{financialStats.thisMonthRevenue.toLocaleString()} ETB</p>
+                  </div>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={280}>
+                <AreaChart data={financialStats.monthlyTrend}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#059669" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#059669" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 500 }} axisLine={false} tickLine={false} dy={10} />
+                  <YAxis tick={{ fontSize: 12, fill: "#cbd5e1", fontWeight: 500 }} axisLine={false} tickLine={false} dx={-10} tickFormatter={(v) => `${v}`} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <Tooltip cursor={{ fill: "#f8fafc" }} contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", padding: "12px 16px" }} labelStyle={{ fontWeight: 700, color: "#0f172a", marginBottom: "8px" }} itemStyle={{ fontWeight: 600, fontSize: "13px" }} formatter={(value: any) => [`${value} ETB`, "Revenue"]} />
+                  <Area type="monotone" dataKey="revenue" stroke="#059669" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
 
             {/* Charts Row */}
