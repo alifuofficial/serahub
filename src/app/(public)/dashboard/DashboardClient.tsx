@@ -143,6 +143,24 @@ export default function DashboardClient({ user, bookmarks, allCategories, cvAnal
                 <p className="text-slate-500">Manage your saved jobs, bids, and profile preferences.</p>
               </div>
 
+              {cvAnalyzerConfig.enabled && (
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-blue-600/20 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-10 -mt-20"></div>
+                  <div className="relative z-10 flex-1">
+                    <h3 className="text-2xl font-black mb-2 flex items-center gap-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg>
+                      Supercharge Your Job Search
+                    </h3>
+                    <p className="text-blue-100 max-w-xl text-sm leading-relaxed">Let our AI analyze your CV to extract your core skills and match you with the perfect jobs automatically.</p>
+                  </div>
+                  <div className="relative z-10">
+                    <button onClick={() => setActiveTab("cvanalyzer")} className="bg-white text-blue-600 px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:scale-105 transition-transform whitespace-nowrap">
+                      {cvAnalysis ? "View Analysis" : "Analyze My CV"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white rounded-3xl border border-slate-200/60 p-7 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
                   <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-5">
