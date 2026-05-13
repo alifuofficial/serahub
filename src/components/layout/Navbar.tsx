@@ -54,13 +54,13 @@ export default function Navbar({ user, siteName, logoUrl, jobsEnabled = true, bi
               </svg>
               Home
             </Link>
-            <Link href="/jobs" className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-900 rounded-full hover:bg-white/50 transition-all flex items-center gap-1.5">
+            <Link href="/jobs" className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-900 rounded-full hover:bg-white/50 transition-all flex items-center gap-1.5">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
               </svg>
               Jobs
             </Link>
-            <Link href="/bids" className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-900 rounded-full hover:bg-white/50 transition-all flex items-center gap-1.5">
+            <Link href="/bids" className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-900 rounded-full hover:bg-white/50 transition-all flex items-center gap-1.5">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>
@@ -146,9 +146,9 @@ export default function Navbar({ user, siteName, logoUrl, jobsEnabled = true, bi
            </div>
            <div className="p-6 space-y-4">
               <Link href="/" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-900">Home</Link>
-              <Link href="/jobs" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-500">Jobs</Link>
-              <Link href="/bids" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-500">Bids</Link>
-              <Link href="/about" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-500">About</Link>
+              <Link href="/jobs" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-700">Jobs</Link>
+              <Link href="/bids" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-700">Bids</Link>
+              <Link href="/about" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-700">About</Link>
            </div>
            <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100">
               {user ? (

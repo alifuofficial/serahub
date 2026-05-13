@@ -31,7 +31,7 @@ export default function Footer({ siteName, logoUrl, socials }: FooterProps) {
               </div>
               <span className="text-xl font-black tracking-tight text-gray-900">{name}</span>
             </Link>
-            <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
+            <p className="text-sm text-gray-700 font-medium leading-relaxed max-w-xs">
               Ethiopia's premier AI-powered platform for career acceleration. Discover high-impact jobs and high-value tenders in one unified hub.
             </p>
             <div className="flex items-center gap-4 mt-8">
@@ -54,36 +54,32 @@ export default function Footer({ siteName, logoUrl, socials }: FooterProps) {
           </div>
 
           <div>
-            <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-6">Platform</h4>
+            <h4 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em] mb-6">Platform</h4>
             <ul className="space-y-4">
-              <li><Link href="/jobs" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Find Jobs</Link></li>
-              <li><Link href="/bids" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Explore Tenders</Link></li>
-              <li><Link href="/about" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Support Hub</Link></li>
+              <li><Link href="/jobs" className="text-sm font-bold text-gray-600 hover:text-brand-600 transition-colors">Jobs</Link></li>
+              <li><Link href="/bids" className="text-sm font-bold text-gray-600 hover:text-brand-600 transition-colors">Bids</Link></li>
+              <li><Link href="/about" className="text-sm font-bold text-gray-600 hover:text-brand-600 transition-colors">About</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-6">Legal</h4>
+            <h4 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em] mb-6">Legal</h4>
             <ul className="space-y-4">
-              <li><Link href="/terms" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/cookies" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Cookie Settings</Link></li>
+              <li><Link href="/terms" className="text-sm font-bold text-gray-600 hover:text-brand-600 transition-colors">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="text-sm font-bold text-gray-600 hover:text-brand-600 transition-colors">Privacy Policy</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-6">Company</h4>
+            <h4 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em] mb-6">Support</h4>
             <ul className="space-y-4">
-              <li><Link href="/careers" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Join the Team</Link></li>
-              <li><Link href="/blog" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Latest News</Link></li>
-              <li><Link href="/partners" className="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors">Partner Program</Link></li>
+              <li><Link href="/contact" className="text-sm font-bold text-gray-600 hover:text-brand-600 transition-colors">Contact</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="mt-16 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          <p className="text-xs font-black text-gray-600 uppercase tracking-widest">
             © {new Date().getFullYear()} {name}. Built for the future of work.
           </p>
           <div className="flex items-center gap-6">

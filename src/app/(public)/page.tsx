@@ -76,8 +76,8 @@ export default async function Home() {
             {/* AI Badge */}
             <div className="animate-in fade-in slide-in-from-top-4 duration-1000">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 border border-brand-200/60 mb-6 shadow-sm">
-                <div className="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></div>
-                <span className="text-xs font-semibold tracking-widest uppercase text-brand-700">AI-Powered Match Engine Live</span>
+                <div className="w-2 h-2 bg-brand-600 rounded-full animate-pulse"></div>
+                <span className="text-xs font-bold tracking-widest uppercase text-brand-800">AI-Powered Match Engine Live</span>
               </div>
             </div>
 
@@ -91,8 +91,8 @@ export default async function Home() {
 
             {/* Subtitle */}
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
-              <p className="text-base md:text-lg text-gray-500 max-w-xl mx-auto mb-8 leading-relaxed">
-                Aggregating Ethiopia's most <span className="text-gray-700 font-medium">high-impact jobs</span> and <span className="text-gray-700 font-medium">high-value bids</span>. Driven by intelligence, built for your success.
+              <p className="text-base md:text-lg text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed">
+                Aggregating Ethiopia's most <span className="text-gray-900 font-bold">high-impact jobs</span> and <span className="text-gray-900 font-bold">high-value bids</span>. Driven by intelligence, built for your success.
               </p>
             </div>
 
@@ -106,9 +106,9 @@ export default async function Home() {
               
               {/* Quick Tags */}
               <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
-                <span className="text-xs text-gray-400">Try:</span>
-                <Link href="/jobs?q=Remote" className="px-3 py-1 text-xs text-gray-500 bg-white border border-gray-200 rounded-full hover:border-brand-300 hover:text-brand-600 transition-all shadow-sm">"Remote react jobs"</Link>
-                <Link href="/bids?q=Construction" className="px-3 py-1 text-xs text-gray-500 bg-white border border-gray-200 rounded-full hover:border-brand-300 hover:text-brand-600 transition-all shadow-sm">"Construction bids"</Link>
+                <span className="text-xs text-gray-500 font-bold">Try:</span>
+                <Link href="/jobs?q=Remote" className="px-3 py-1 text-xs text-gray-700 bg-white border border-gray-200 rounded-full hover:border-brand-300 hover:text-brand-600 transition-all shadow-sm font-medium">"Remote react jobs"</Link>
+                <Link href="/bids?q=Construction" className="px-3 py-1 text-xs text-gray-700 bg-white border border-gray-200 rounded-full hover:border-brand-300 hover:text-brand-600 transition-all shadow-sm font-medium">"Construction bids"</Link>
               </div>
             </div>
 
@@ -138,20 +138,16 @@ export default async function Home() {
       </section>
 
       {/* Trusted By Section */}
-      <section className="relative py-10 border-b border-gray-100 bg-white/60">
+      <section className="relative py-12 border-b border-gray-100 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-[10px] font-bold tracking-[0.3em] uppercase text-brand-600/50 mb-8">Trusted by forward-thinking companies</p>
-          <div className="relative overflow-hidden">
-            <div className="marquee gap-16">
-              {[...partners, ...partners].map((partner, idx) => (
-                <div key={`${partner.id}-${idx}`} className="flex items-center gap-3 flex-shrink-0 opacity-40 hover:opacity-100 transition-all group">
-                  <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center p-2 group-hover:bg-white group-hover:shadow-sm">
-                    <img src={partner.logoUrl} alt={partner.name} className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0" />
-                  </div>
-                  <span className="text-sm font-bold text-gray-500 group-hover:text-gray-900 whitespace-nowrap">{partner.name}</span>
-                </div>
-              ))}
-            </div>
+          <p className="text-center text-[11px] font-black tracking-[0.4em] uppercase text-brand-600/60 mb-10">Trusted by forward-thinking companies</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-10">
+            {partners.map((partner) => (
+              <div key={partner.id} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-all group grayscale hover:grayscale-0">
+                <img src={partner.logoUrl} alt={partner.name} className="h-8 w-auto object-contain" />
+                <span className="text-sm font-bold text-gray-700 group-hover:text-gray-900">{partner.name}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -168,41 +164,45 @@ export default async function Home() {
             ].map((stat, i) => (
               <div key={i} className="p-8 rounded-3xl bg-white border border-gray-100 card-hover shadow-sm hover:shadow-md">
                 <div className={`text-4xl font-black ${stat.color} tracking-tight`}>{stat.value.toLocaleString()}+</div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">{stat.label}</p>
+                <p className="text-xs font-black text-gray-600 uppercase tracking-widest mt-2">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Why SeraHub Section */}
-      <section className="relative py-24 bg-white">
+      {/* Browse by Industry Section */}
+      <section className="relative py-24 bg-brand-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase text-brand-600 mb-4">Why SeraHub?</span>
-            <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-6">
-              Everything you need to <span className="gradient-text">accelerate</span> your career
-            </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed">
-              We've built a powerful ecosystem that combines raw data with cutting-edge AI to give you an unfair advantage in the market.
-            </p>
+            <h2 className="text-4xl font-black text-gray-900 mb-4">Browse by Industry</h2>
+            <p className="text-gray-600 font-medium">Find exactly what you're looking for across our diverse categories</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex flex-wrap justify-center gap-4 mb-16">
+            <button className="px-6 py-2.5 rounded-full bg-brand-100 text-brand-700 font-bold text-sm border border-brand-200">All</button>
+            {["Technology", "Finance", "Construction", "Healthcare", "Education", "Agriculture"].map((cat) => (
+              <button key={cat} className="px-6 py-2.5 rounded-full bg-white text-gray-600 font-bold text-sm border border-gray-100 hover:border-brand-200 hover:text-brand-600 transition-all">{cat}</button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              { title: "AI-Powered Matching", desc: "Our advanced algorithms match your skills and preferences with the most relevant jobs and bids automatically.", icon: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z", color: "brand" },
-              { title: "Real-time Tenders", desc: "Get instant access to government and private sector bids from across Ethiopia, categorized and searchable.", icon: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z", color: "blue" },
-              { title: "CV Analysis", desc: "Upload your CV and let our AI analyze your strengths, suggesting the perfect roles and improvements.", icon: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z", color: "purple" },
-              { title: "Smart Notifications", desc: "Never miss an opportunity with personalized email alerts and web notifications tailored to your profile.", icon: "M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0", color: "orange" },
-            ].map((feature, i) => (
-              <div key={i} className="group p-8 rounded-3xl bg-white border border-gray-100 card-hover shadow-sm hover:shadow-lg">
-                <div className={`w-14 h-14 bg-${feature.color}-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                  <svg className={`w-7 h-7 text-${feature.color === 'brand' ? 'brand-600' : feature.color + '-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d={feature.icon}/>
+              { name: "Technology", jobs: 320, icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z", color: "blue" },
+              { name: "Finance", jobs: 280, icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.67 2.57 1.63M12 8V7m0 11v1m0-1c-1.11 0-2.08-.67-2.57-1.63M12 18V7", color: "emerald" },
+              { name: "Construction", jobs: 190, icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4", color: "orange" },
+              { name: "Healthcare", jobs: 150, icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z", color: "red" },
+              { name: "Education", jobs: 120, icon: "M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z", color: "purple" },
+              { name: "Agriculture", jobs: 95, icon: "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z", color: "yellow" },
+            ].map((industry, i) => (
+              <div key={i} className="bg-white p-8 rounded-[2rem] text-center border border-gray-100 shadow-sm hover:shadow-xl hover:border-brand-200 transition-all cursor-pointer group">
+                <div className={`w-14 h-14 bg-${industry.color}-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform`}>
+                  <svg className={`w-7 h-7 text-${industry.color}-600`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d={industry.icon}/>
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-sm font-black text-gray-900 mb-1">{industry.name}</h3>
+                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-tight">{industry.jobs}+ jobs</p>
               </div>
             ))}
           </div>
@@ -268,7 +268,7 @@ export default async function Home() {
             <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-6">
               Choose the plan that fits <span className="gradient-text">your goals</span>
             </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed">
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
               Simple, transparent pricing to help you take the next step in your professional journey.
             </p>
           </div>
@@ -285,13 +285,13 @@ export default async function Home() {
               </div>
               <ul className="space-y-4 mb-10">
                 {["Access to all listings", "Basic search filters", "Daily email alerts"].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-gray-600 font-medium">
-                    <svg className="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  <li key={i} className="flex items-center gap-3 text-sm text-gray-700 font-bold">
+                    <svg className="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                     {item}
                   </li>
                 ))}
               </ul>
-              <button className="w-full py-4 px-6 text-sm font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-2xl hover:bg-gray-100 transition-all">Get Started</button>
+              <button className="w-full py-4 px-6 text-sm font-black text-gray-700 bg-gray-50 border border-gray-200 rounded-2xl hover:bg-gray-100 transition-all">Get Started</button>
             </div>
 
             {/* Pro Plan */}
@@ -330,30 +330,43 @@ export default async function Home() {
               </div>
               <ul className="space-y-4 mb-10">
                 {["All Pro Jobs features", "Full tender documents", "Bid tracking & analytics", "Competitor intel"].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-gray-600 font-medium">
-                    <svg className="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  <li key={i} className="flex items-center gap-3 text-sm text-gray-700 font-bold">
+                    <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                     {item}
                   </li>
                 ))}
               </ul>
-              <button className="w-full py-4 px-6 text-sm font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-2xl hover:bg-gray-100 transition-all">Go Pro Bids</button>
+              <button className="w-full py-4 px-6 text-sm font-black text-gray-700 bg-gray-50 border border-gray-200 rounded-2xl hover:bg-gray-100 transition-all">Go Pro Bids</button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section className="py-24 bg-surface-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-gradient-to-br from-brand-50 to-brand-100 p-12 md:p-20 rounded-[3rem] border border-brand-200/50 text-center relative overflow-hidden">
-             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-200/20 blur-3xl rounded-full -mr-32 -mt-32"></div>
+      {/* Newsletter Section */}
+      <section className="py-24 bg-brand-50/50">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="bg-white p-12 md:p-20 rounded-[3rem] border border-brand-100 text-center shadow-xl shadow-brand-500/5 relative overflow-hidden">
+             <div className="absolute top-0 left-0 w-full h-2 bg-brand-500"></div>
              <div className="relative z-10">
-                <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-6">Stay ahead of the curve</h2>
-                <p className="text-gray-600 text-lg mb-10 max-w-lg mx-auto font-medium">Join 10,000+ professionals receiving curated opportunities every week.</p>
-                <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                   <input type="email" placeholder="Enter your email address" className="flex-1 px-6 py-4 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-sm font-medium" />
-                   <button className="px-8 py-4 bg-brand-600 text-white font-bold rounded-2xl hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/20">Subscribe</button>
+                <div className="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-8">
+                  <svg className="w-8 h-8 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">Stay ahead of the curve</h2>
+                <p className="text-gray-600 text-lg mb-12 max-w-lg mx-auto font-medium leading-relaxed">
+                  Join 10,000+ professionals receiving curated opportunities every week. No spam, ever.
+                </p>
+                <form className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+                   <div className="flex-1 relative">
+                      <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                      </svg>
+                      <input type="email" placeholder="Enter your email address" className="w-full pl-12 pr-6 py-5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:bg-white focus:border-brand-300 transition-all text-base font-bold text-gray-900" />
+                   </div>
+                   <button className="px-10 py-5 bg-brand-500 text-white font-black rounded-2xl hover:bg-brand-600 transition-all shadow-lg shadow-brand-500/30 text-lg">Subscribe</button>
                 </form>
+                <p className="mt-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Unsubscribe at any time.</p>
              </div>
           </div>
         </div>

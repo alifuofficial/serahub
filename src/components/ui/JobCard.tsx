@@ -45,12 +45,12 @@ export default function JobCard({ job, isBookmarked = false }: JobCardProps) {
         </Link>
       </h3>
       
-      <p className="text-slate-500 text-sm line-clamp-2 mb-5 flex-grow font-normal leading-relaxed">
+      <p className="text-slate-600 text-sm line-clamp-2 mb-5 flex-grow font-medium leading-relaxed">
         {getPlainText(job.description)}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        {job.source && <span className="bg-slate-50 border border-slate-100 text-slate-500 px-2.5 py-1 rounded-lg text-xs font-medium">{job.source}</span>}
+        {job.source && <span className="bg-slate-50 border border-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-tight">{job.source}</span>}
         {job.deadline && (
           <span className="bg-red-50 border border-red-100 text-red-500 px-2.5 py-1 rounded-lg text-xs font-medium">
             Ends {new Date(job.deadline).toLocaleDateString()}
@@ -67,7 +67,7 @@ export default function JobCard({ job, isBookmarked = false }: JobCardProps) {
         </div>
         
         <div className="flex items-center gap-3">
-          <span className="text-slate-400 text-xs font-medium">
+          <span className="text-slate-600 text-xs font-bold">
             {timeAgo(job.createdAt)}
           </span>
           <BookmarkButton id={job.id} type="JOB" initialIsBookmarked={isBookmarked} />

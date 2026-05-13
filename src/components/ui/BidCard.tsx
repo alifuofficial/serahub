@@ -28,13 +28,13 @@ export default function BidCard({ bid, isBookmarked = false }: BidCardProps) {
         </Link>
       </h3>
       
-      <p className="text-slate-500 text-sm line-clamp-2 mb-5 flex-grow font-normal leading-relaxed">
+      <p className="text-slate-600 text-sm line-clamp-2 mb-5 flex-grow font-medium leading-relaxed">
         {getPlainText(bid.description)}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        <span className="bg-slate-50 border border-slate-100 text-slate-500 px-2.5 py-1 rounded-lg text-xs font-medium">Contract</span>
-        {bid.source && <span className="bg-slate-50 border border-slate-100 text-slate-500 px-2.5 py-1 rounded-lg text-xs font-medium">{bid.source}</span>}
+        <span className="bg-slate-50 border border-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-tight">Contract</span>
+        {bid.source && <span className="bg-slate-50 border border-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-tight">{bid.source}</span>}
       </div>
       
       <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
@@ -44,7 +44,7 @@ export default function BidCard({ bid, isBookmarked = false }: BidCardProps) {
         </div>
         
         <div className="flex items-center gap-3">
-          <span className="text-slate-400 text-xs font-medium">
+          <span className="text-slate-600 text-xs font-bold">
             3 d
           </span>
           <BookmarkButton id={bid.id} type="BID" initialIsBookmarked={isBookmarked} />
