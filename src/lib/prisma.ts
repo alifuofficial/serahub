@@ -35,8 +35,9 @@ function createPrismaClient() {
             return await query(args);
           } catch (error: any) {
             // P2021 is "The table `main.Model` does not exist in the current database."
-            if (error?.code === 'P2021') {
-              console.warn(`[Prisma] Table ${model} does not exist. Returning empty result during build.`);
+            // P2022 is "The column `main.Model.column` does not exist in the current database."
+            if (error?.code === 'P2021' || error?.code === 'P2022') {
+              console.warn(`[Prisma] Table or column for ${model} does not exist. Returning empty result during build.`);
               
               // Return appropriate empty values based on the operation
               if (operation.includes('count')) return 0;
