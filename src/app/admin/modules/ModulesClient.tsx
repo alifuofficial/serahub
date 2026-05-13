@@ -21,8 +21,10 @@ export default function ModulesClient({ user, config }: Props) {
   };
 
   const handleSave = () => {
+    const fd = new FormData();
+    Object.entries(form).forEach(([key, value]) => fd.append(key, value));
     startTransition(async () => {
-      const res = await updateSettingsAction(form);
+      const res = await updateSettingsAction(fd);
       if (res.error) setMsg({ type: "error", text: res.error });
       else {
         setMsg({ type: "success", text: "Modules updated successfully!" });
