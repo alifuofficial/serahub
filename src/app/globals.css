@@ -120,72 +120,73 @@ body {
 }
 
 .glass {
-  @apply bg-white/80 backdrop-blur-xl border border-white/50;
+  @apply bg-white/60 backdrop-blur-2xl border border-white/80;
+}
+
+.glass-card {
+  @apply bg-white/60 backdrop-blur-xl border border-white/70;
 }
 
 .glass-dark {
-  @apply bg-slate-900/80 backdrop-blur-xl border border-slate-700/50;
+  @apply bg-emerald-950/70 backdrop-blur-2xl border border-emerald-500/20;
 }
 
 .gradient-text {
-  @apply bg-clip-text text-transparent;
-  background-image: linear-gradient(135deg, var(--primary) 0%, #00e5a0 50%, var(--primary) 100%);
-  background-size: 200% auto;
-  animation: gradient-shift 3s ease infinite;
+  background: linear-gradient(135deg, #16a34a, #22c55e, #4ade80, #16a34a);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
 }
 
-.hover-lift {
-  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+.hero-bg {
+  background: 
+    radial-gradient(ellipse at 30% 0%, rgba(22, 163, 74, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 0%, rgba(34, 197, 94, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, #f0fdf4 0%, #f7fdf9 40%, #effcf3 100%);
 }
 
-.hero-mesh {
-  background-image:
-    radial-gradient(at 20% 80%, rgba(0, 192, 135, 0.08) 0%, transparent 50%),
-    radial-gradient(at 80% 20%, rgba(0, 192, 135, 0.06) 0%, transparent 50%),
-    radial-gradient(at 40% 40%, rgba(0, 229, 160, 0.04) 0%, transparent 60%);
-}
-
-.ai-glow {
-  box-shadow: 0 0 20px rgba(0, 192, 135, 0.15), 0 0 40px rgba(0, 192, 135, 0.1);
-}
-
-.ai-card {
-  @apply bg-white/40 backdrop-blur-md border border-white/40 shadow-2xl;
-  background-image: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
-}
-
-.ai-badge {
-  @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white shadow-xl;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.ai-scan-line {
-  position: relative;
-  overflow: hidden;
-}
-
-.ai-scan-line::after {
-  content: "";
-  position: absolute;
-  top: -100%;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  background: linear-gradient(to bottom, transparent, rgba(0, 192, 135, 0.05), transparent);
-  animation: scan 4s linear infinite;
-}
-
-@keyframes scan {
-  0% { top: -100%; }
-  100% { top: 100%; }
-}
-
-.hero-grid {
-  background-image:
-    linear-gradient(rgba(0, 192, 135, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 192, 135, 0.03) 1px, transparent 1px);
+.grid-pattern-light {
+  background-image: 
+    linear-gradient(rgba(22, 163, 74, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 163, 74, 0.04) 1px, transparent 1px);
   background-size: 60px 60px;
 }
+
+.card-hover {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+}
+
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delay { animation: float 6s ease-in-out 2s infinite; }
+.animate-float-slow { animation: float 8s ease-in-out 1s infinite; }
+.animate-spin-slow { animation: spin-slow 20s linear infinite; }
 
 .tiptap {
   @apply min-h-[250px] outline-none;
