@@ -185,7 +185,7 @@ export default function Renderer({ content }: { content: string }) {
             return (
               <blockquote key={i}>
                 <p dangerouslySetInnerHTML={{ __html: (d.text as string) || "" }} />
-                {d.caption && <footer className="text-sm text-slate-400 mt-1">— {d.caption as string}</footer>}
+                {(d.caption as string) && <footer className="text-sm text-slate-400 mt-1">— {d.caption as string}</footer>}
               </blockquote>
             );
           case "delimiter": return <hr key={i} />;
