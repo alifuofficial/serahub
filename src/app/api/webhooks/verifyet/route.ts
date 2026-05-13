@@ -47,6 +47,26 @@ export async function POST(req: Request) {
         },
       });
 
+      // If successful, handle subscription upgrades or feature unlocks
+      if (newStatus === "SUCCESS") {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 30);
+
+        if (transaction.purpose === "SUBSCRIPTION_PRO_JOB") {
+          await prisma.user.update({
+            where: { id: transaction.userId },
+            data: { subscriptionPlan: "PRO_JOB", subscriptionExpiresAt: expiresAt }
+          });
+          console.log(`[Verifyet Webhook] User ${transaction.userId} upgraded to PRO_JOB`);
+        } else if (transaction.purpose === "SUBSCRIPTION_PRO_BID") {
+          await prisma.user.update({
+            where: { id: transaction.userId },
+            data: { subscriptionPlan: "PRO_BID", subscriptionExpiresAt: expiresAt }
+          });
+          console.log(`[Verifyet Webhook] User ${transaction.userId} upgraded to PRO_BID`);
+        }
+      }
+
       console.log(`[Verifyet Webhook] Transaction ${transaction.id} updated to ${newStatus}`);
     }
 

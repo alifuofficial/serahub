@@ -18,6 +18,9 @@ export default async function DashboardPage() {
         name: true,
         role: true,
         newsletterFrequency: true,
+        subscriptionPlan: true,
+        subscriptionExpiresAt: true,
+        trialUsed: true,
         preferredCategories: {
           select: { categoryId: true }
         }
@@ -50,7 +53,16 @@ export default async function DashboardPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.siteConfig.findMany({
-      where: { key: { in: ["cvanalyzer_enabled", "cvanalyzer_price_etb"] } }
+      where: { key: { in: [
+        "cvanalyzer_enabled", 
+        "cvanalyzer_price_etb", 
+        "sub_pro_job_enabled",
+        "sub_pro_job_price",
+        "sub_pro_bid_enabled",
+        "sub_pro_bid_price",
+        "sub_trial_enabled",
+        "sub_trial_days"
+      ] } }
     }),
     prisma.cVAnalysis.findFirst({
       where: { userId: session.id },
@@ -61,6 +73,16 @@ export default async function DashboardPage() {
 
   if (!user) {
     redirect("/auth/login");
+  }
+
+  // Handle subscription expiration
+  let currentPlan = user.subscriptionPlan;
+  if (user.subscriptionPlan !== "FREE" && user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < new Date()) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { subscriptionPlan: "FREE" }
+    });
+    currentPlan = "FREE";
   }
 
   // Convert dates and handle nulls for client component
@@ -89,6 +111,12 @@ export default async function DashboardPage() {
     price: parseInt(config.cvanalyzer_price_etb || "150", 10)
   };
 
+  const subConfig = {
+    pro_job: { enabled: config.sub_pro_job_enabled === "true", price: parseInt(config.sub_pro_job_price || "150", 10) },
+    pro_bid: { enabled: config.sub_pro_bid_enabled === "true", price: parseInt(config.sub_pro_bid_price || "500", 10) },
+    trial: { enabled: config.sub_trial_enabled === "true", days: parseInt(config.sub_trial_days || "7", 10) }
+  };
+
   const formattedCvAnalysis = cvAnalysis ? {
     id: cvAnalysis.id,
     fileName: cvAnalysis.fileName,
@@ -100,13 +128,20 @@ export default async function DashboardPage() {
     createdAt: cvAnalysis.createdAt.toISOString()
   } : null;
 
+  const formattedUser = {
+    ...user,
+    subscriptionPlan: currentPlan,
+    subscriptionExpiresAt: user.subscriptionExpiresAt?.toISOString() || null
+  };
+
   return (
     <DashboardClient 
-      user={user as any} 
+      user={formattedUser as any} 
       bookmarks={formattedBookmarks} 
       allCategories={allCategories} 
       cvAnalyzerConfig={cvAnalyzerConfig}
       cvAnalysis={formattedCvAnalysis}
+      subConfig={subConfig}
     />
   );
 }

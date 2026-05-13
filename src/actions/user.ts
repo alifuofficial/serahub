@@ -87,6 +87,19 @@ export async function toggleBookmarkAction(type: "JOB" | "BID", id: string) {
       revalidatePath(type === "JOB" ? `/jobs/[slug]` : `/bids/[slug]`);
       return { success: true, bookmarked: false };
     } else {
+      // Check subscription limits for FREE users
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { subscriptionPlan: true }
+      });
+
+      if (user?.subscriptionPlan === "FREE") {
+        const count = await prisma.bookmark.count({ where: { userId } });
+        if (count >= 5) {
+          return { error: "FREE users are limited to 5 bookmarks. Upgrade to Pro for unlimited saves!" };
+        }
+      }
+
       await prisma.bookmark.create({
         data: {
           userId,

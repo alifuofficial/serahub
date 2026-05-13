@@ -18,10 +18,13 @@ model User {
   preferredCategories UserCategory[]
   interactions      UserInteraction[]
   lastNewsletterAt  DateTime?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  transactions      Transaction[]
-  cvAnalyses        CVAnalysis[]
+  subscriptionPlan    String            @default("FREE") // FREE, PRO_JOB, PRO_BID, TRIAL
+  subscriptionExpiresAt DateTime?
+  trialUsed           Boolean           @default(false)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  transactions        Transaction[]
+  cvAnalyses          CVAnalysis[]
 }
 
 model OtpToken {

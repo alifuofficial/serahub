@@ -11,6 +11,9 @@ interface User {
   name: string | null;
   role: string;
   newsletterFrequency: string | null;
+  subscriptionPlan: "FREE" | "PRO_JOB" | "PRO_BID" | "TRIAL";
+  subscriptionExpiresAt: string | null;
+  trialUsed: boolean;
   preferredCategories: { categoryId: string }[];
 }
 
@@ -27,11 +30,16 @@ interface Props {
   allCategories: { id: string, name: string }[];
   cvAnalyzerConfig: { enabled: boolean; price: number };
   cvAnalysis: any;
+  subConfig: {
+    pro_job: { enabled: boolean; price: number };
+    pro_bid: { enabled: boolean; price: number };
+    trial: { enabled: boolean; days: number };
+  };
 }
 
-type Tab = "overview" | "bookmarks" | "cvanalyzer" | "profile" | "newsletter";
+type Tab = "overview" | "bookmarks" | "cvanalyzer" | "billing" | "profile" | "newsletter";
 
-export default function DashboardClient({ user, bookmarks, allCategories, cvAnalyzerConfig, cvAnalysis }: Props) {
+export default function DashboardClient({ user, bookmarks, allCategories, cvAnalyzerConfig, cvAnalysis, subConfig }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [isPending, startTransition] = useTransition();
   const [msg, setMsg] = useState({ type: "", text: "" });
@@ -70,6 +78,7 @@ export default function DashboardClient({ user, bookmarks, allCategories, cvAnal
     { id: "overview", label: "Overview", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> },
     { id: "bookmarks", label: "My Bookmarks", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> },
     ...(cvAnalyzerConfig.enabled ? [{ id: "cvanalyzer", label: "AI CV Analyzer", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg> }] : []),
+    { id: "billing", label: "Billing & Plans", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg> },
     { id: "newsletter", label: "Newsletter", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> },
     { id: "profile", label: "Profile Settings", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
   ];
@@ -546,7 +555,7 @@ export default function DashboardClient({ user, bookmarks, allCategories, cvAnal
                 </div>
               )}
 
-              {currentAnalysis && currentAnalysis.status === "PENDING" && currentAnalysis.transactionStatus !== "SUCCESS" && (
+              {currentAnalysis && currentAnalysis.status === "PENDING" && currentAnalysis.transactionStatus !== "SUCCESS" && user.subscriptionPlan !== "PRO_JOB" && user.subscriptionPlan !== "TRIAL" && (
                 <div className="bg-white rounded-3xl border border-slate-200/60 p-8 shadow-xl shadow-slate-200/20">
                   <div className="flex items-center justify-between mb-8 pb-8 border-b border-slate-100">
                     <div className="flex items-center gap-4">
@@ -637,7 +646,7 @@ export default function DashboardClient({ user, bookmarks, allCategories, cvAnal
                 </div>
               )}
 
-              {currentAnalysis && (currentAnalysis.status === "PENDING" || currentAnalysis.status === "FAILED") && currentAnalysis.transactionStatus === "SUCCESS" && (
+              {currentAnalysis && (currentAnalysis.status === "PENDING" || currentAnalysis.status === "FAILED") && (currentAnalysis.transactionStatus === "SUCCESS" || user.subscriptionPlan === "PRO_JOB" || user.subscriptionPlan === "TRIAL") && (
                 <div className="bg-white rounded-3xl border border-slate-200/60 p-10 text-center shadow-xl shadow-slate-200/20">
                   <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white mb-6 shadow-lg shadow-emerald-500/30">
                      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -753,6 +762,217 @@ export default function DashboardClient({ user, bookmarks, allCategories, cvAnal
                   </div>
                 </div>
               )}
+            </div>
+          )}
+          {activeTab === "billing" && (
+            <div className="max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <div className="mb-10 text-center lg:text-left">
+                <h1 className="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">Billing & Plans</h1>
+                <p className="text-slate-500 max-w-2xl">Manage your subscription and unlock premium features for job seekers and businesses.</p>
+              </div>
+
+              {/* Current Status */}
+              <div className="bg-white rounded-3xl border border-slate-200/60 p-8 mb-10 relative overflow-hidden group shadow-sm">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-20 group-hover:bg-primary/10 transition-colors duration-500"></div>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-xl font-bold text-slate-900 uppercase tracking-tight">
+                          {user.subscriptionPlan.replace("_", " ")}
+                        </h3>
+                        {user.subscriptionPlan !== "FREE" && (
+                           <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                             <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
+                             Active
+                           </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-slate-500">
+                        {user.subscriptionPlan === "FREE" ? "You are currently on the free tier." : `Your plan will expire on ${new Date(user.subscriptionExpiresAt!).toLocaleDateString()}`}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {user.subscriptionPlan === "FREE" && subConfig.trial.enabled && !user.trialUsed && (
+                    <button 
+                      onClick={async () => {
+                        if(confirm(`Start your ${subConfig.trial.days}-day free trial?`)) {
+                          const res = await fetch("/api/user/start-trial", { method: "POST" });
+                          if(res.ok) window.location.reload();
+                          else alert("Failed to start trial");
+                        }
+                      }}
+                      className="btn-primary px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 hover:-translate-y-1 transition-all"
+                    >
+                      Start Free Trial
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Plans Comparison */}
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* FREE PLAN */}
+                <div className="bg-white rounded-3xl border border-slate-100 p-8 flex flex-col hover:border-slate-300 transition-all">
+                  <div className="mb-6">
+                    <h4 className="text-slate-900 font-bold text-lg mb-1">Free Tier</h4>
+                    <p className="text-slate-400 text-sm">Perfect for browsing.</p>
+                  </div>
+                  <div className="mb-8">
+                    <span className="text-4xl font-black text-slate-900">0</span>
+                    <span className="text-slate-400 font-bold ml-1">ETB/mo</span>
+                  </div>
+                  <ul className="space-y-4 mb-10 flex-1">
+                    <li className="flex items-center gap-3 text-sm text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>
+                      Job & Bid Search
+                    </li>
+                    <li className="flex items-center gap-3 text-sm text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>
+                      Max 5 Bookmarks
+                    </li>
+                    <li className="flex items-center gap-3 text-sm text-slate-400 line-through">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                      Unlimited Saves
+                    </li>
+                  </ul>
+                  <button disabled className="w-full py-3 rounded-xl border border-slate-200 text-slate-400 font-bold text-sm">
+                    {user.subscriptionPlan === "FREE" ? "Current Plan" : "Free Tier"}
+                  </button>
+                </div>
+
+                {/* PRO JOB */}
+                <div className={`rounded-3xl border-2 p-8 flex flex-col relative overflow-hidden transition-all hover:scale-[1.02] ${user.subscriptionPlan === "PRO_JOB" ? "border-primary bg-primary/[0.02]" : "border-slate-100 bg-white"}`}>
+                  <div className="absolute top-4 right-4">
+                    <span className="bg-primary/10 text-primary text-[10px] font-black uppercase px-2 py-1 rounded-lg">JOB SEEKER</span>
+                  </div>
+                  <div className="mb-6">
+                    <h4 className="text-slate-900 font-bold text-lg mb-1">Job Seeker Pro</h4>
+                    <p className="text-slate-400 text-sm">Land your dream job faster.</p>
+                  </div>
+                  <div className="mb-8">
+                    <span className="text-4xl font-black text-slate-900">{subConfig.pro_job.price}</span>
+                    <span className="text-slate-400 font-bold ml-1">ETB/mo</span>
+                  </div>
+                  <ul className="space-y-4 mb-10 flex-1">
+                    <li className="flex items-center gap-3 text-sm text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>
+                      Unlimited Saves
+                    </li>
+                    <li className="flex items-center gap-3 text-sm text-slate-600 font-bold">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>
+                      Free AI CV Analysis
+                    </li>
+                    <li className="flex items-center gap-3 text-sm text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>
+                      Early Access to Jobs
+                    </li>
+                  </ul>
+                  <button 
+                    onClick={async () => {
+                      const res = await fetch("/api/user/subscribe", { method: "POST", body: JSON.stringify({ plan: "PRO_JOB" }) });
+                      const data = await res.json();
+                      if(data.success) {
+                        alert(`Please pay ${data.amount} ETB. Ref: ${data.reference}. Then verify your payment.`);
+                        // Redirect to payment info or open modal
+                      } else alert(data.error);
+                    }}
+                    className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${user.subscriptionPlan === "PRO_JOB" ? "bg-primary text-white cursor-default" : "bg-slate-900 text-white hover:bg-slate-800"}`}
+                  >
+                    {user.subscriptionPlan === "PRO_JOB" ? "Current Plan" : "Upgrade Now"}
+                  </button>
+                </div>
+
+                {/* PRO BID */}
+                <div className={`rounded-3xl border-2 p-8 flex flex-col relative overflow-hidden transition-all hover:scale-[1.02] ${user.subscriptionPlan === "PRO_BID" ? "border-indigo-500 bg-indigo-50/10" : "border-slate-100 bg-white"}`}>
+                   <div className="absolute top-4 right-4">
+                    <span className="bg-indigo-500/10 text-indigo-600 text-[10px] font-black uppercase px-2 py-1 rounded-lg">BUSINESS</span>
+                  </div>
+                  <div className="mb-6">
+                    <h4 className="text-slate-900 font-bold text-lg mb-1">Business Pro</h4>
+                    <p className="text-slate-400 text-sm">Win more tenders.</p>
+                  </div>
+                  <div className="mb-8">
+                    <span className="text-4xl font-black text-slate-900">{subConfig.pro_bid.price}</span>
+                    <span className="text-slate-400 font-bold ml-1">ETB/mo</span>
+                  </div>
+                  <ul className="space-y-4 mb-10 flex-1">
+                    <li className="flex items-center gap-3 text-sm text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>
+                      Download Tender Files
+                    </li>
+                    <li className="flex items-center gap-3 text-sm text-slate-600 font-bold">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>
+                      AI Bid Summarizer
+                    </li>
+                    <li className="flex items-center gap-3 text-sm text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>
+                      Daily Tender Alerts
+                    </li>
+                  </ul>
+                  <button 
+                    onClick={async () => {
+                      const res = await fetch("/api/user/subscribe", { method: "POST", body: JSON.stringify({ plan: "PRO_BID" }) });
+                      const data = await res.json();
+                      if(data.success) {
+                        alert(`Please pay ${data.amount} ETB. Ref: ${data.reference}. Then verify your payment.`);
+                      } else alert(data.error);
+                    }}
+                    className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${user.subscriptionPlan === "PRO_BID" ? "bg-indigo-600 text-white cursor-default" : "bg-indigo-900 text-white hover:bg-indigo-800"}`}
+                  >
+                    {user.subscriptionPlan === "PRO_BID" ? "Current Plan" : "Upgrade Now"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Payment Verification Box */}
+              <div className="mt-10 p-8 rounded-3xl bg-slate-900 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-10 -mt-20"></div>
+                <div className="relative z-10 grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Already Paid?</h3>
+                    <p className="text-slate-400 text-sm">Enter your transaction reference to activate your plan instantly.</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="e.g. FT123456789" 
+                      value={verifyRef}
+                      onChange={e => setVerifyRef(e.target.value)}
+                      className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/50"
+                    />
+                    <button 
+                      onClick={async () => {
+                        setVerifyLoading(true);
+                        try {
+                          const res = await fetch("/api/user/verify-subscription", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ reference: verifyRef })
+                          });
+                          if(res.ok) {
+                            alert("Verification submitted successfully!");
+                            window.location.reload();
+                          } else {
+                            const d = await res.json();
+                            alert(d.error || "Verification failed");
+                          }
+                        } finally {
+                          setVerifyLoading(false);
+                        }
+                      }}
+                      disabled={verifyLoading || !verifyRef}
+                      className="btn-primary px-6 py-3 rounded-xl font-bold disabled:opacity-50"
+                    >
+                      Verify
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
