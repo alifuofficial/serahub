@@ -11,7 +11,7 @@ interface Props {
   config: Record<string, string>;
 }
 
-type Section = "general" | "seo" | "smtp" | "ads" | "appearance" | "storage" | "ai" | "maintenance" | "social" | "danger";
+type Section = "general" | "seo" | "smtp" | "ads" | "appearance" | "storage" | "ai" | "maintenance" | "social" | "verification" | "danger";
 
 const navItems = [
   { label: "Overview", href: "/admin", icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> },
@@ -35,6 +35,7 @@ const sections: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: "ai", label: "AI Configuration", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4"/><path d="m16.2 3.8 2.8 2.8"/><path d="M22 12h-4"/><path d="m18.2 16.2-2.8 2.8"/><path d="M12 22v-4"/><path d="m7.8 20.2-2.8-2.8"/><path d="M2 12h4"/><path d="m5.8 7.8 2.8-2.8"/><circle cx="12" cy="12" r="4"/><path d="M16 12h.01"/><path d="M12 16h.01"/><path d="M8 12h.01"/><path d="M12 8h.01"/></svg> },
   { id: "maintenance", label: "Availability", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> },
   { id: "social", label: "Social Login", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> },
+  { id: "verification", label: "Bank Verification", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg> },
   { id: "danger", label: "Danger Zone", icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> },
 ];
 
@@ -717,6 +718,52 @@ export default function SettingsClient({ user, config }: Props) {
                     </div>
                     <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>
                     </div>
+                  </div>
+                )}
+
+                {activeSection === "verification" && (
+                  <div className="space-y-6">
+                    <div className="bg-white rounded-2xl border border-slate-200/60 p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></div>
+                        <div><h2 className="text-lg font-bold text-slate-900">Verifyet Integration</h2><p className="text-sm text-slate-500">Configure bank verification and payment matching.</p></div>
+                      </div>
+                      <div className="space-y-5">
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+                          <div><p className="text-sm font-semibold text-slate-800">Enable Verifyet API</p><p className="text-xs text-slate-500 mt-0.5">Allow users to pay and verify via Ethiopian banks (CBE, Telebirr, etc.)</p></div>
+                          <Toggle checked={form.verifyet_enabled === "true"} onChange={(v) => update("verifyet_enabled", v ? "true" : "false")} />
+                        </div>
+                        
+                        <FormRow label="Environment" hint="Select the Verifyet API environment">
+                          <select 
+                            value={form.verifyet_environment || "production"} 
+                            onChange={(e) => update("verifyet_environment", e.target.value)}
+                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+                          >
+                           <option value="production">Production (https://verify.et)</option>
+                           <option value="development">Development (http://localhost:3000)</option>
+                          </select>
+                        </FormRow>
+
+                        <div className="grid grid-cols-1 gap-5">
+                           <FormRow label="Verifyet API Key" hint="Your API key starting with VERIFY_BANK_ET_">
+                             <input type="password" value={form.verifyet_api_key ?? ""} onChange={(e) => update("verifyet_api_key", e.target.value)} className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="VERIFY_BANK_ET_..." />
+                           </FormRow>
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200/50">
+                          <h4 className="text-sm font-bold text-emerald-900 flex items-center gap-2 mb-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Webhook Information
+                          </h4>
+                          <p className="text-xs text-emerald-800 mb-2">Configure this URL in your Verifyet dashboard or pass it during verification requests:</p>
+                          <code className="block p-2 bg-white/60 border border-emerald-200 rounded-lg text-xs text-emerald-900 font-mono overflow-x-auto">
+                            {typeof window !== 'undefined' ? `${window.location.origin}/api/webhooks/verifyet` : 'https://your-domain.com/api/webhooks/verifyet'}
+                          </code>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-end"><button onClick={handleSave} disabled={isPending} className="btn-primary text-sm disabled:opacity-50">{isPending ? "Saving..." : "Save Changes"}</button></div>
                   </div>
                 )}
 

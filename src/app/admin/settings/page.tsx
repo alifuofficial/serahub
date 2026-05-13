@@ -70,6 +70,9 @@ const SETTING_KEYS = [
   "coming_soon_enabled",
   "coming_soon_title",
   "coming_soon_message",
+  "verifyet_enabled",
+  "verifyet_api_key",
+  "verifyet_environment",
 ];
 
 export default async function SettingsPage() {

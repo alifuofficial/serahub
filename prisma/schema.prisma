@@ -20,6 +20,7 @@ model User {
   lastNewsletterAt  DateTime?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
+  transactions      Transaction[]
 }
 
 model OtpToken {
@@ -226,4 +227,24 @@ model MagicToken {
   token      String   @unique
   expiresAt  DateTime
   createdAt  DateTime @default(now())
+}
+
+model Transaction {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount         Float
+  currency       String   @default("ETB")
+  status         String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  reference      String?  // Reference provided by user (e.g. transaction number)
+  bank           String?  // Bank chosen or detected (e.g. cbe, telebirr)
+  verifyetReqId  String?  @unique // Request ID from Verifyet
+  purpose        String   @default("CV_ANALYSIS") // What this payment is for
+  meta           String?  // JSON string for additional data (e.g., webhook payload)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([reference])
 }
