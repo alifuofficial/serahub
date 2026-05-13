@@ -25,8 +25,9 @@ export default function ModulesClient({ user, config }: Props) {
     Object.entries(form).forEach(([key, value]) => fd.append(key, value));
     startTransition(async () => {
       const res = await updateSettingsAction(fd);
-      if (res.error) setMsg({ type: "error", text: res.error });
-      else {
+      if ("error" in res) {
+        setMsg({ type: "error", text: res.error as string });
+      } else {
         setMsg({ type: "success", text: "Modules updated successfully!" });
         setTimeout(() => setMsg({ type: "", text: "" }), 3000);
       }

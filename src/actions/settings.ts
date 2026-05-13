@@ -16,18 +16,24 @@ export async function getSettings(keys: string[]): Promise<Record<string, string
 }
 
 export async function updateSettingsAction(formData: FormData) {
-  const entries = Array.from(formData.entries());
-  for (const [key, value] of entries) {
-    if (typeof key !== "string") continue;
-    const strVal = (value as string) ?? "";
-    await prisma.siteConfig.upsert({
-      where: { key },
-      update: { value: strVal },
-      create: { key, value: strVal },
-    });
+  try {
+    const entries = Array.from(formData.entries());
+    for (const [key, value] of entries) {
+      if (typeof key !== "string") continue;
+      const strVal = (value as string) ?? "";
+      await prisma.siteConfig.upsert({
+        where: { key },
+        update: { value: strVal },
+        create: { key, value: strVal },
+      });
+    }
+    revalidatePath("/admin/settings");
+    revalidatePath("/admin/modules");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Update Settings Error:", error);
+    return { error: error.message || "Failed to update settings" };
   }
-  revalidatePath("/admin/settings");
-  return { success: true };
 }
 
 export async function resetViewsAction() {
