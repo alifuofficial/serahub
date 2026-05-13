@@ -70,7 +70,7 @@ export default function Navbar({ user, siteName, logoUrl, jobsEnabled = true, bi
 
           <div className="flex items-center gap-4">
             <div className="hidden lg:block">
-              <SearchForm variant="navbar" />
+              <SearchForm variant="nav" />
             </div>
 
             <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
