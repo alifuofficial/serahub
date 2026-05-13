@@ -27,6 +27,7 @@
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.9.0",
     "file-type": "^22.0.1",
+    "framer-motion": "^12.38.0",
     "jose": "^6.2.2",
     "jsonwebtoken": "^9.0.3",
     "next": "16.2.4",
