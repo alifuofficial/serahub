@@ -40,3 +40,15 @@ export async function getConfig(key: string, defaultValue: string = ""): Promise
     return defaultValue;
   }
 }
+
+export async function getSiteConfig(): Promise<Record<string, string>> {
+  try {
+    const configs = await prisma.siteConfig.findMany();
+    return configs.reduce((acc, curr) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {} as Record<string, string>);
+  } catch (error) {
+    return {};
+  }
+}
