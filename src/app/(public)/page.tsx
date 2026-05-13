@@ -67,78 +67,52 @@ export default async function Home() {
       <WebSiteJsonLd />
       
       {/* Hero Section */}
-      <section className="relative pt-24 pb-32 overflow-hidden bg-[#0a0f1d]">
+      <section className="relative pt-32 pb-40 overflow-hidden bg-[#0a0f1d]">
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] bg-gradient-to-b from-primary/20 via-transparent to-transparent blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-gradient-to-b from-primary/20 via-transparent to-transparent blur-[120px] pointer-events-none" />
         
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
-          <div className="text-center max-w-4xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              Next-Gen Opportunity Intelligence
+              AI-Powered Match Engine Live
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight mb-8 leading-[1.1] animate-in fade-in slide-in-from-bottom-6 duration-1000">
-              Your Professional Future,<br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-500">Accelerated by AI.</span>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight mb-8 leading-[1] animate-in fade-in slide-in-from-bottom-6 duration-1000">
+              Find Your Next<br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-500">Opportunity.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-              Ethiopia's most comprehensive platform for high-impact jobs and high-value bids. Engineered for the ambitious professional.
+              Aggregating Ethiopia's most high-impact jobs and high-value bids. 
+              Driven by intelligence, built for your success.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
-              <Link href="/auth/register" className="w-full sm:w-auto px-10 py-5 bg-primary text-white rounded-2xl text-base font-black shadow-2xl shadow-primary/40 hover:bg-primary-dark transition-all transform hover:-translate-y-1">
-                Start Your Free Trial
-              </Link>
-              <Link href="/jobs" className="w-full sm:w-auto px-10 py-5 bg-white/5 text-white border border-white/10 rounded-2xl text-base font-black hover:bg-white/10 transition-all">
-                Explore Opportunities
-              </Link>
-            </div>
-          </div>
-
-          <div className="relative max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-blue-500/30 rounded-[32px] blur-2xl opacity-50" />
-            <div className="relative rounded-[32px] border border-white/10 bg-slate-900/50 backdrop-blur-3xl overflow-hidden shadow-2xl">
-              <Image 
-                src="/saas_dashboard_mockup.png" 
-                alt="SeraHub Dashboard" 
-                width={1200} 
-                height={800} 
-                className="w-full h-auto opacity-90 hover:opacity-100 transition-opacity duration-500"
+            <div className="max-w-2xl mx-auto mb-12 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
+              <SearchForm 
+                variant="hero" 
+                placeholder="Search jobs, tenders, or AI-powered matching..."
+                className="shadow-2xl shadow-primary/20"
               />
             </div>
-            
-            {/* Floating elements for SaaS feel */}
-            <div className="absolute -top-10 -right-10 hidden lg:block animate-float">
-              <div className="glass-dark p-6 rounded-3xl border border-white/10 shadow-2xl">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Match Score</p>
-                    <p className="text-xl font-black text-white">98.5%</p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <div className="absolute -bottom-10 -left-10 hidden lg:block animate-float-delayed">
-              <div className="glass-dark p-6 rounded-3xl border border-white/10 shadow-2xl">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="m17 5-5-5-5 5"/><path d="m17 19-5 5-5-5"/></svg>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tenders Analyzed</p>
-                    <p className="text-xl font-black text-white">12.4k</p>
-                  </div>
+            <div className="flex flex-wrap items-center justify-center gap-6 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
+              <Link href="/jobs" className="flex items-center gap-2 text-sm font-bold text-white hover:text-primary transition-colors group">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                 </div>
-              </div>
+                Browse Jobs
+              </Link>
+              <div className="w-1 h-1 rounded-full bg-white/20 hidden sm:block" />
+              <Link href="/bids" className="flex items-center gap-2 text-sm font-bold text-white hover:text-orange-400 transition-colors group">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-orange-400/10 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                Explore Tenders
+              </Link>
             </div>
           </div>
         </div>

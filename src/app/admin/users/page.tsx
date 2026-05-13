@@ -16,7 +16,7 @@ export default async function AdminUsersPage() {
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
-    select: { id: true, email: true, name: true, role: true, createdAt: true },
+    select: { id: true, email: true, name: true, role: true, subscriptionPlan: true, createdAt: true },
   });
 
   const serialized = users.map((u) => ({
