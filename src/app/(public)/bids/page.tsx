@@ -67,9 +67,9 @@ export default async function BidsPage({ searchParams }: PageProps) {
   if (q) {
     where.OR = searchTerms.map(term => ({
       OR: [
-        { title: { contains: term, mode: "insensitive" } },
-        { description: { contains: term, mode: "insensitive" } },
-        { source: { contains: term, mode: "insensitive" } },
+        { title: { contains: term } },
+        { description: { contains: term } },
+        { source: { contains: term } },
       ]
     }));
   }

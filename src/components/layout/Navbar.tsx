@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logoutAction } from "@/actions/auth";
 import SearchForm from "@/components/common/SearchForm";
 
@@ -23,151 +23,154 @@ interface NavbarProps {
 export default function Navbar({ user, siteName, logoUrl, jobsEnabled = true, bidsEnabled = true }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const name = siteName || "SeraHub";
 
-  return (
-    <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src={logoUrl || "/logo.png"} alt={name} width={32} height={32} className="w-8 h-8 rounded-lg object-contain" />
-          <span className="font-bold text-xl tracking-tight text-slate-800">{name}</span>
-        </Link>
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-        <div className="hidden md:flex flex-1 max-w-3xl items-center justify-center gap-6 px-10">
-          <div className="flex gap-2">
-            <Link href="/" className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-full shadow-sm shadow-primary/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm py-2" : "bg-transparent py-4"}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-gradient-to-br from-brand-500 to-brand-600 rounded-lg flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-110 transition-transform">
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <span className="text-xl font-black tracking-tight text-gray-900">{name}</span>
+          </Link>
+
+          <div className="hidden md:flex items-center gap-1">
+            <Link href="/" className="px-4 py-2 text-sm font-bold text-brand-600 bg-brand-50 rounded-full border border-brand-200/50">
+              <svg className="w-4 h-4 inline mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
               Home
             </Link>
-            <Link href="/jobs" className="group flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-all hover:bg-slate-50 relative">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <Link href="/jobs" className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-900 rounded-full hover:bg-white/50 transition-all flex items-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
               Jobs
-              {!jobsEnabled && (
-                <span className="absolute -top-1 -right-2 bg-slate-100 text-slate-400 text-[10px] px-1.5 py-0.5 rounded-md font-bold border border-slate-200 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/20 transition-colors">SOON</span>
-              )}
             </Link>
-            <Link href="/bids" className="group flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-all hover:bg-slate-50 relative">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+            <Link href="/bids" className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-900 rounded-full hover:bg-white/50 transition-all flex items-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
               Bids
-              {!bidsEnabled && (
-                <span className="absolute -top-1 -right-2 bg-slate-100 text-slate-400 text-[10px] px-1.5 py-0.5 rounded-md font-bold border border-slate-200 group-hover:bg-orange-100 group-hover:text-orange-600 group-hover:border-orange-200 transition-colors">SOON</span>
-              )}
-            </Link>
-            <Link href="/about" className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-sm font-semibold px-4 py-2 rounded-full transition-all hover:bg-slate-50">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
-              About
             </Link>
           </div>
 
-          <SearchForm />
-        </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden lg:block">
+              <SearchForm variant="navbar" />
+            </div>
 
-        <div className="hidden md:flex items-center gap-4">
-          {user ? (
-            <div className="relative">
-              <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full hover:bg-slate-100 transition-colors">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${user.role === "ADMIN" ? "bg-gradient-to-br from-[#00c087] to-[#00e5a0]" : "bg-gradient-to-br from-blue-500 to-cyan-500"}`}>
-                  {(user.name || "U").charAt(0).toUpperCase()}
-                </div>
-                <span className="text-sm font-semibold text-slate-700 max-w-[120px] truncate">{user.name || user.email.split("@")[0]}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`text-slate-400 transition-transform ${menuOpen ? "rotate-180" : ""}`}><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-
-              {menuOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl border border-slate-200 shadow-lg z-50 py-2 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-slate-100">
-                      <p className="text-sm font-semibold text-slate-800 truncate">{user.name || "User"}</p>
-                      <p className="text-xs text-slate-400 truncate">{user.email}</p>
-                      {user.role === "ADMIN" && <span className="inline-block mt-1 bg-[#e6fbf4] text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest">Admin</span>}
+            <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+              {user ? (
+                <div className="relative">
+                  <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 group">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md transition-transform group-hover:scale-105 ${user.role === "ADMIN" ? "bg-gradient-to-br from-brand-500 to-brand-700" : "bg-gradient-to-br from-blue-500 to-indigo-600"}`}>
+                      {(user.name || user.email).charAt(0).toUpperCase()}
                     </div>
-                    <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                      My Dashboard
-                    </Link>
-                    {user.role === "ADMIN" && (
-                      <Link href="/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        Admin Panel
-                      </Link>
-                    )}
-                    <form action={logoutAction}>
-                      <button type="submit" className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-                        Sign Out
-                      </button>
-                    </form>
-                  </div>
-                </>
+                    <span className="hidden md:block text-sm font-bold text-gray-700">{user.name || user.email.split('@')[0]}</span>
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform ${menuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </button>
+
+                  {menuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                      <div className="absolute right-0 top-full mt-3 w-64 bg-white rounded-2xl border border-gray-100 shadow-2xl z-50 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                         <div className="px-4 py-3 border-b border-gray-50 mb-2">
+                            <p className="text-sm font-bold text-gray-900 truncate">{user.name || "User"}</p>
+                            <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                         </div>
+                         <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">
+                            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            My Dashboard
+                         </Link>
+                         {user.role === "ADMIN" && (
+                           <Link href="/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-brand-600 hover:bg-brand-50 transition-colors">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                              Admin Panel
+                           </Link>
+                         )}
+                         <div className="h-px bg-gray-50 my-2" />
+                         <form action={logoutAction}>
+                            <button type="submit" className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors">
+                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                               Sign Out
+                            </button>
+                         </form>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link href="/auth/login" className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-brand-600 transition-colors">Sign In</Link>
+                  <Link href="/auth/register" className="px-5 py-2.5 text-sm font-bold text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/20">Sign Up</Link>
+                </div>
               )}
             </div>
-          ) : (
-            <>
-              <Link href="/auth/login" className="text-sm font-semibold text-slate-600 hover:text-primary transition-colors">Sign In</Link>
-              <Link href="/auth/register" className="btn-primary py-2 px-5 text-sm">Sign Up</Link>
-            </>
-          )}
+            
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-500 hover:text-gray-900 transition-colors">
+               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+          </div>
         </div>
-
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-slate-600">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-        </button>
       </div>
 
+      {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white animate-in slide-in-from-top duration-300">
-          <div className="px-4 py-3 space-y-1">
-            <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-               Home
-            </Link>
-            <Link href="/jobs" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-               <div className="flex items-center gap-3">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                 Jobs
-               </div>
-               {!jobsEnabled && <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Soon</span>}
-            </Link>
-            <Link href="/bids" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-               <div className="flex items-center gap-3">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                 Bids
-               </div>
-               {!bidsEnabled && <span className="bg-orange-100 text-orange-600 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Soon</span>}
-            </Link>
-            <Link href="/about" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
-               About
-            </Link>
-          </div>
-          <div className="px-4 py-3 border-t border-slate-100 space-y-2">
-            {user ? (
-              <>
-                <div className="flex items-center gap-3 px-3 py-2">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm ${user.role === "ADMIN" ? "bg-gradient-to-br from-[#00c087] to-[#00e5a0]" : "bg-gradient-to-br from-blue-500 to-cyan-500"}`}>
-                    {(user.name || "U").charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-800 truncate">{user.name || "User"}</p>
-                    <p className="text-xs text-slate-400 truncate">{user.email}</p>
-                  </div>
+        <div className="md:hidden fixed inset-0 z-[60] bg-white animate-in slide-in-from-right duration-300">
+           <div className="p-4 flex items-center justify-between border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
+                   <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </div>
-                <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50">My Dashboard</Link>
-                {user.role === "ADMIN" && (
-                  <Link href="/admin" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-primary/5">Admin Panel</Link>
-                )}
-                <form action={logoutAction}>
-                  <button type="submit" className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50">Sign Out</button>
-                </form>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="block w-full text-center py-2.5 text-sm font-semibold text-slate-600 hover:text-primary">Sign In</Link>
-                <Link href="/auth/register" onClick={() => setMobileOpen(false)} className="block w-full text-center btn-primary py-2.5 text-sm">Sign Up</Link>
-              </>
-            )}
-          </div>
+                <span className="text-xl font-black text-gray-900">{name}</span>
+              </div>
+              <button onClick={() => setMobileOpen(false)} className="p-2 text-gray-400">
+                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+           </div>
+           <div className="p-6 space-y-4">
+              <Link href="/" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-900">Home</Link>
+              <Link href="/jobs" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-500">Jobs</Link>
+              <Link href="/bids" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-500">Bids</Link>
+              <Link href="/about" onClick={() => setMobileOpen(false)} className="block text-2xl font-black text-gray-500">About</Link>
+           </div>
+           <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100">
+              {user ? (
+                <div className="flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-bold">{(user.name || "U").charAt(0)}</div>
+                      <div>
+                         <p className="font-bold text-gray-900">{user.name}</p>
+                         <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                   </div>
+                   <form action={logoutAction}>
+                      <button type="submit" className="p-2 text-red-500"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></button>
+                   </form>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4">
+                   <Link href="/auth/login" className="py-4 text-center font-bold text-gray-600 bg-gray-50 rounded-2xl">Sign In</Link>
+                   <Link href="/auth/register" className="py-4 text-center font-bold text-white bg-brand-600 rounded-2xl">Sign Up</Link>
+                </div>
+              )}
+           </div>
         </div>
       )}
     </nav>

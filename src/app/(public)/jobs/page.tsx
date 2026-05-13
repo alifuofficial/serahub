@@ -72,10 +72,10 @@ export default async function JobsPage({ searchParams }: PageProps) {
   if (q) {
     where.OR = searchTerms.map(term => ({
       OR: [
-        { title: { contains: term, mode: "insensitive" } },
-        { description: { contains: term, mode: "insensitive" } },
-        { company: { contains: term, mode: "insensitive" } },
-        { keywords: { contains: term, mode: "insensitive" } },
+        { title: { contains: term } },
+        { description: { contains: term } },
+        { company: { contains: term } },
+        { keywords: { contains: term } },
       ]
     }));
   }
