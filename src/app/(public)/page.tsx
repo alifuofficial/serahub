@@ -67,13 +67,15 @@ export default async function Home() {
       <WebSiteJsonLd />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-40 overflow-hidden bg-[#0a0f1d]">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-gradient-to-b from-primary/20 via-transparent to-transparent blur-[120px] pointer-events-none" />
+      <section className="relative pt-20 pb-24 overflow-hidden bg-[#020806]">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-20" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-gradient-to-b from-emerald-500/20 via-transparent to-transparent blur-[120px] pointer-events-none" />
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-[20%] -right-[5%] w-[30%] h-[30%] bg-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
         
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -81,9 +83,9 @@ export default async function Home() {
               AI-Powered Match Engine Live
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight mb-8 leading-[1] animate-in fade-in slide-in-from-bottom-6 duration-1000">
+            <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight mb-8 leading-[1.1] animate-in fade-in slide-in-from-bottom-6 duration-1000">
               Find Your Next<br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-500">Opportunity.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-200 to-emerald-500">Opportunity.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
@@ -95,7 +97,7 @@ export default async function Home() {
               <SearchForm 
                 variant="hero" 
                 placeholder="Search jobs, tenders, or AI-powered matching..."
-                className="shadow-2xl shadow-primary/20"
+                className="shadow-2xl shadow-emerald-500/20"
               />
             </div>
 
@@ -133,7 +135,7 @@ export default async function Home() {
       <Features />
 
       {/* Category Explorer */}
-      <section className="py-24 bg-white">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Browse by Industry</h2>
@@ -154,7 +156,7 @@ export default async function Home() {
       </section>
 
       {/* Main Content Sections (Jobs & Bids) */}
-      <section className="py-24 bg-slate-50/50">
+      <section className="py-16 bg-slate-50/50">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex flex-col sm:flex-row justify-between items-end mb-12 gap-4">
             <div>
@@ -162,9 +164,9 @@ export default async function Home() {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Live Opportunities
               </div>
-              <h2 className="text-4xl font-extrabold text-slate-900">Featured Jobs</h2>
+              <h2 className="text-3xl font-bold text-slate-900">Featured Jobs</h2>
             </div>
-            <Link href="/jobs" className="flex items-center gap-2 text-primary font-black text-sm hover:translate-x-1 transition-transform">
+            <Link href="/jobs" className="flex items-center gap-2 text-primary font-bold text-sm hover:translate-x-1 transition-transform">
               View All Jobs
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </Link>
@@ -183,9 +185,9 @@ export default async function Home() {
                   <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
                   Active Tenders
                 </div>
-                <h2 className="text-4xl font-extrabold text-slate-900">Recent Bids</h2>
+                <h2 className="text-3xl font-bold text-slate-900">Recent Bids</h2>
               </div>
-              <Link href="/bids" className="flex items-center gap-2 text-orange-500 font-black text-sm hover:translate-x-1 transition-transform">
+              <Link href="/bids" className="flex items-center gap-2 text-orange-500 font-bold text-sm hover:translate-x-1 transition-transform">
                 Explore All Bids
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </Link>

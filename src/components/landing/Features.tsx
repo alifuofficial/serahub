@@ -39,11 +39,11 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="py-24 relative overflow-hidden bg-slate-50/50">
+    <section className="py-16 relative overflow-hidden bg-slate-50/50">
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <h2 className="text-sm font-black uppercase tracking-[0.3em] text-primary mb-4">Why SeraHub?</h2>
-          <h3 className="text-4xl font-extrabold text-slate-900 mb-6 leading-tight">
+          <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-primary mb-4">Why SeraHub?</h2>
+          <h3 className="text-3xl font-bold text-slate-900 mb-6 leading-tight">
             Everything you need to <span className="gradient-text">accelerate</span> your career
           </h3>
           <p className="text-slate-500 text-lg leading-relaxed">
@@ -64,7 +64,7 @@ export default function Features() {
               <div className={`w-14 h-14 rounded-2xl ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                 {feature.icon}
               </div>
-              <h4 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h4>
+              <h4 className="text-lg font-semibold text-slate-900 mb-3">{feature.title}</h4>
               <p className="text-slate-500 text-sm leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}

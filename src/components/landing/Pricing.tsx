@@ -55,13 +55,13 @@ const plans = [
 
 export default function Pricing() {
   return (
-    <section className="py-24 bg-white relative">
+    <section className="py-16 bg-white relative">
       <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-slate-50/50 to-transparent" />
       
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-20">
-          <h2 className="text-sm font-black uppercase tracking-[0.3em] text-primary mb-4">Pricing Plans</h2>
-          <h3 className="text-4xl font-extrabold text-slate-900 mb-6">Choose the plan that fits <span className="gradient-text">your goals</span></h3>
+          <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-primary mb-4">Pricing Plans</h2>
+          <h3 className="text-3xl font-bold text-slate-900 mb-6">Choose the plan that fits <span className="gradient-text">your goals</span></h3>
           <p className="text-slate-500 text-lg">Simple, transparent pricing to help you take the next step in your professional journey.</p>
         </div>
 
@@ -86,9 +86,9 @@ export default function Pricing() {
               )}
 
               <div className="mb-8">
-                <p className={`text-sm font-black uppercase tracking-widest mb-2 ${plan.featured ? "text-emerald-400" : "text-primary"}`}>{plan.name}</p>
+                <p className={`text-sm font-bold uppercase tracking-widest mb-2 ${plan.featured ? "text-emerald-400" : "text-primary"}`}>{plan.name}</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black">{plan.price}</span>
+                  <span className="text-3xl font-bold">{plan.price}</span>
                   <span className={`text-sm font-bold ${plan.featured ? "text-slate-400" : "text-slate-400"}`}>ETB/month</span>
                 </div>
                 <p className={`mt-4 text-sm font-medium ${plan.featured ? "text-slate-400" : "text-slate-500"}`}>{plan.description}</p>

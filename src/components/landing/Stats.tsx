@@ -11,7 +11,7 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-12 relative overflow-hidden">
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, idx) => (
@@ -23,10 +23,10 @@ export default function Stats() {
               viewport={{ once: true }}
               className="text-center p-8 rounded-[32px] bg-white border border-slate-100 shadow-sm shadow-slate-100/50"
             >
-              <div className={`text-4xl lg:text-5xl font-black mb-3 ${stat.color} tracking-tight`}>
+              <div className={`text-3xl font-bold mb-3 ${stat.color} tracking-tight`}>
                 {stat.value}
               </div>
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+              <div className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
                 {stat.label}
               </div>
             </motion.div>
