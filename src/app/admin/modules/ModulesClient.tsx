@@ -3,6 +3,7 @@
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { logoutAction } from "@/actions/auth";
+import { updateSettingsAction } from "@/actions/settings";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 interface Props {
