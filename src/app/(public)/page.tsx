@@ -8,7 +8,6 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { Metadata } from "next";
 import { getModuleStatus } from "@/lib/config";
-import Counter from "@/components/landing/Counter"; // I'll create this or use a simple version
 
 export const metadata: Metadata = {
   title: "SeraHub - AI-Powered Job & Bid Platform",
